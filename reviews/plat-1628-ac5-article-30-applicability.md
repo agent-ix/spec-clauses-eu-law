@@ -41,3 +41,23 @@ means that only clauses role-applicable under the table remain unresolved, or
 that all Article 30(1)-(4) clauses must remain unresolved until the records
 applicability value is supplied. PLAT-1628 tests the declared table and keeps
 the unresolved result for empty context.
+
+## Package content-rights verification follow-up
+
+- Scanner: the published Engineering Assurance v0.10.1 GitHub release binary, SHA-256 `97f09047917f6d9520a1dbd0b403eb2b4b7ea958ec63ac2729113f5a7e7e1d5d`.
+- The wheel and npm tarball were built from this branch through `~/dev/worktrees/locked-build.sh`, unpacked without file edits into temporary Git-selected trees, and scanned with `engineering-assurance content-rights-tree`.
+- Wheel: `spec_clauses_eu_law-0.1.0-py3-none-any.whl`, SHA-256 `83f8b001b8ca175e4f4fc038a0200eacdb6b4ffb7d70d4c69c8d75439dfa7e8e`.
+- npm: `agent-ix-spec-clauses-eu-law-0.0.0-managed.tgz`, SHA-256 `94cb930c071e453aa52aea5bdf781cf62da7e9e2596f1e563d1ddfc8b6f079c5`.
+- The GDPR ELI and legal-notice URLs produce no finding in either artifact. No suppression was added. The remaining findings are on unchanged MDR/MDCG attribution lines and npm package repository metadata.
+
+Exact scanner output for the wheel:
+
+```json
+{"protocol":"engineering-assurance.content-rights-tree-result/v1","outcome":"withheld","inspected_entries":10,"findings":[{"path":"spec_clauses_eu_law/clauses/eu-mdcg-mdcg-2019-16-rev1.json","line":12,"category":"unapproved-external-url"},{"path":"spec_clauses_eu_law/clauses/eu-mdr-2017-745-2026-07-19.json","line":12,"category":"unapproved-external-url"}]}
+```
+
+Exact scanner output for npm:
+
+```json
+{"protocol":"engineering-assurance.content-rights-tree-result/v1","outcome":"withheld","inspected_entries":8,"findings":[{"path":"package/clauses/eu-mdcg-mdcg-2019-16-rev1.json","line":12,"category":"unapproved-external-url"},{"path":"package/clauses/eu-mdr-2017-745-2026-07-19.json","line":12,"category":"unapproved-external-url"},{"path":"package/package.json","line":15,"category":"unapproved-external-url"}]}
+```
