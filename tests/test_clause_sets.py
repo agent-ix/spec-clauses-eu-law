@@ -1085,15 +1085,17 @@ def _assert_ai_act_crosswalk_contract(clause_sets: list[dict]) -> None:
         source_ids = {clause["id"] for clause in clause_set["clauses"]}
         for crosswalk in clause_set.get("crosswalks", []):
             source_clause = crosswalk.get("sourceClause", "")
-            assert source_clause in source_ids, (
-                f"{source_key}#{source_clause}.sourceClause must name a clause"
-            )
-            assert crosswalk.get("relation") in {"partial", "informative"}, (
-                f"{source_key}#{source_clause}.relation must be partial or informative"
-            )
-            assert isinstance(crosswalk.get("rationale"), str) and crosswalk[
-                "rationale"
-            ].strip(), f"{source_key}#{source_clause}.rationale must be nonempty"
+            assert (
+                source_clause in source_ids
+            ), f"{source_key}#{source_clause}.sourceClause must name a clause"
+            assert crosswalk.get("relation") in {
+                "partial",
+                "informative",
+            }, f"{source_key}#{source_clause}.relation must be partial or informative"
+            assert (
+                isinstance(crosswalk.get("rationale"), str)
+                and crosswalk["rationale"].strip()
+            ), f"{source_key}#{source_clause}.rationale must be nonempty"
     assert_crosswalk_targets_resolve(clause_sets)
 
 
@@ -1104,7 +1106,8 @@ def test_ai_act_crosswalks_match_the_annex_table_and_resolve_to_mdr():
     Assumptions: The exact AI Act and MDR sets are declared in the module.
     Criteria: Each Annex IV row either has its table target or explicitly has
     no counterpart; article mappings cover the ticket's named Article 9 and
-    Article 15 examples; all targets resolve with non-equivalent relations.
+    Article 15 examples using only clauses in the selected MDR set; all targets
+    resolve with non-equivalent relations.
     Trace: FR-021-AC-1, FR-021-AC-2
     """
     clause_sets = load_clause_sets()
@@ -1135,7 +1138,7 @@ def test_ai_act_crosswalks_match_the_annex_table_and_resolve_to_mdr():
     )
 
     expected_article_targets = {
-        "art-9": {"II-5", *(f"I-{index}" for index in range(1, 9))},
+        "art-9": {"II-5", *(f"I-{index}" for index in range(1, 6)), "I-8"},
         "art-15": {"I-17.2", "I-17.4", "I-18.8"},
     }
     actual_article_targets = {
