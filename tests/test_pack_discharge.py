@@ -512,14 +512,14 @@ def test_dangling_evidence_fixture_fails_with_clause_id(tmp_path: pathlib.Path):
         )
 
 
-@pytest.mark.trace("PLAT-1635-AC-3")
+@pytest.mark.trace("FR-020-AC-1")
 def test_ai_act_human_oversight_requires_named_person_approval():
     """Reject AI Act risk or oversight dispositions without person approval.
 
     Assumptions: Risk acceptance and human oversight are explicit dispositions.
     Criteria: An art-14 disposition whose approval reference does not name a
     person fails with the clause id; a named-person reference passes.
-    Trace: PLAT-1635-AC-3
+    Trace: FR-020-AC-1
     """
     missing_approval = [
         {
