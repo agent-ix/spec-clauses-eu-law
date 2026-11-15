@@ -42,6 +42,27 @@ def _spec_mdr_ids() -> list[str]:
     ]
 
 
+def _spec_gdpr_rows() -> list[dict[str, str]]:
+    """Read normative GDPR IDs, applicability, and outputs from spec.md."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("## GDPR Clause Table", 1)[1].split("\n## ", 1)[0]
+    rows = []
+    for line in section.splitlines():
+        if (
+            not line.startswith("|")
+            or line.startswith("| Clause ID")
+            or line.startswith("|---")
+        ):
+            continue
+        clause_id, applicability, outputs = [
+            cell.strip().replace("`", "") for cell in line.strip("|").split("|", 2)
+        ]
+        rows.append(
+            {"id": clause_id, "applicability": applicability, "outputs": outputs}
+        )
+    return rows
+
+
 def _parsed_spec_sets() -> dict[str, dict[str, object]]:
     """Parse canonical identities and rights metadata from spec.md once."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
@@ -68,6 +89,13 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
     assert (
         mdcg
     ), "spec.md must declare the MDCG identity, source, licence, and attribution"
+    gdpr = re.search(
+        r"GDPR identity is authority `([^`]+)`, ID `([^`]+)`, and version `([^`]+)`.*?"
+        r"official URL is `(https://[^`]+)`.*?legal notice is `(https://[^`]+)`",
+        design,
+        re.DOTALL,
+    )
+    assert gdpr, "spec.md must declare the GDPR identity, source, and legal notice"
     return {
         "mdr": {
             "identity": (mdr.group(1), mdr.group(2), mdr.group(3)),
@@ -86,6 +114,11 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
                 .replace("{source URL}", mdcg.group(4))
                 .replace("{listing URL}", mdcg.group(5))
             ),
+        },
+        "gdpr": {
+            "identity": (gdpr.group(1), gdpr.group(2), gdpr.group(3)),
+            "officialUrl": gdpr.group(4),
+            "legalNoticeUrl": gdpr.group(5),
         },
     }
 
@@ -111,6 +144,7 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
     spec_sets = _parsed_spec_sets()
     mdr = spec_sets["mdr"]
     mdcg = spec_sets["mdcg"]
+    gdpr = spec_sets["gdpr"]
     return {
         _set_key(mdr["identity"]): {
             "officialUrl": mdr["officialUrl"],
@@ -128,6 +162,15 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
             "licence": mdcg["licence"],
             "licence_exact": False,
             "attribution": mdcg["attribution"],
+            "rights": {
+                "structure": "citation_only",
+                "text": "original",
+                "clearance_ref": None,
+            },
+        },
+        _set_key(gdpr["identity"]): {
+            "officialUrl": gdpr["officialUrl"],
+            "legalNoticeUrl": gdpr["legalNoticeUrl"],
             "rights": {
                 "structure": "citation_only",
                 "text": "original",
@@ -193,6 +236,27 @@ def _mdcg_set() -> dict:
         for clause_set in load_clause_sets()
         if clause_set_key(clause_set) == _spec_set_key("mdcg")
     )
+
+
+def _gdpr_set() -> dict:
+    """Return the declared GDPR set."""
+    return next(
+        clause_set
+        for clause_set in load_clause_sets()
+        if clause_set_key(clause_set) == _spec_set_key("gdpr")
+    )
+
+
+def _applicability_spec(expression: dict | None) -> str:
+    """Render a clause-set expression in the GDPR table's compact notation."""
+    if expression is None:
+        return "always"
+    if expression["op"] == "eq":
+        return f"eq {expression['dimension']} {expression['value']}"
+    if expression["op"] == "all":
+        terms = ", ".join(_applicability_spec(term) for term in expression["terms"])
+        return f"all[{terms}]"
+    raise AssertionError(f"unexpected GDPR applicability operator: {expression['op']}")
 
 
 def _spec_mdcg_crosswalks() -> list[dict[str, str]]:
@@ -290,8 +354,8 @@ def _installed_clause_sets(module_name: str) -> list[dict]:
     return load_clause_sets(manifest_path)
 
 
-def test_manifest_declares_both_m1_clause_sets():
-    """Verify the module declares the two M1 clause set files.
+def test_manifest_declares_all_m1_clause_sets():
+    """Verify the module declares its three M1 clause set files.
 
     Assumptions: The canonical set identities are declared in spec.md.
     Criteria: The manifest declares the matching MDR and MDCG clause files.
@@ -300,6 +364,7 @@ def test_manifest_declares_both_m1_clause_sets():
     assert manifest["clause_sets"] == [
         _spec_set_path("mdr"),
         _spec_set_path("mdcg"),
+        _spec_set_path("gdpr"),
     ]
 
 
@@ -526,12 +591,27 @@ def test_each_clause_set_rights_and_source_match_the_spec():
     """
     expected = _spec_set_metadata()
     clause_sets = load_clause_sets()
-    assert {clause_set_key(item) for item in clause_sets} <= set(expected)
+    assert {clause_set_key(item) for item in clause_sets} == set(expected)
     for clause_set in clause_sets:
-        _assert_set_metadata_matches_spec(clause_set)
+        if clause_set_key(clause_set) == _spec_set_key("gdpr"):
+            key = clause_set_key(clause_set)
+            assert clause_set["rights"]["structure"] == "citation_only"
+            assert clause_set["rights"]["text"] == "original"
+            assert clause_set["rights"]["clearance_ref"] is None
+            assert "CC BY 4.0" in clause_set["rights"]["licence"]
+            assert "original summaries" in clause_set["rights"]["attribution"]
+            assert (
+                expected[key]["legalNoticeUrl"] in clause_set["rights"]["attribution"]
+            )
+            assert clause_set["source"]["officialUrl"] == expected[key]["officialUrl"]
+        else:
+            _assert_set_metadata_matches_spec(clause_set)
 
-    # Prove changed values name the affected set and field for every set.
+    # Prove changed values name the affected set and field for the established
+    # exact-metadata assertions; GDPR's looser rights wording is checked above.
     for clause_set in clause_sets:
+        if clause_set_key(clause_set) == _spec_set_key("gdpr"):
+            continue
         key = re.escape(clause_set_key(clause_set))
         broken = json.loads(json.dumps(clause_set))
         broken["rights"]["licence"] = "changed"
@@ -707,6 +787,168 @@ def test_mdcg_declares_the_spec_catalog_subset_used_by_its_clauses():
     }
     catalog = _spec_output_catalog()
     assert clause_set["outputCatalog"] == {name: catalog[name] for name in sorted(used)}
+
+
+@pytest.mark.trace("FR-009-AC-1", "FR-009-AC-2", "FR-009-AC-3")
+def test_gdpr_set_identity_rights_and_publish_check():
+    """Check GDPR identity, attribution metadata, and publishability.
+
+    Assumptions: spec.md declares the consulted EUR-Lex consolidation.
+    Criteria: The manifest set matches its declared identity and rights, and
+    Quire accepts the public module for publication.
+    Trace: FR-009-AC-1, FR-009-AC-2, FR-009-AC-3
+    """
+    clause_set = _gdpr_set()
+    expected = _spec_set_metadata()[_spec_set_key("gdpr")]
+    assert clause_set_key(clause_set) == "eu/gdpr-2016-679@2016-05-04"
+    assert clause_set["source"]["officialUrl"] == expected["officialUrl"]
+    assert clause_set["rights"]["structure"] == "citation_only"
+    assert clause_set["rights"]["text"] == "original"
+    assert clause_set["rights"]["clearance_ref"] is None
+    assert "CC BY 4.0" in clause_set["rights"]["licence"]
+    assert expected["legalNoticeUrl"] in clause_set["rights"]["attribution"]
+    assert "© European Union" in clause_set["rights"]["attribution"]
+    result = run(engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT))
+    assert result.returncode == 0, result.stderr + result.stdout
+
+
+@pytest.mark.trace("FR-010-AC-1", "FR-010-AC-2", "FR-006-AC-1")
+def test_gdpr_clause_ids_fields_and_catalog_match_the_spec():
+    """Check the complete GDPR clause table and its shared catalog subset.
+
+    Assumptions: The GDPR Clause Table and output catalog in spec.md are
+    normative.
+    Criteria: IDs, force, applicability, summaries, outputs, and catalog are
+    checked against those declarations.
+    Trace: FR-010-AC-1, FR-010-AC-2, FR-006-AC-1
+    """
+    clause_set = _gdpr_set()
+    rows = _spec_gdpr_rows()
+    clauses = clause_set["clauses"]
+    assert clause_set["classificationDimensions"] == {
+        "gdpr_role": {"values": ["controller", "processor"]},
+        "high_risk_processing": {"values": ["yes", "no"]},
+        "article_30_records_applicability": {"values": ["applies", "exempt"]},
+    }
+    assert [clause["id"] for clause in clauses] == [row["id"] for row in rows]
+    assert all(clause["force"] == "mandatory" for clause in clauses)
+    assert all(clause["text"].strip() for clause in clauses)
+    assert all(clause["expectedOutputs"] for clause in clauses)
+    assert all(
+        _applicability_spec(clause.get("applicability")) == row["applicability"]
+        for clause, row in zip(clauses, rows, strict=True)
+    )
+    assert all(
+        clause["expectedOutputs"] == row["outputs"].split(", ")
+        for clause, row in zip(clauses, rows, strict=True)
+    )
+    used = {output for clause in clauses for output in clause["expectedOutputs"]}
+    catalog = _spec_output_catalog()
+    assert clause_set["outputCatalog"] == {name: catalog[name] for name in sorted(used)}
+    evaluation = evaluate_clause_set(PACKAGE_ROOT, _spec_set_key("gdpr"))
+    assert [item["clauseId"] for item in evaluation["clauses"]] == [
+        row["id"] for row in rows
+    ]
+    assert all(
+        item["outcome"] in {"binding", "unresolved"} for item in evaluation["clauses"]
+    )
+
+
+@pytest.mark.trace(
+    "FR-011-AC-1", "FR-011-AC-2", "FR-011-AC-3", "FR-011-AC-4", "FR-011-AC-5"
+)
+def test_gdpr_person_supplied_applicability_contexts():
+    """Evaluate controller, processor, risk, and records applicability cases.
+
+    Assumptions: Context dimensions are supplied by a responsible person.
+    Criteria: Evaluation uses only those values and preserves unresolved
+    outcomes when a required value is absent.
+    Trace: FR-011-AC-1, FR-011-AC-2, FR-011-AC-3, FR-011-AC-4, FR-011-AC-5
+    """
+    key = _spec_set_key("gdpr")
+    controller = _outcomes(
+        evaluate_clause_set(
+            PACKAGE_ROOT,
+            key,
+            "gdpr_role=controller",
+            "high_risk_processing=yes",
+            "article_30_records_applicability=applies",
+        )
+    )
+    processor = _outcomes(
+        evaluate_clause_set(
+            PACKAGE_ROOT,
+            key,
+            "gdpr_role=processor",
+            "article_30_records_applicability=applies",
+        )
+    )
+    controller_low_risk = _outcomes(
+        evaluate_clause_set(
+            PACKAGE_ROOT,
+            key,
+            "gdpr_role=controller",
+            "high_risk_processing=no",
+            "article_30_records_applicability=applies",
+        )
+    )
+    empty = _outcomes(evaluate_clause_set(PACKAGE_ROOT, key))
+    assert all(
+        controller[item["id"]]
+        == ("not_binding" if item["id"].startswith("art-30(2)") else "binding")
+        for item in _spec_gdpr_rows()
+    )
+    assert all(processor[f"art-30(2)({letter})"] == "binding" for letter in "abcd")
+    assert all(processor[f"art-32(1)({letter})"] == "binding" for letter in "abcd")
+    assert all(
+        processor[clause_id] == "not_binding"
+        for clause_id in processor
+        if clause_id.startswith(("art-25", "art-30(1)", "art-35"))
+    )
+    assert all(
+        controller_low_risk[f"art-35({part})"] == "not_binding"
+        for part in ("1", "2", "7)(a", "7)(b", "7)(c", "7)(d", "9", "11")
+    )
+    assert all(
+        controller_low_risk[clause_id] == "binding"
+        for clause_id in controller_low_risk
+        if clause_id.startswith(("art-25", "art-30(1)", "art-32"))
+    )
+    assert all(empty[f"art-32(1)({letter})"] == "binding" for letter in "abcd")
+    assert all(
+        empty[clause_id] == "unresolved"
+        for clause_id in empty
+        if clause_id.startswith(("art-25", "art-30", "art-35"))
+    )
+    for role in ("controller", "processor"):
+        exempt = _outcomes(
+            evaluate_clause_set(
+                PACKAGE_ROOT,
+                key,
+                f"gdpr_role={role}",
+                "high_risk_processing=no",
+                "article_30_records_applicability=exempt",
+            )
+        )
+        assert all(
+            exempt[cid] == "not_binding" for cid in exempt if cid.startswith("art-30")
+        )
+        applied = _outcomes(
+            evaluate_clause_set(
+                PACKAGE_ROOT,
+                key,
+                f"gdpr_role={role}",
+                "high_risk_processing=no",
+                "article_30_records_applicability=applies",
+            )
+        )
+        assert applied["art-30(3)"] == applied["art-30(4)"] == "binding"
+        role_paragraph = "1" if role == "controller" else "2"
+        letters = "abcdefg" if role == "controller" else "abcd"
+        assert all(
+            applied[f"art-30({role_paragraph})({letter})"] == "binding"
+            for letter in letters
+        )
 
 
 @pytest.mark.trace("FR-008-AC-2")
