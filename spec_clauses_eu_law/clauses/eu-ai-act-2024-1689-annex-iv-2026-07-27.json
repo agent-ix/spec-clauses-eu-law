@@ -1,0 +1,1056 @@
+{
+  "schemaVersion": "clause-set-v1",
+  "authority": "eu",
+  "id": "ai-act-2024-1689-annex-iv",
+  "title": "AI Act Annex IV technical documentation elements",
+  "version": "2026-07-27",
+  "rights": {
+    "structure": "citation_only",
+    "text": "original",
+    "clearance_ref": null,
+    "licence": "EUR-Lex legal documents may be reused for commercial or non-commercial purposes unless otherwise specified and that the consolidated text is under CC BY 4.0 with source attribution and indication of changes.",
+    "attribution": "© European Union. Source: https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | This set contains original summaries and changes made. EUR-Lex legal notice: https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en"
+  },
+  "source": {
+    "title": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
+    "identifier": "Regulation (EU) 2024/1689",
+    "officialUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
+  },
+  "classificationDimensions": {
+    "ai_high_risk": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_role": {
+      "values": [
+        "provider",
+        "deployer"
+      ]
+    },
+    "ai_annex_iv_1_a_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_1_b_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_1_c_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_1_d_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_1_e_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_1_f_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_1_g_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_1_h_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_2_a_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_2_b_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_2_c_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_2_d_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_2_e_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_2_f_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_2_g_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_2_h_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_3_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_4_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_5_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_6_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_7_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_8_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_annex_iv_9_applicable": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    }
+  },
+  "outputCatalog": {
+    "conformity-declaration": {
+      "kind": "document",
+      "description": "EU declaration of conformity and its controlled reference."
+    },
+    "data-lineage": {
+      "kind": "record",
+      "description": "Provenance, selection, preparation and transformations for data used by the AI system."
+    },
+    "human-oversight-design": {
+      "kind": "record",
+      "description": "Human oversight roles, measures, competence and output-interpretation controls."
+    },
+    "model-description": {
+      "kind": "document",
+      "description": "Original description of AI system purpose, version, behavior, limits and use."
+    },
+    "post-market-monitoring-plan": {
+      "kind": "document",
+      "description": "Provider plan and evidence for post-market performance monitoring."
+    },
+    "release-record": {
+      "kind": "record",
+      "description": "Engineering-assurance release decision."
+    },
+    "risk-management-records": {
+      "kind": "record",
+      "description": "`spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records."
+    },
+    "security-risk-records": {
+      "kind": "record",
+      "description": "`spec-objects-security` threat, risk, and control records."
+    },
+    "software-architecture": {
+      "kind": "record",
+      "description": "`spec-objects-architecture` parts and connections."
+    },
+    "verification-records": {
+      "kind": "record",
+      "description": "Test matrix and retained evidence."
+    },
+    "written-procedure": {
+      "kind": "procedure",
+      "description": "Customer-owned written procedure."
+    }
+  },
+  "clauses": [
+    {
+      "id": "IV-1(a)",
+      "force": "mandatory",
+      "title": "Intended use and system identity",
+      "text": "The file states the system's intended use and identifies its provider and version lineage.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_1_a_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-1(b)",
+      "force": "mandatory",
+      "title": "System interactions",
+      "text": "The file explains how the system interacts with its hardware, software, and connected systems.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "software-architecture"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_1_b_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-1(c)",
+      "force": "mandatory",
+      "title": "Versions and updates",
+      "text": "The file records relevant software or firmware versions and how updates are handled.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_1_c_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-1(d)",
+      "force": "mandatory",
+      "title": "Distribution forms",
+      "text": "The file identifies the forms in which the system is supplied or placed into service.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_1_d_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-1(e)",
+      "force": "mandatory",
+      "title": "Intended hardware",
+      "text": "The file describes the hardware environment for which the system is designed.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "software-architecture"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_1_e_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-1(f)",
+      "force": "mandatory",
+      "title": "Product component presentation",
+      "text": "When the system forms part of a product, the file describes its visible placement and identifying features.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "software-architecture"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_1_f_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-1(g)",
+      "force": "mandatory",
+      "title": "Deployer interface",
+      "text": "The file describes the system's interface as presented to its deployers.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_1_g_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-1(h)",
+      "force": "mandatory",
+      "title": "Use instructions",
+      "text": "The file identifies instructions for use and describes the interface details relevant to those instructions.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_1_h_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-2(a)",
+      "force": "mandatory",
+      "title": "Development process",
+      "text": "The file describes the methods and stages used to develop the system, including relevant external tools.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "software-architecture",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_2_a_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-2(b)",
+      "force": "mandatory",
+      "title": "Design decisions and assumptions",
+      "text": "The file records the system's design choices, logic, assumptions, and classification decisions.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description",
+        "software-architecture"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_2_b_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-2(c)",
+      "force": "mandatory",
+      "title": "System architecture and resources",
+      "text": "The file describes the system structure, component integration, and computational resources.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "software-architecture"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_2_c_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-2(d)",
+      "force": "mandatory",
+      "title": "Data provenance and preparation",
+      "text": "The file records the origin, selection, and preparation of data relevant to the system.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "data-lineage"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_2_d_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-2(e)",
+      "force": "mandatory",
+      "title": "Human oversight and interpretation",
+      "text": "The file describes the oversight approach and measures that help people interpret system outputs.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "human-oversight-design"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_2_e_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-2(f)",
+      "force": "mandatory",
+      "title": "Planned changes and conformity",
+      "text": "The file records planned system changes and the measures used to preserve conformity after them.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "release-record",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_2_f_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-2(g)",
+      "force": "mandatory",
+      "title": "Validation and testing",
+      "text": "The file describes validation and test methods, datasets, measures, logs, and results.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_2_g_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-2(h)",
+      "force": "mandatory",
+      "title": "Cybersecurity controls",
+      "text": "The file describes cybersecurity protections applied to the system.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_2_h_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-3",
+      "force": "mandatory",
+      "title": "Capabilities, limits, and use conditions",
+      "text": "The file describes system capabilities, limitations, relevant risks, oversight measures, and input conditions.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description",
+        "human-oversight-design",
+        "security-risk-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_3_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-4",
+      "force": "mandatory",
+      "title": "Performance measures",
+      "text": "The file explains why its chosen performance measures are suitable for the system.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_4_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-5",
+      "force": "mandatory",
+      "title": "Risk process",
+      "text": "The file describes the provider's process for identifying and addressing system risks.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "risk-management-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_5_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-6",
+      "force": "mandatory",
+      "title": "Lifecycle changes",
+      "text": "The file records relevant provider changes made to the system over its lifecycle.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "release-record"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_6_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-7",
+      "force": "mandatory",
+      "title": "Solutions selected",
+      "text": "The file describes the solutions used to address the system requirements without naming any particular standard.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_7_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-8",
+      "force": "mandatory",
+      "title": "Conformity declaration",
+      "text": "The file identifies the applicable EU declaration of conformity when one exists.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "conformity-declaration"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_8_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-9",
+      "force": "mandatory",
+      "title": "Post-market monitoring",
+      "text": "The file describes the system's post-market performance review and monitoring approach.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "post-market-monitoring-plan"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_annex_iv_9_applicable",
+            "value": "yes"
+          }
+        ]
+      }
+    }
+  ],
+  "crosswalks": []
+}

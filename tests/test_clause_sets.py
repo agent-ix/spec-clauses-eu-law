@@ -91,6 +91,32 @@ def _spec_ai_act_rows() -> list[dict[str, str]]:
     return rows
 
 
+def _spec_ai_act_annex_rows() -> list[dict[str, str]]:
+    """Read normative Annex IV IDs, applicability, and outputs from spec.md."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("## AI Act Annex IV Table", 1)[1].split("\n## ", 1)[0]
+    rows = []
+    for line in section.splitlines():
+        if (
+            not line.startswith("|")
+            or line.startswith("| Clause ID")
+            or line.startswith("|---")
+        ):
+            continue
+        cells = [cell.strip().replace("`", "") for cell in line.strip("|").split("|")]
+        if len(cells) != 8:
+            continue
+        clause_id, _element, _condition, applicability, outputs, *_ = cells
+        rows.append(
+            {
+                "id": clause_id,
+                "applicability": applicability,
+                "outputs": outputs,
+            }
+        )
+    return rows
+
+
 def _parsed_spec_sets() -> dict[str, dict[str, object]]:
     """Parse canonical identities and rights metadata from spec.md once."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
@@ -160,6 +186,7 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
         },
         "ai_act": {
             "identity": (ai_act.group(1), ai_act.group(2), ai_act.group(4)),
+            "annex_identity": (ai_act.group(1), ai_act.group(3), ai_act.group(4)),
             "officialUrl": ai_act.group(5),
             "legalNoticeUrl": ai_act.group(7),
         },
@@ -233,6 +260,25 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
             },
         },
         _set_key(ai_act["identity"]): {
+            "officialUrl": ai_act["officialUrl"],
+            "licence": (
+                "EUR-Lex legal documents may be reused for commercial or "
+                "non-commercial purposes unless otherwise specified and that "
+                "the consolidated text is under CC BY 4.0 with source attribution "
+                "and indication of changes."
+            ),
+            "attribution": (
+                f"© European Union. Source: {ai_act['officialUrl']} | This set "
+                f"contains original summaries and changes made. EUR-Lex legal "
+                f"notice: {ai_act['legalNoticeUrl']}"
+            ),
+            "rights": {
+                "structure": "citation_only",
+                "text": "original",
+                "clearance_ref": None,
+            },
+        },
+        _set_key(ai_act["annex_identity"]): {
             "officialUrl": ai_act["officialUrl"],
             "licence": (
                 "EUR-Lex legal documents may be reused for commercial or "
@@ -345,6 +391,86 @@ def _ai_act_set() -> dict:
         for clause_set in load_clause_sets()
         if clause_set_key(clause_set) == "eu/ai-act-2024-1689@2026-07-27"
     )
+
+
+def _ai_act_annex_set() -> dict:
+    """Return the declared AI Act Annex IV set."""
+    return next(
+        clause_set
+        for clause_set in load_clause_sets()
+        if clause_set_key(clause_set) == "eu/ai-act-2024-1689-annex-iv@2026-07-27"
+    )
+
+
+def _assert_ai_act_set_metadata_matches_spec(
+    clause_set: dict, identity: tuple[str, str, str]
+) -> None:
+    """Check one AI Act set's identity and EUR-Lex rights field by field."""
+    authority, set_id, version = identity
+    key = f"{authority}/{set_id}@{version}"
+    expected = _spec_set_metadata()[key]
+    for field, value in (
+        ("authority", authority),
+        ("id", set_id),
+        ("version", version),
+    ):
+        assert clause_set.get(field) == value, f"{key}.{field} differs from spec.md"
+    assert (
+        clause_set.get("source", {}).get("officialUrl") == expected["officialUrl"]
+    ), f"{key}.source.officialUrl differs from spec.md"
+    for field, value in expected["rights"].items():
+        assert (
+            clause_set.get("rights", {}).get(field) == value
+        ), f"{key}.rights.{field} differs from spec.md"
+    assert (
+        clause_set.get("rights", {}).get("licence") == expected["licence"]
+    ), f"{key}.rights.licence differs from spec.md"
+    assert (
+        clause_set.get("rights", {}).get("attribution") == expected["attribution"]
+    ), f"{key}.rights.attribution differs from spec.md"
+
+
+def _assert_ai_act_annex_clause_fields(clause_set: dict) -> None:
+    """Check each Annex IV clause against its normative table row."""
+    rows = _spec_ai_act_annex_rows()
+    clauses = clause_set["clauses"]
+    expected_ids = [row["id"] for row in rows]
+    actual_ids = [clause["id"] for clause in clauses]
+    missing_ids = [
+        clause_id for clause_id in expected_ids if clause_id not in actual_ids
+    ]
+    extra_ids = [clause_id for clause_id in actual_ids if clause_id not in expected_ids]
+    assert actual_ids == expected_ids, (
+        "AI Act Annex IV clause IDs differ from the normative table: "
+        f"missing={missing_ids}, extra={extra_ids}"
+    )
+    catalog = _spec_output_catalog()
+    for clause, row in zip(clauses, rows, strict=True):
+        clause_id = clause["id"]
+        assert clause["force"] == "mandatory", f"{clause_id}.force differs from spec"
+        assert clause["text"].strip(), f"{clause_id}.text must be nonempty"
+        assert clause[
+            "expectedOutputs"
+        ], f"{clause_id}.expectedOutputs must be nonempty"
+        assert (
+            _applicability_spec(clause.get("applicability")) == row["applicability"]
+        ), f"{clause_id}.applicability differs from the AI Act Annex IV table"
+        assert clause["expectedOutputs"] == row["outputs"].split(
+            ", "
+        ), f"{clause_id}.expectedOutputs differs from the AI Act Annex IV table"
+        output_kinds = []
+        for output in clause["expectedOutputs"]:
+            assert (
+                output in catalog
+            ), f"{clause_id}.expectedOutputs has unknown {output}"
+            output_kinds.append(catalog[output]["kind"])
+        assert any(
+            kind in {"record", "document"} for kind in output_kinds
+        ), f"{clause_id} must have at least one record or document output"
+    used = {output for clause in clauses for output in clause["expectedOutputs"]}
+    assert clause_set["outputCatalog"] == {
+        name: catalog[name] for name in sorted(used)
+    }, "AI Act Annex IV outputCatalog differs from the expected outputs"
 
 
 def _assert_ai_act_clause_fields(clause_set: dict) -> None:
@@ -488,6 +614,7 @@ def test_manifest_declares_all_implemented_clause_sets():
         _spec_set_path("mdcg"),
         _spec_set_path("gdpr"),
         "clauses/eu-ai-act-2024-1689-2026-07-27.json",
+        "clauses/eu-ai-act-2024-1689-annex-iv-2026-07-27.json",
     ]
 
 
@@ -502,14 +629,15 @@ def test_manifest_declares_no_non_clause_contributions():
     assert not {"object_types", "archetypes", "edges"}.intersection(manifest)
 
 
-@pytest.mark.trace("FR-014-AC-4")
+@pytest.mark.trace("FR-014-AC-4", "FR-016-AC-4")
 def test_quire_validates_the_module_and_spec_bundle():
     """Validate the clause module and its specification documents.
 
     Assumptions: The installed ISO artifacts module supplies validation
     schemas.
-    Criteria: Quire exits successfully for the EU module and spec documents.
-    Trace: FR-014-AC-4
+    Criteria: Quire validates the EU module and specs, and publish-check accepts
+    the module.
+    Trace: FR-014-AC-4, FR-016-AC-4
     """
     iso_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-iso"
     process_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-process"
@@ -525,6 +653,10 @@ def test_quire_validates_the_module_and_spec_bundle():
         "spec/**/*.md",
     )
     assert result.returncode == 0, result.stderr + result.stdout
+    published = run(
+        engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT)
+    )
+    assert published.returncode == 0, published.stderr + published.stdout
 
 
 @pytest.mark.trace("FR-001-AC-2")
@@ -1362,6 +1494,284 @@ def test_ai_act_provider_and_deployer_applicability_is_person_supplied():
         for row in rows
     )
     assert set(empty.values()) == {"unresolved"}
+
+
+@pytest.mark.trace("FR-016-AC-1", "FR-016-AC-2", "FR-016-AC-3")
+def test_ai_act_sets_share_exact_identity_source_and_rights_metadata():
+    """Check both declared AI Act sets against the master source metadata.
+
+    Assumptions: Both set identities and EUR-Lex reuse details are normative in
+    spec.md.
+    Criteria: Each key and file appears exactly once, both sets carry the exact
+    source and rights fields, and injected field changes fail with field paths.
+    """
+    spec_sets = _parsed_spec_sets()["ai_act"]
+    identities = [spec_sets["identity"], spec_sets["annex_identity"]]
+    expected_keys = [_set_key(identity) for identity in identities]
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    ai_paths = [
+        path
+        for path in manifest["clause_sets"]
+        if "ai-act-2024-1689" in pathlib.PurePosixPath(path).name
+    ]
+    assert len(ai_paths) == 2, f"AI Act clause files declared: {ai_paths}"
+    loaded = {
+        clause_set_key(clause_set): clause_set
+        for clause_set in load_clause_sets()
+        if clause_set_key(clause_set) in expected_keys
+    }
+    assert set(loaded) == set(expected_keys)
+    for identity, key in zip(identities, expected_keys, strict=True):
+        _, set_id, version = identity
+        expected_path = f"clauses/eu-{set_id}-{version}.json"
+        assert (
+            manifest["clause_sets"].count(expected_path) == 1
+        ), f"{key} must reference {expected_path} exactly once"
+        clause_set = loaded[key]
+        _assert_ai_act_set_metadata_matches_spec(clause_set, identity)
+
+        field_changes = [
+            ("authority", "example.invalid", "authority"),
+            ("id", "changed", "id"),
+            ("version", "2026-07-28", "version"),
+            (
+                "source",
+                {
+                    **clause_set["source"],
+                    "officialUrl": "https://example.invalid/changed",
+                },
+                "source.officialUrl",
+            ),
+            (
+                "rights",
+                {**clause_set["rights"], "structure": "copied_text"},
+                "rights.structure",
+            ),
+            ("rights", {**clause_set["rights"], "text": "licensed"}, "rights.text"),
+            (
+                "rights",
+                {**clause_set["rights"], "clearance_ref": "missing"},
+                "rights.clearance_ref",
+            ),
+            (
+                "rights",
+                {**clause_set["rights"], "licence": "changed"},
+                "rights.licence",
+            ),
+            (
+                "rights",
+                {**clause_set["rights"], "attribution": "changed"},
+                "rights.attribution",
+            ),
+        ]
+        for field, value, target_field in field_changes:
+            broken = json.loads(json.dumps(clause_set))
+            broken[field] = value
+            with pytest.raises(
+                AssertionError, match=rf"{re.escape(key)}\.{re.escape(target_field)}"
+            ):
+                _assert_ai_act_set_metadata_matches_spec(broken, identity)
+
+
+@pytest.mark.trace("FR-018-AC-1", "FR-018-AC-2", "FR-018-AC-4", "FR-019-AC-5")
+def test_ai_act_annex_rows_match_the_normative_table():
+    """Check Annex IV identity, exact rows, outputs, and context dimensions.
+
+    Assumptions: The Annex IV table and output catalog in spec.md are normative.
+    Criteria: All point IDs, applicability expressions, outputs, and allowed
+    dimensions match, while injected row changes identify their field.
+    """
+    clause_set = _ai_act_annex_set()
+    rows = _spec_ai_act_annex_rows()
+    _assert_ai_act_annex_clause_fields(clause_set)
+    point_dimensions = {
+        f"ai_annex_iv_{row['id'][3:].replace('(', '_').replace(')', '').replace('.', '_')}_applicable"
+        for row in rows
+    }
+    common_dimensions = {"ai_high_risk", "ai_role"}
+    assert len(point_dimensions) == 23
+    assert set(clause_set["classificationDimensions"]) == (
+        common_dimensions | point_dimensions
+    )
+    assert set(_ai_act_set()["classificationDimensions"]) == common_dimensions
+    for dimension in point_dimensions:
+        assert clause_set["classificationDimensions"][dimension] == {
+            "values": ["yes", "no"]
+        }, f"{dimension} must be a person-supplied yes/no value"
+
+    broken = json.loads(json.dumps(clause_set))
+    broken["clauses"].pop(0)
+    with pytest.raises(AssertionError, match=r"missing=\['IV-1\(a\)'\]"):
+        _assert_ai_act_annex_clause_fields(broken)
+
+    broken = json.loads(json.dumps(clause_set))
+    broken["clauses"][0]["id"] = "IV-1(a)-extra"
+    with pytest.raises(
+        AssertionError,
+        match=r"missing=\['IV-1\(a\)'\], extra=\['IV-1\(a\)-extra'\]",
+    ):
+        _assert_ai_act_annex_clause_fields(broken)
+
+    broken = json.loads(json.dumps(clause_set))
+    broken["clauses"][0]["applicability"]["terms"][2]["value"] = "no"
+    with pytest.raises(AssertionError, match=r"IV-1\(a\)\.applicability"):
+        _assert_ai_act_annex_clause_fields(broken)
+
+    broken = json.loads(json.dumps(clause_set))
+    broken["clauses"][0]["expectedOutputs"] = ["missing-output"]
+    with pytest.raises(AssertionError, match=r"IV-1\(a\)\.expectedOutputs"):
+        _assert_ai_act_annex_clause_fields(broken)
+
+
+@pytest.mark.trace(
+    "FR-018-AC-3", "FR-019-AC-1", "FR-019-AC-2", "FR-019-AC-3", "FR-019-AC-4"
+)
+def test_ai_act_annex_applicability_is_person_supplied_and_independent():
+    """Evaluate every Annex IV point with yes, no, and omitted person inputs.
+
+    Assumptions: High-risk classification, role, and point applicability are
+    supplied explicitly as contexts.
+    Criteria: Both sets follow low-risk, provider, deployer, empty, and partial
+    context rules; each Annex IV point resolves only from its own value.
+    """
+    high_risk_key = "eu/ai-act-2024-1689@2026-07-27"
+    annex_key = "eu/ai-act-2024-1689-annex-iv@2026-07-27"
+    rows = _spec_ai_act_annex_rows()
+    point_dimensions = [
+        dimension
+        for dimension in _ai_act_annex_set()["classificationDimensions"]
+        if dimension not in {"ai_high_risk", "ai_role"}
+    ]
+    assert len(point_dimensions) == len(rows) == 23
+    all_yes = [f"{dimension}=yes" for dimension in point_dimensions]
+    all_no = [f"{dimension}=no" for dimension in point_dimensions]
+
+    low_risk_high_risk = _outcomes(
+        evaluate_clause_set(PACKAGE_ROOT, high_risk_key, "ai_high_risk=no")
+    )
+    low_risk_annex = _outcomes(
+        evaluate_clause_set(PACKAGE_ROOT, annex_key, "ai_high_risk=no")
+    )
+    assert set(low_risk_high_risk.values()) == {"not_binding"}
+    assert set(low_risk_annex.values()) == {"not_binding"}
+
+    provider_high_risk = _outcomes(
+        evaluate_clause_set(
+            PACKAGE_ROOT,
+            high_risk_key,
+            "ai_high_risk=yes",
+            "ai_role=provider",
+        )
+    )
+    provider_annex = _outcomes(
+        evaluate_clause_set(
+            PACKAGE_ROOT,
+            annex_key,
+            "ai_high_risk=yes",
+            "ai_role=provider",
+            *all_yes,
+        )
+    )
+    assert set(provider_high_risk) == {row["id"] for row in _spec_ai_act_rows()}
+    assert all(
+        outcome == ("not_binding" if clause_id == "art-26" else "binding")
+        for clause_id, outcome in provider_high_risk.items()
+    )
+    assert set(provider_annex) == {row["id"] for row in rows}
+    assert set(provider_annex.values()) == {"binding"}
+
+    for point in point_dimensions:
+        other_yes = [
+            f"{dimension}=yes" for dimension in point_dimensions if dimension != point
+        ]
+        not_applicable = _outcomes(
+            evaluate_clause_set(
+                PACKAGE_ROOT,
+                annex_key,
+                "ai_high_risk=yes",
+                "ai_role=provider",
+                *other_yes,
+                f"{point}=no",
+            )
+        )
+        omitted = _outcomes(
+            evaluate_clause_set(
+                PACKAGE_ROOT,
+                annex_key,
+                "ai_high_risk=yes",
+                "ai_role=provider",
+                *other_yes,
+            )
+        )
+        clause_id = next(
+            row["id"]
+            for row in rows
+            if point
+            == f"ai_annex_iv_{row['id'][3:].replace('(', '_').replace(')', '').replace('.', '_')}_applicable"
+        )
+        assert not_applicable[clause_id] == "not_binding", f"{clause_id} for {point}=no"
+        assert all(
+            outcome == "binding"
+            for other_id, outcome in not_applicable.items()
+            if other_id != clause_id
+        ), f"{clause_id} leaked its point decision to another clause"
+        assert (
+            omitted[clause_id] == "unresolved"
+        ), f"{clause_id} when {point} is omitted"
+        assert all(
+            outcome == "binding"
+            for other_id, outcome in omitted.items()
+            if other_id != clause_id
+        ), f"{clause_id} omission changed another point"
+
+    deployer_high_risk = _outcomes(
+        evaluate_clause_set(
+            PACKAGE_ROOT,
+            high_risk_key,
+            "ai_high_risk=yes",
+            "ai_role=deployer",
+        )
+    )
+    deployer_annex_yes = _outcomes(
+        evaluate_clause_set(
+            PACKAGE_ROOT,
+            annex_key,
+            "ai_high_risk=yes",
+            "ai_role=deployer",
+            *all_yes,
+        )
+    )
+    deployer_annex_no = _outcomes(
+        evaluate_clause_set(
+            PACKAGE_ROOT,
+            annex_key,
+            "ai_high_risk=yes",
+            "ai_role=deployer",
+            *all_no,
+        )
+    )
+    assert deployer_high_risk["art-26"] == "binding"
+    assert all(
+        value == "not_binding"
+        for key, value in deployer_high_risk.items()
+        if key != "art-26"
+    )
+    assert set(deployer_annex_yes.values()) == {"not_binding"}
+    assert set(deployer_annex_no.values()) == {"not_binding"}
+
+    empty_high_risk = _outcomes(evaluate_clause_set(PACKAGE_ROOT, high_risk_key))
+    empty_annex = _outcomes(evaluate_clause_set(PACKAGE_ROOT, annex_key))
+    assert set(empty_high_risk.values()) == {"unresolved"}
+    assert set(empty_annex.values()) == {"unresolved"}
+
+    missing_high_risk = _outcomes(
+        evaluate_clause_set(PACKAGE_ROOT, annex_key, "ai_role=provider", *all_yes)
+    )
+    assert set(missing_high_risk.values()) == {"unresolved"}
+    missing_role = _outcomes(
+        evaluate_clause_set(PACKAGE_ROOT, annex_key, "ai_high_risk=yes", *all_yes)
+    )
+    assert set(missing_role.values()) == {"unresolved"}
 
 
 @pytest.mark.trace("FR-008-AC-2")
