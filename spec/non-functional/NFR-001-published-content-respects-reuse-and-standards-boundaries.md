@@ -36,6 +36,20 @@ relationships:
     type: "constrains"
   - target: "ix://agent-ix/spec-clauses-eu-law/FR-015"
     type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-016"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-017"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-018"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-019"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-020"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-021"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-022"
+    type: "constrains"
 ---
 # NFR-001: Published content respects reuse and standards boundaries
 
@@ -77,6 +91,6 @@ Review source notices and rights fields; scan package files for known designator
 
 ## Dependencies
 
-Constrains FR-001 through FR-015. The source-specific rights boundaries are
+Constrains FR-001 through FR-022. The source-specific rights boundaries are
 defined in `spec.md`; each FR specifies the tests and review methods that
 enforce them.
