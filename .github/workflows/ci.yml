@@ -1,27 +1,32 @@
 name: CI
 
-# Manual only. Never on push, pull request, commit, or merge.
 on:
-  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+
 jobs:
-  publish-to-pypi:
+  checks:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Encode key to base64
-      id: encode_key
-      run: echo "gcp_key_64=$(echo -n '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' | base64 -w 0)" >> "$GITHUB_OUTPUT"
-
-    - name: Publish
-      uses: agent-ix/python-service-actions/publish-to-pypi@main
-      with:
-        username: _json_key_base64
-        password: ${{ steps.encode_key.outputs.gcp_key_64 }}
-        registry_url: https://${{ vars.GCP_REGION }}-python.pkg.dev/${{ vars.GCP_PROJECT_NAME }}/${{ vars.GCP_PYPI }}
-
-  ci:
-    uses: agent-ix/python-service-actions/.github/workflows/lib-ci.yml@main
-    with:
-      extra_index_url: https://${{ vars.GCP_REGION }}-python.pkg.dev/${{ vars.GCP_PROJECT_NAME }}/${{ vars.GCP_PYPI }}/simple/
-    secrets:
-      GCP_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Python test and packaging tools
+        run: python -m pip install poetry pytest PyYAML black ruff
+      - name: Install project test dependencies
+        run: poetry install --no-interaction --no-root
+      - name: Install Quire and Quoin CLIs
+        run: npm ci --userconfig /dev/null --registry https://registry.npmjs.org/ --@agent-ix:registry=https://registry.npmjs.org/
+      - name: Add engine CLIs to PATH
+        run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: Install default Quire modules
+        run: quoin module ensure-defaults
+      - name: Verify module, rights, catalog, and distributions
+        run: pytest
+      - name: Check Python style
+        run: make lint

@@ -4,6 +4,7 @@ dist/
 *.egg-info/
 .idea
 .venv/
+.worktrees/
 node_modules
 .pnpm-store
 .pytest_cache/
@@ -11,3 +12,8 @@ node_modules
 .coverage
 *.log
 report.json
+target/
+*-target/
+build/
+*.tgz
+.npm-stage-backup/

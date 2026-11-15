@@ -1,0 +1,364 @@
+"""Packaging and shared behavior for the EU law clause module."""
+
+from __future__ import annotations
+
+import json
+import os
+import pathlib
+import shutil
+import subprocess
+import tarfile
+import zipfile
+
+import pytest
+import yaml
+from conftest import (
+    MANIFEST_PATH,
+    PACKAGE_ROOT,
+    REPO_ROOT,
+    assert_crosswalk_targets_resolve,
+    assert_output_catalog_consistent,
+    clause_set_key,
+    engine_tool,
+    load_clause_sets,
+    run,
+    stage_clause_sets,
+)
+
+
+def _synthetic_set(
+    authority: str,
+    set_id: str,
+    version: str,
+    *,
+    output_catalog: dict | None = None,
+    clauses: list[dict] | None = None,
+    crosswalks: list[dict] | None = None,
+    text_rights: str = "original",
+) -> dict:
+    return {
+        "schemaVersion": "clause-set-v1",
+        "authority": authority,
+        "id": set_id,
+        "title": f"{set_id} synthetic set",
+        "version": version,
+        "rights": {
+            "structure": "citation_only",
+            "text": text_rights,
+            "clearance_ref": None,
+            "licence": "Synthetic test fixture",
+        },
+        "source": {
+            "title": "Synthetic test source",
+            "identifier": "example.invalid/test",
+            "officialUrl": "https://example.invalid/test",
+        },
+        "outputCatalog": output_catalog or {},
+        "clauses": clauses or [],
+        "crosswalks": crosswalks or [],
+    }
+
+
+def _installed_clause_sets(module_name: str) -> list[dict]:
+    """Load an optional installed module when checking shared catalog parity."""
+    result = run(engine_tool("quoin"), "module", "list")
+    assert result.returncode == 0, result.stderr + result.stdout
+    plugins = json.loads(result.stdout)["plugins"]
+    module = next((item for item in plugins if item["name"] == module_name), None)
+    if module is None:
+        return []
+    manifest_path = pathlib.Path(module["targetPath"]) / "manifest.yaml"
+    return load_clause_sets(manifest_path)
+
+
+@pytest.mark.trace("TC-001", "FR-001-AC-1")
+def test_manifest_is_clause_only_and_starts_without_sets():
+    """Verify the scaffold declares only its future clause set resources.
+
+    Assumptions: MDR and MDCG content lands in later tickets.
+    Criteria: The manifest has an empty clause set list and no other module
+    contributions.
+    Trace: FR-001-AC-1
+    """
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    assert manifest["clause_sets"] == []
+    assert not {"object_types", "archetypes", "edges"}.intersection(manifest)
+    assert manifest["name"] == "spec_clauses_eu_law"
+
+
+@pytest.mark.trace("TC-002", "FR-001-AC-1")
+def test_quire_validates_the_module_and_spec_bundle():
+    """Validate the empty module and its specification documents.
+
+    Assumptions: The installed ISO artifacts module supplies validation
+    schemas.
+    Criteria: Quire exits successfully for the EU module and spec documents.
+    Trace: FR-001-AC-1
+    """
+    iso_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-iso"
+    process_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-process"
+    result = run(
+        engine_tool("quire"),
+        "validate",
+        "--module",
+        str(PACKAGE_ROOT),
+        "--module",
+        str(iso_module),
+        "--module",
+        str(process_module),
+        "spec/**/*.md",
+    )
+    assert result.returncode == 0, result.stderr + result.stdout
+
+
+@pytest.mark.trace("TC-003", "FR-001-AC-2")
+def test_path_install_reports_a_non_pack_clause_module(tmp_path):
+    """Install the module in an isolated Quoin home.
+
+    Assumptions: The module contains no licensed clause sets.
+    Criteria: Installation succeeds and the list reports pack false.
+    Trace: FR-001-AC-2
+    """
+    home = tmp_path / "home"
+    config_root = tmp_path / "config"
+    home.mkdir()
+    config_root.mkdir()
+    env = {**os.environ, "HOME": str(home), "IX_CONFIG_ROOT": str(config_root)}
+    installed = run(
+        engine_tool("quoin"), "module", "install", f"path:{PACKAGE_ROOT}", env=env
+    )
+    assert installed.returncode == 0, installed.stderr + installed.stdout
+    listed = run(engine_tool("quoin"), "module", "list", env=env)
+    assert listed.returncode == 0, listed.stderr + listed.stdout
+    plugins = json.loads(listed.stdout)["plugins"]
+    module = next(item for item in plugins if item["name"] == "spec_clauses_eu_law")
+    assert module["pack"] is False
+
+
+@pytest.mark.trace("TC-004", "FR-001-AC-3")
+def test_quoin_detects_a_licensed_set_in_a_temporary_module(tmp_path):
+    """Verify pack detection with an isolated licensed set fixture.
+
+    Assumptions: The synthetic fixture uses the clause-set rights shape.
+    Criteria: Quoin installs it and reports pack true.
+    Trace: FR-001-AC-3
+    """
+    licensed_set = _synthetic_set("example.invalid", "licensed", "1.0.0")
+    licensed_set["rights"]["text"] = "licensed"
+    module_root = stage_clause_sets(tmp_path, licensed_set)
+    home = tmp_path / "licensed-home"
+    config_root = tmp_path / "licensed-config"
+    home.mkdir()
+    config_root.mkdir()
+    env = {**os.environ, "HOME": str(home), "IX_CONFIG_ROOT": str(config_root)}
+    installed = run(
+        engine_tool("quoin"),
+        "module",
+        "install",
+        f"path:{module_root}",
+        env=env,
+    )
+    assert installed.returncode == 0, installed.stderr + installed.stdout
+    listed = run(engine_tool("quoin"), "module", "list", env=env)
+    assert listed.returncode == 0, listed.stderr + listed.stdout
+    module = json.loads(listed.stdout)["plugins"][0]
+    assert module["pack"] is True
+
+
+@pytest.mark.trace("TC-005", "FR-006-AC-1")
+def test_all_declared_sets_share_one_output_catalog():
+    """Reject output kind or description drift across installed sets.
+
+    Assumptions: A US pack module may be installed in the test environment.
+    Criteria: This module's sets and any installed US sets share exact output
+    definitions.
+    Trace: FR-006-AC-1
+    """
+    clause_sets = load_clause_sets()
+    clause_sets.extend(_installed_clause_sets("spec_clauses_us_health"))
+    assert_output_catalog_consistent(clause_sets)
+
+
+@pytest.mark.trace("TC-006", "FR-006-AC-2")
+def test_catalog_mismatch_error_names_both_sets():
+    """Name both source sets when a shared output definition changes.
+
+    Assumptions: Two synthetic sets declare the same output key.
+    Criteria: A kind mismatch raises an assertion naming both set keys.
+    Trace: FR-006-AC-2
+    """
+    sets = [
+        _synthetic_set(
+            "example.invalid",
+            "first",
+            "1.0.0",
+            output_catalog={"audit-trail": {"kind": "record", "description": "Log."}},
+        ),
+        _synthetic_set(
+            "example.invalid",
+            "second",
+            "1.0.0",
+            output_catalog={
+                "audit-trail": {"kind": "procedure", "description": "Log."}
+            },
+        ),
+    ]
+    with pytest.raises(
+        AssertionError,
+        match=r"example.invalid/first@1.0.0.*example.invalid/second@1.0.0",
+    ):
+        assert_output_catalog_consistent(sets)
+
+
+@pytest.mark.trace("TC-007", "FR-005-AC-2")
+def test_crosswalk_error_names_source_clause_and_missing_target_key():
+    """Name the source clause and target set when a crosswalk target is absent.
+
+    Assumptions: The synthetic source references a loaded target set whose
+    clause list does not contain the requested clause.
+    Criteria: The consistency check fails with both identifiers in its error.
+    Trace: FR-005-AC-2
+    """
+    target = _synthetic_set(
+        "example.invalid",
+        "target",
+        "1.0.0",
+        clauses=[{"id": "present"}],
+    )
+    source = _synthetic_set(
+        "example.invalid",
+        "source",
+        "1.0.0",
+        clauses=[{"id": "source-clause"}],
+        crosswalks=[
+            {
+                "sourceClause": "source-clause",
+                "target": {
+                    "set": {
+                        "authority": "example.invalid",
+                        "id": "target",
+                        "version": "1.0.0",
+                    },
+                    "clause": "missing",
+                },
+                "relation": "informative",
+                "rationale": "Synthetic fixture.",
+            }
+        ],
+    )
+    with pytest.raises(
+        AssertionError,
+        match=r"source-clause.*example.invalid/target@1.0.0#missing",
+    ):
+        assert_crosswalk_targets_resolve([source, target])
+
+
+@pytest.mark.trace("TC-008", "FR-005-AC-1")
+def test_crosswalk_to_a_loaded_clause_resolves():
+    """Accept a crosswalk whose external target clause is loaded.
+
+    Assumptions: The target set and clause are included in the loaded module.
+    Criteria: The crosswalk resolver returns without an error.
+    Trace: FR-005-AC-1
+    """
+    target = _synthetic_set(
+        "example.invalid",
+        "target",
+        "1.0.0",
+        clauses=[{"id": "present"}],
+    )
+    source = _synthetic_set(
+        "example.invalid",
+        "source",
+        "1.0.0",
+        clauses=[{"id": "source-clause"}],
+        crosswalks=[
+            {
+                "sourceClause": "source-clause",
+                "target": {
+                    "set": {
+                        "authority": "example.invalid",
+                        "id": "target",
+                        "version": "1.0.0",
+                    },
+                    "clause": "present",
+                },
+                "relation": "informative",
+                "rationale": "Synthetic fixture.",
+            }
+        ],
+    )
+    assert_crosswalk_targets_resolve([source, target])
+
+
+@pytest.mark.trace("TC-009", "FR-001-AC-6")
+def test_clause_files_ship_in_wheel_and_npm_tarball(tmp_path):
+    """Build both distributions and inspect their declared clause resources.
+
+    Assumptions: A synthetic JSON set is added to a disposable project copy so
+    this packaging test cannot pass with an empty manifest.
+    Criteria: The manifest and every declared clause file are present in both
+    the wheel and npm tarball.
+    Trace: FR-001-AC-6
+    """
+    project = tmp_path / "project"
+    shutil.copytree(
+        REPO_ROOT,
+        project,
+        ignore=shutil.ignore_patterns(
+            ".git",
+            ".venv",
+            "node_modules",
+            "target",
+            "dist",
+            "build",
+            "__pycache__",
+            ".pytest_cache",
+            ".ruff_cache",
+            "report.json",
+            ".coverage",
+        ),
+    )
+    package_root = project / "spec_clauses_eu_law"
+    clause_file = package_root / "clauses" / "synthetic.json"
+    synthetic = _synthetic_set("example.invalid", "synthetic", "1.0.0")
+    clause_file.write_text(json.dumps(synthetic))
+    manifest_path = package_root / "manifest.yaml"
+    manifest = yaml.safe_load(manifest_path.read_text())
+    manifest["clause_sets"] = ["clauses/synthetic.json"]
+    manifest_path.write_text(yaml.safe_dump(manifest))
+
+    wheel_dir = tmp_path / "wheel"
+    wheel_dir.mkdir()
+    wheel = run(
+        "poetry",
+        "build",
+        "--format",
+        "wheel",
+        "--output",
+        str(wheel_dir),
+        cwd=project,
+    )
+    assert wheel.returncode == 0, wheel.stderr + wheel.stdout
+    wheel_path = next(wheel_dir.glob("*.whl"))
+    with zipfile.ZipFile(wheel_path) as archive:
+        wheel_files = set(archive.namelist())
+    assert "spec_clauses_eu_law/manifest.yaml" in wheel_files
+    assert "spec_clauses_eu_law/clauses/synthetic.json" in wheel_files
+
+    npm_dir = tmp_path / "npm"
+    npm_dir.mkdir()
+    packed = run(
+        "npm",
+        "pack",
+        "--json",
+        "--pack-destination",
+        str(npm_dir),
+        cwd=project,
+    )
+    assert packed.returncode == 0, packed.stderr + packed.stdout
+    tarball = next(npm_dir.glob("*.tgz"))
+    with tarfile.open(tarball, "r:gz") as archive:
+        npm_files = set(archive.getnames())
+    assert "package/manifest.yaml" in npm_files
+    assert "package/clauses/synthetic.json" in npm_files
