@@ -10,7 +10,6 @@ import tarfile
 from importlib.util import module_from_spec, spec_from_file_location
 
 import yaml
-
 from conftest import REPO_ROOT, engine_tool, run
 
 _publish_gate_spec = spec_from_file_location(

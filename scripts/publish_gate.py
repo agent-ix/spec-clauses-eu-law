@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
-import shutil
 import subprocess
 import sys
 import tarfile
@@ -69,7 +68,9 @@ def scan_archive(
             return False, ["content-rights-tree returned an unsupported result"]
         findings = _safe_finding(result)
         if scanned.returncode != 0 or result.get("outcome") != "accepted":
-            return False, findings or [f"content-rights-tree failed (exit {scanned.returncode})"]
+            return False, findings or [
+                f"content-rights-tree failed (exit {scanned.returncode})"
+            ]
         return True, []
 
 
@@ -94,7 +95,10 @@ def main(argv: list[str] | None = None) -> int:
     wheel_files = sorted(arguments.wheel_dir.glob("*.whl"))
     npm_files = sorted(arguments.npm_dir.glob("*.tgz"))
     if len(wheel_files) != 1 or len(npm_files) != 1:
-        print("publish gate requires exactly one wheel and one npm archive", file=sys.stderr)
+        print(
+            "publish gate requires exactly one wheel and one npm archive",
+            file=sys.stderr,
+        )
         return 2
 
     accepted, findings = check_publishable(arguments.module, arguments.quire)
