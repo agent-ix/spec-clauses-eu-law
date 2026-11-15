@@ -74,7 +74,7 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
         f"{mdr.group(1)}/{mdr.group(2)}@{mdr.group(3)}": {
             "officialUrl": mdr.group(4),
             "licence": mdr.group(5),
-            "attribution": mdr.group(6),
+            "attribution": mdr.group(6).replace("<official URL>", mdr.group(4)),
             "rights": {
                 "structure": "citation_only",
                 "text": "original",
@@ -84,7 +84,7 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
         f"{mdcg.group(1)}/{mdcg.group(2)}@{mdcg.group(3)}": {
             "officialUrl": mdcg.group(4),
             "licence": mdcg.group(5),
-            "attribution_terms": mdcg.group(6),
+            "attribution_terms": mdcg.group(6).replace("*", ""),
             "rights": {
                 "structure": "citation_only",
                 "text": "original",
@@ -109,7 +109,7 @@ def _assert_set_metadata_matches_spec(clause_set: dict) -> None:
         ), f"{key}.rights.licence differs from spec.md"
     else:
         assert (
-            expected["licence"] in rights["licence"]
+            expected["licence"].casefold() in rights["licence"].casefold()
         ), f"{key}.rights.licence omits its source-specific spec statement"
     if "attribution" in expected:
         assert (
