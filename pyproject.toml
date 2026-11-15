@@ -27,6 +27,9 @@ markers = ["trace: Bind a test to one or more spec criteria."]
 [tool.black]
 line-length = 88
 target-version = ["py313"]
+extend-exclude = '''
+^/\.deps/engineering-assurance/
+'''
 
 [tool.ruff]
 line-length = 88

@@ -1,0 +1,71 @@
+name: Release npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to publish (for example 0.1.0)
+        required: false
+        type: string
+      dry_run:
+        description: Run all publication checks and skip upload
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  publish-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/checkout@v4
+        with:
+          repository: agent-ix/engineering-assurance
+          ref: v0.10.1
+          path: .deps/engineering-assurance
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.98.1
+      - name: Install package tooling
+        run: python -m pip install poetry
+      - name: Install package dependencies
+        run: |
+          poetry install --no-interaction --no-root
+          npm ci --userconfig /dev/null --registry https://registry.npmjs.org/ --@agent-ix:registry=https://registry.npmjs.org/
+      - name: Install default Quire modules
+        run: quoin module ensure-defaults
+      - name: Add Quire and Quoin to PATH
+        run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: Build engineering-assurance content rights checker
+        run: cargo build --locked --features full --manifest-path .deps/engineering-assurance/Cargo.toml
+      - name: Build wheel and npm archive
+        run: |
+          mkdir -p dist
+          poetry build --format wheel --output dist
+          npm pack --json --pack-destination dist > /tmp/npm-pack.json
+      - name: Check module publication rights and packaged content
+        run: >-
+          python scripts/publish_gate.py
+          --module spec_clauses_eu_law
+          --wheel-dir dist
+          --npm-dir dist
+          --engineering-assurance .deps/engineering-assurance/target/debug/engineering-assurance
+
+  publish:
+    needs: publish-checks
+    if: ${{ inputs.dry_run == false }}
+    permissions:
+      contents: read
+      id-token: write
+    uses: agent-ix/nodejs-actions/.github/workflows/release-npm-module.yml@main
+    with:
+      version: ${{ inputs.version }}
