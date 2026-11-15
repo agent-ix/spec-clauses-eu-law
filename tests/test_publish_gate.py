@@ -7,11 +7,20 @@ import pathlib
 import shutil
 import subprocess
 import tarfile
+from importlib.util import module_from_spec, spec_from_file_location
 
 import yaml
 
-from conftest import engine_tool, run
-from scripts.publish_gate import PROTOCOL, scan_archive
+from conftest import REPO_ROOT, engine_tool, run
+
+_publish_gate_spec = spec_from_file_location(
+    "eu_publish_gate", REPO_ROOT / "scripts" / "publish_gate.py"
+)
+assert _publish_gate_spec and _publish_gate_spec.loader
+_publish_gate = module_from_spec(_publish_gate_spec)
+_publish_gate_spec.loader.exec_module(_publish_gate)
+PROTOCOL = _publish_gate.PROTOCOL
+scan_archive = _publish_gate.scan_archive
 
 
 def _rights_tool() -> str:
