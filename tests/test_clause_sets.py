@@ -635,15 +635,14 @@ def test_manifest_declares_no_non_clause_contributions():
     assert not {"object_types", "archetypes", "edges"}.intersection(manifest)
 
 
-@pytest.mark.trace("FR-014-AC-4", "FR-016-AC-4")
+@pytest.mark.trace("FR-014-AC-4")
 def test_quire_validates_the_module_and_spec_bundle():
     """Validate the clause module and its specification documents.
 
     Assumptions: The installed ISO artifacts module supplies validation
     schemas.
-    Criteria: Quire validates the EU module and specs, and publish-check accepts
-    the module.
-    Trace: FR-014-AC-4, FR-016-AC-4
+    Criteria: Quire exits successfully for the EU module and spec documents.
+    Trace: FR-014-AC-4
     """
     iso_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-iso"
     process_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-process"
@@ -659,6 +658,31 @@ def test_quire_validates_the_module_and_spec_bundle():
         "spec/**/*.md",
     )
     assert result.returncode == 0, result.stderr + result.stdout
+
+
+@pytest.mark.trace("FR-016-AC-4")
+def test_ai_act_module_validates_and_passes_publish_check():
+    """Validate the module specifications and both publishable AI Act sets.
+
+    Assumptions: The installed ISO and process artifact modules supply the
+    schemas used by the package specification.
+    Criteria: Quire validates the specification bundle and module, then accepts
+    its source and rights metadata for publication.
+    """
+    iso_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-iso"
+    process_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-process"
+    validated = run(
+        engine_tool("quire"),
+        "validate",
+        "--module",
+        str(PACKAGE_ROOT),
+        "--module",
+        str(iso_module),
+        "--module",
+        str(process_module),
+        "spec/**/*.md",
+    )
+    assert validated.returncode == 0, validated.stderr + validated.stdout
     published = run(
         engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT)
     )
