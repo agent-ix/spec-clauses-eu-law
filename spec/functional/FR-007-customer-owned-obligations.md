@@ -2,6 +2,11 @@
 id: FR-007
 title: "Customer-owned obligations"
 type: FR
+relationships:
+  - target: "ix://agent-ix/spec-clauses-eu-law/US-001"
+    type: "traces_to"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-006"
+    type: "depends_on"
 ---
 # FR-007: Customer-owned obligations
 
@@ -18,4 +23,4 @@ When a clause has only outputs of kind `procedure`, the pack SHALL require deleg
 
 ## Dependencies
 
-Uses the clause-set, evaluation, publication and discharge contracts already implemented by quire and quoin.
+Depends on FR-006 because procedure output kinds define which clauses are customer-owned. The pack owns the classification test; Quoin owns disposition evaluation and rendering of tailoring fields in the RMM. If `quoin evidence record-discharge` or `quoin discharge --rmm` is unavailable, integration verification fails with the missing executable or capability and does not skip the criterion.

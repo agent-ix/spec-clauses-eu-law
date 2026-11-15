@@ -2,6 +2,15 @@
 id: FR-003
 title: "MDR software clause set"
 type: FR
+relationships:
+  - target: "ix://agent-ix/spec-clauses-eu-law/US-001"
+    type: "traces_to"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-001"
+    type: "depends_on"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-002"
+    type: "depends_on"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-006"
+    type: "depends_on"
 ---
 # FR-003: MDR software clause set
 
@@ -19,4 +28,4 @@ The MDR set SHALL use the source, key, version, clause IDs, mandatory force, app
 
 ## Dependencies
 
-Uses the clause-set, evaluation, publication and discharge contracts already implemented by quire and quoin.
+Depends on FR-001 for the module home, FR-002 for source rights, and FR-006 for expected-output definitions. Quire owns generic clause-set schema validation; the EU pack owns the exhaustive ID, original-summary, and catalog-reference assertions. If `quire validate` or its clause-set capability is unavailable, the criterion fails with the missing executable or capability and is not skipped.

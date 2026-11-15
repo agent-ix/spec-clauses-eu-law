@@ -2,6 +2,9 @@
 id: FR-001
 title: "Pack module and home"
 type: FR
+relationships:
+  - target: "ix://agent-ix/spec-clauses-eu-law/US-001"
+    type: "traces_to"
 ---
 # FR-001: Pack module and home
 
