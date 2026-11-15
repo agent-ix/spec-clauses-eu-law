@@ -120,7 +120,16 @@ For PLAT-1628, retain `skills/spec-security-analysis/references/gdpr/ChII-Princi
 
 ## Article 32 Crosswalk Policy
 
-Crosswalks originate from `art-32(1)(a)` through `(d)` and `art-32(2)`. They may point to `nist/sp800-53@5.2.0` in `spec-objects-security` and `us-hhs/45-cfr-164-subpart-c@2026-11-12` in `spec-clauses-us-health`. The target modules are test-time dependencies and are never copied into this module. Each source clause has at least one target in each module. Relations are `partial` or `informative`; they never assert equivalence. Every target set and clause identifier must resolve in the installed target module. The rationale is an original explanation of scope, not a restatement of target text.
+Crosswalks cover every Article 32 clause present in the GDPR Clause Table: `art-32(1)(a)`, `art-32(1)(b)`, `art-32(1)(c)`, `art-32(1)(d)`, `art-32(2)`, and `art-32(4)`. `art-32(3)` is not a clause in this set and has no crosswalk. Each listed source clause has at least one target in both `nist/sp800-53@5.2.0` in `spec-objects-security` and `us-hhs/45-cfr-164-subpart-c@2026-11-12` in `spec-clauses-us-health`. These target modules are test-time dependencies and are never copied into this module. Relations are `partial` or `informative`; they never assert equivalence or automatically discharge the source obligation. Every target set and clause identifier must resolve in the installed target module. Rationales use original wording to explain the limited scope of each mapping, not restate target text.
+
+For `art-32(4)`, the planned mappings are:
+
+| Source clause | Target set | Target clause | Relation | Original rationale |
+|---|---|---|---|---|
+| `art-32(4)` | `nist/sp800-53@5.2.0` | `AC-6` | `partial` | Least-privilege access restrictions can limit a person's or process's access, but they do not establish that processing follows the controller's or processor's instructions. |
+| `art-32(4)` | `us-hhs/45-cfr-164-subpart-c@2026-11-12` | `164.308(a)(4)(i)` | `partial` | Access-authorization policies address the authorization boundary for access, but they do not establish instruction-bound processing or cover personal data beyond the HIPAA scope. |
+
+The mappings are informative evidence of related control scope only. Neither target establishes the full Article 32(4) obligation, and neither mapping discharges it automatically.
 
 ## MDCG Companion Table
 
