@@ -802,6 +802,45 @@ def test_mdcg_missing_mdr_target_fails_with_source_and_target_key(tmp_path):
         assert_crosswalk_targets_resolve(load_clause_sets(fixture / "manifest.yaml"))
 
 
+def _assert_exact_crosswalk_source_rows(
+    crosswalks: list[dict], expected_sources: set[str]
+) -> None:
+    """Require Article 32 crosswalk rows to use exactly the selected clauses."""
+    actual_sources = {item["sourceClause"] for item in crosswalks}
+    unexpected = sorted(actual_sources - expected_sources)
+    missing = sorted(expected_sources - actual_sources)
+    assert not unexpected, (
+        "unexpected sourceClause row(s) in Article 32 crosswalks: "
+        + ", ".join(unexpected)
+    )
+    assert not missing, (
+        "missing sourceClause row(s) in Article 32 crosswalks: "
+        + ", ".join(missing)
+    )
+
+
+@pytest.mark.trace("FR-014-AC-1")
+def test_gdpr_article32_crosswalks_reject_article32_three():
+    """Reject an Article 32(3) source row outside the selected clause set.
+
+    Assumptions: The selected GDPR clause rows are valid.
+    Criteria: Exact source coverage rejects an unexpected Article 32(3) row
+    and identifies its sourceClause value.
+    Trace: FR-014-AC-1
+    """
+    crosswalks = _gdpr_set()["crosswalks"]
+    expected_sources = {item["sourceClause"] for item in crosswalks}
+    unexpected_row = {**crosswalks[0], "sourceClause": "art-32(3)"}
+
+    with pytest.raises(
+        AssertionError,
+        match=r"unexpected sourceClause row\(s\).*art-32\(3\)",
+    ):
+        _assert_exact_crosswalk_source_rows(
+            [*crosswalks, unexpected_row], expected_sources
+        )
+
+
 @pytest.mark.trace("FR-014-AC-1", "FR-014-AC-2", "FR-014-AC-3")
 def test_gdpr_article32_crosswalks_use_the_selected_nist_and_hipaa_sets():
     """Check Article 32 mappings against the two selected installed sets.
@@ -845,6 +884,7 @@ def test_gdpr_article32_crosswalks_use_the_selected_nist_and_hipaa_sets():
             ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.308(a)(4)(i)"),
         },
     }
+    _assert_exact_crosswalk_source_rows(gdpr["crosswalks"], set(expected))
     actual = {
         source: {
             (
