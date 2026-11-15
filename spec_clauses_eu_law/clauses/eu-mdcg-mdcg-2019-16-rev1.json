@@ -1,0 +1,835 @@
+{
+  "schemaVersion": "clause-set-v1",
+  "authority": "eu-mdcg",
+  "id": "mdcg-2019-16",
+  "title": "MDCG 2019-16 rev.1 cybersecurity guidance for medical devices",
+  "version": "rev1",
+  "rights": {
+    "structure": "citation_only",
+    "text": "original",
+    "clearance_ref": null,
+    "licence": "No reuse licence is asserted for this source and that the module contains only citations and original summaries, not reproduced PDF text.",
+    "attribution": "Medical Device Coordination Group (MDCG), MDCG 2019-16 rev.1, July 2020. Source: https://health.ec.europa.eu/document/download/b23b362f-8a56-434c-922a-5b3ca4d0a7a1_en?filename=md_cybersecurity_en.pdf. Listing: https://health.ec.europa.eu/medical-devices-sector/new-regulations/guidance-mdcg-endorsed-documents-and-other-guidance_en. The source is not a European Commission publication; summaries are original Agent-IX text."
+  },
+  "source": {
+    "title": "MDCG 2019-16 rev.1 Guidance on Cybersecurity for Medical Devices",
+    "identifier": "MDCG 2019-16 rev.1",
+    "officialUrl": "https://health.ec.europa.eu/document/download/b23b362f-8a56-434c-922a-5b3ca4d0a7a1_en?filename=md_cybersecurity_en.pdf"
+  },
+  "outputCatalog": {
+    "anomaly-list": {
+      "kind": "record",
+      "description": "Unresolved-anomaly report."
+    },
+    "it-requirements-statement": {
+      "kind": "document",
+      "description": "Minimum hardware, network and IT-security requirements for instructions for use."
+    },
+    "release-record": {
+      "kind": "record",
+      "description": "Engineering-assurance release decision."
+    },
+    "risk-management-records": {
+      "kind": "record",
+      "description": "`spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records."
+    },
+    "security-risk-records": {
+      "kind": "record",
+      "description": "`spec-objects-security` threat, risk, and control records."
+    },
+    "software-architecture": {
+      "kind": "record",
+      "description": "`spec-objects-architecture` parts and connections."
+    },
+    "software-requirements": {
+      "kind": "record",
+      "description": "Functional and non-functional requirements (FR/NFR)."
+    },
+    "verification-records": {
+      "kind": "record",
+      "description": "Test matrix and retained evidence."
+    }
+  },
+  "clauses": [
+    {
+      "id": "2.1",
+      "force": "recommended",
+      "title": "Security goals for intended use",
+      "text": "The product's security measures address confidentiality, integrity, and availability of information and services, together with the hardware, network, and access conditions needed for intended operation.",
+      "subjects": [
+        "it-security",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "risk-management-records"
+      ]
+    },
+    {
+      "id": "2.2",
+      "force": "recommended",
+      "title": "Security and patient safety",
+      "text": "Risk assessment considers how weak or overly restrictive security controls can affect patient safety and device performance.",
+      "subjects": [
+        "risk",
+        "device-performance",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records"
+      ]
+    },
+    {
+      "id": "2.3",
+      "force": "recommended",
+      "title": "Use and operating environment",
+      "text": "Cybersecurity requirements reflect the device's intended use, communication needs, and operating environment; the design uses layered protection without relying on external controls.",
+      "subjects": [
+        "software-lifecycle",
+        "it-security",
+        "risk"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "anomaly-list",
+        "security-risk-records"
+      ]
+    },
+    {
+      "id": "2.4",
+      "force": "recommended",
+      "title": "Foreseeable cybersecurity misuse",
+      "text": "Security risk analysis accounts for reasonably foreseeable misuse and exploitable weaknesses associated with device software and its components.",
+      "subjects": [
+        "risk",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records"
+      ]
+    },
+    {
+      "id": "2.5",
+      "force": "recommended",
+      "title": "Operating environment assumptions",
+      "text": "The manufacturer defines risk-based baseline protections for the operating environment and records assumptions needed for secure operation.",
+      "subjects": [
+        "it-security",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "it-requirements-statement",
+        "security-risk-records"
+      ]
+    },
+    {
+      "id": "2.6",
+      "force": "recommended",
+      "title": "Stakeholder security responsibilities",
+      "text": "Security planning identifies the responsibilities expected of manufacturers, integrators, operators, suppliers, and users while preserving the manufacturer's legal obligations.",
+      "subjects": [
+        "it-security",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "verification-records"
+      ]
+    },
+    {
+      "id": "3.1",
+      "force": "recommended",
+      "title": "Security through the lifecycle",
+      "text": "The manufacturer applies security management throughout the product lifecycle and coordinates secure design, verification, issue handling, updates, and user guidance.",
+      "subjects": [
+        "software-lifecycle",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "anomaly-list",
+        "security-risk-records"
+      ]
+    },
+    {
+      "id": "3.2",
+      "force": "recommended",
+      "title": "Security risk management",
+      "text": "The security risk process analyses, evaluates, controls, and reports residual security risk, and shares safety-relevant risks and controls with the safety assessment.",
+      "subjects": [
+        "risk",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "anomaly-list",
+        "security-risk-records"
+      ]
+    },
+    {
+      "id": "3.3",
+      "force": "recommended",
+      "title": "Security capabilities",
+      "text": "Selected security capabilities address device and data protection while preserving safety, effectiveness, performance, and existing risk controls.",
+      "subjects": [
+        "it-security",
+        "device-performance"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "software-architecture"
+      ]
+    },
+    {
+      "id": "3.4",
+      "force": "recommended",
+      "title": "Security risk assessment",
+      "text": "The security assessment considers intended clinical use and environment, relevant threats and vulnerabilities, and their possible effects on safety and performance.",
+      "subjects": [
+        "risk",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "software-requirements"
+      ]
+    },
+    {
+      "id": "3.5",
+      "force": "recommended",
+      "title": "Security benefit-risk analysis",
+      "text": "An overall benefit-risk analysis considers intended use and safety or performance effects of security risks, using the safety assessment rather than scoring every security risk separately.",
+      "subjects": [
+        "risk",
+        "device-performance"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "verification-records"
+      ]
+    },
+    {
+      "id": "3.6",
+      "force": "recommended",
+      "title": "Minimum operating-environment requirements",
+      "text": "Minimum operating-environment requirements are risk based and state the external hardware, network, and security measures needed without relying on them to compensate for device vulnerabilities.",
+      "subjects": [
+        "it-security",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "it-requirements-statement"
+      ]
+    },
+    {
+      "id": "3.7",
+      "force": "recommended",
+      "title": "Security verification and validation",
+      "text": "Security testing demonstrates that security requirements are met and maintained; suitable methods may include feature testing, fuzz testing, vulnerability scanning, and penetration testing.",
+      "subjects": [
+        "verification",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "release-record",
+        "verification-records"
+      ]
+    },
+    {
+      "id": "3.8",
+      "force": "recommended",
+      "title": "Cybersecurity lifecycle maintenance",
+      "text": "During the support lifetime, the manufacturer gathers incident, vulnerability, and threat information, reassesses security and safety risk, and implements timely controls or updates.",
+      "subjects": [
+        "software-lifecycle",
+        "risk",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "anomaly-list",
+        "release-record"
+      ]
+    },
+    {
+      "id": "4.1",
+      "force": "recommended",
+      "title": "Cybersecurity technical documentation",
+      "text": "Technical documentation justifies and validates security measures, records verification methods and results, and incorporates post-market incident and vulnerability remediation information.",
+      "subjects": [
+        "technical-documentation",
+        "verification",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "it-requirements-statement"
+      ]
+    },
+    {
+      "id": "4.2",
+      "force": "recommended",
+      "title": "Cybersecurity instructions for use",
+      "text": "Instructions communicate device security risks, operating-system and update requirements, secure installation and configuration, and user actions for alerts or failsafe operation.",
+      "subjects": [
+        "technical-documentation",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "it-requirements-statement"
+      ]
+    },
+    {
+      "id": "4.3",
+      "force": "recommended",
+      "title": "Information for healthcare providers",
+      "text": "Provider information describes deployment protections, network interfaces, logging and recovery, operating-environment needs, and response to detected incidents or vulnerabilities.",
+      "subjects": [
+        "technical-documentation",
+        "it-security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "it-requirements-statement",
+        "verification-records"
+      ]
+    },
+    {
+      "id": "5.1",
+      "force": "recommended",
+      "title": "Cybersecurity post-market surveillance",
+      "text": "Post-market surveillance gathers and reviews user experience and cybersecurity information for the device and third-party components, then updates corrective actions, risk records, testing, and documentation.",
+      "subjects": [
+        "software-lifecycle",
+        "risk",
+        "anomaly-list"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "anomaly-list",
+        "release-record"
+      ]
+    },
+    {
+      "id": "5.2",
+      "force": "recommended",
+      "title": "Cybersecurity vigilance",
+      "text": "The manufacturer investigates serious cybersecurity incidents, assesses health effects, reports and coordinates corrective actions as required, and informs affected users of necessary actions.",
+      "subjects": [
+        "software-lifecycle",
+        "risk",
+        "release-record"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "anomaly-list",
+        "release-record"
+      ]
+    }
+  ],
+  "crosswalks": [
+    {
+      "sourceClause": "2.1",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-1"
+      },
+      "relation": "informative",
+      "rationale": "Introduces the guidance context for risk management; it does not replace the MDR risk-management requirement."
+    },
+    {
+      "sourceClause": "2.1",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-3"
+      },
+      "relation": "partial",
+      "rationale": "Connects cybersecurity risk consideration to the broader risk process while covering only the cybersecurity aspect."
+    },
+    {
+      "sourceClause": "2.2",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "Describes cybersecurity as part of software risk management, covering only that aspect of the MDR software lifecycle clause."
+    },
+    {
+      "sourceClause": "2.3",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "Frames cybersecurity risk management across the software lifecycle, a subset of the clause's lifecycle activities."
+    },
+    {
+      "sourceClause": "2.3",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Relates cybersecurity risk control to software security, without covering all software verification and validation."
+    },
+    {
+      "sourceClause": "2.4",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "Describes a risk-management approach for cybersecurity threats, not the entire software lifecycle process."
+    },
+    {
+      "sourceClause": "2.5",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "Connects threat identification and risk analysis to software lifecycle risk records."
+    },
+    {
+      "sourceClause": "2.5",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-14.2(d)"
+      },
+      "relation": "informative",
+      "rationale": "Network and IT-security considerations can inform the device's stated environmental and infrastructure requirements."
+    },
+    {
+      "sourceClause": "2.6",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "The section's security risk-control discussion covers a subset of software lifecycle risk management."
+    },
+    {
+      "sourceClause": "2.6",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Security-control discussion informs software security measures but does not cover the full verification and validation obligation."
+    },
+    {
+      "sourceClause": "3.1",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "Security-by-design guidance concerns software lifecycle activities, limited to the cybersecurity dimension."
+    },
+    {
+      "sourceClause": "3.1",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Security-by-design informs software security measures, not every verification and validation activity."
+    },
+    {
+      "sourceClause": "3.2",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "Secure design guidance concerns software lifecycle activity only for cybersecurity risks."
+    },
+    {
+      "sourceClause": "3.2",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Design recommendations inform security measures but do not establish the full verification outcome."
+    },
+    {
+      "sourceClause": "3.3",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.1"
+      },
+      "relation": "partial",
+      "rationale": "Architecture guidance concerns software architecture within the broader software lifecycle."
+    },
+    {
+      "sourceClause": "3.3",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "Architecture guidance addresses cybersecurity-related software lifecycle risks."
+    },
+    {
+      "sourceClause": "3.4",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.1"
+      },
+      "relation": "partial",
+      "rationale": "Software requirements guidance addresses only the requirements portion of lifecycle processes."
+    },
+    {
+      "sourceClause": "3.4",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "Security requirements contribute to, but do not exhaust, software risk management."
+    },
+    {
+      "sourceClause": "3.5",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "Implementation guidance addresses cybersecurity risk controls within lifecycle risk management."
+    },
+    {
+      "sourceClause": "3.5",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.3"
+      },
+      "relation": "partial",
+      "rationale": "The guidance can inform mobile-platform verification when applicable, without making that MDR clause universally applicable."
+    },
+    {
+      "sourceClause": "3.6",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-14.2(d)"
+      },
+      "relation": "partial",
+      "rationale": "Minimum IT requirements inform only the device's infrastructure requirement."
+    },
+    {
+      "sourceClause": "3.6",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-23.4(ab)"
+      },
+      "relation": "informative",
+      "rationale": "Environment and security information may inform instructions but does not cover the whole instructions requirement."
+    },
+    {
+      "sourceClause": "3.7",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Verification and validation guidance addresses a portion of the software lifecycle process."
+    },
+    {
+      "sourceClause": "3.7",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-18.8"
+      },
+      "relation": "partial",
+      "rationale": "Verification and validation evidence can contribute to the release process without covering its full scope."
+    },
+    {
+      "sourceClause": "3.8",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Lifecycle guidance informs continuing software security activities but not all verification and validation duties."
+    },
+    {
+      "sourceClause": "3.8",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-18.8"
+      },
+      "relation": "partial",
+      "rationale": "Vulnerability resolution may affect release evidence, without covering all release-process duties."
+    },
+    {
+      "sourceClause": "4.1",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-14.2(d)"
+      },
+      "relation": "partial",
+      "rationale": "Security requirements for the operating environment inform only the IT-infrastructure portion of this requirement."
+    },
+    {
+      "sourceClause": "4.1",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-23.4(ab)"
+      },
+      "relation": "informative",
+      "rationale": "User information can inform the security-related content considered for instructions, without asserting full equivalence."
+    },
+    {
+      "sourceClause": "4.2",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-23.4(ab)"
+      },
+      "relation": "partial",
+      "rationale": "Security information for users contributes to, but does not exhaust, the information required by this clause."
+    },
+    {
+      "sourceClause": "4.3",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Operational security guidance informs software security measures, not all verification and validation activities."
+    },
+    {
+      "sourceClause": "4.3",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-23.4(ab)"
+      },
+      "relation": "informative",
+      "rationale": "User-facing security considerations may inform instructions but do not establish clause equivalence."
+    },
+    {
+      "sourceClause": "5.1",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Lifecycle maintenance guidance informs software security evidence but does not exhaust the clause."
+    },
+    {
+      "sourceClause": "5.1",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-18.8"
+      },
+      "relation": "partial",
+      "rationale": "Maintenance and update records can support release evidence within the broader release obligation."
+    },
+    {
+      "sourceClause": "5.2",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Incident and vulnerability response informs software maintenance evidence, not the whole lifecycle obligation."
+    },
+    {
+      "sourceClause": "5.2",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-18.8"
+      },
+      "relation": "partial",
+      "rationale": "Response and release handling are related, but the guidance addresses only part of the MDR release process."
+    }
+  ]
+}

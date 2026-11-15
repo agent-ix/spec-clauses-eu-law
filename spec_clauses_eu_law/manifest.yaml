@@ -3,3 +3,4 @@ name: spec_clauses_eu_law
 version: 0.1.0
 clause_sets:
   - clauses/eu-mdr-2017-745-2026-07-19.json
+  - clauses/eu-mdcg-mdcg-2019-16-rev1.json
