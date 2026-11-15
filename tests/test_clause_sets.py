@@ -828,9 +828,16 @@ def test_gdpr_article32_crosswalks_reject_article32_three():
     and identifies its sourceClause value.
     Trace: FR-014-AC-1
     """
-    crosswalks = _gdpr_set()["crosswalks"]
-    expected_sources = {item["sourceClause"] for item in crosswalks}
-    unexpected_row = {**crosswalks[0], "sourceClause": "art-32(3)"}
+    expected_sources = {
+        "art-32(1)(a)",
+        "art-32(1)(b)",
+        "art-32(1)(c)",
+        "art-32(1)(d)",
+        "art-32(2)",
+        "art-32(4)",
+    }
+    crosswalks = [{"sourceClause": source} for source in expected_sources]
+    unexpected_row = {"sourceClause": "art-32(3)"}
 
     with pytest.raises(
         AssertionError,
