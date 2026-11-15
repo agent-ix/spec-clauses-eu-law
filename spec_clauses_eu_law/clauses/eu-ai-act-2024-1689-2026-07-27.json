@@ -1,0 +1,641 @@
+{
+  "schemaVersion": "clause-set-v1",
+  "authority": "eu",
+  "id": "ai-act-2024-1689",
+  "title": "AI Act high-risk system obligations",
+  "version": "2026-07-27",
+  "rights": {
+    "structure": "citation_only",
+    "text": "original",
+    "clearance_ref": null,
+    "licence": "EUR-Lex legal documents may be reused for commercial or non-commercial purposes unless otherwise specified. Consolidated texts are CC BY 4.0; acknowledge the source and indicate changes.",
+    "attribution": "© European Union. Source: https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | This set contains original summaries and changes made. EUR-Lex legal notice: https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en"
+  },
+  "source": {
+    "title": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
+    "identifier": "Regulation (EU) 2024/1689",
+    "officialUrl": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng",
+    "applicationDate": {
+      "date": "2028-08-02",
+      "source": "Article 113",
+      "scope": "Article 6(1) Annex I high-risk AI systems; Chapter III Sections 1–3"
+    }
+  },
+  "classificationDimensions": {
+    "ai_high_risk": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "ai_role": {
+      "values": [
+        "provider",
+        "deployer"
+      ]
+    }
+  },
+  "outputCatalog": {
+    "anomaly-list": {
+      "kind": "record",
+      "description": "Unresolved-anomaly report."
+    },
+    "audit-trail": {
+      "kind": "record",
+      "description": "Git history and signed-approval history produced by the `approval-trail` capability for the record."
+    },
+    "conformity-declaration": {
+      "kind": "document",
+      "description": "EU declaration of conformity and its controlled reference."
+    },
+    "data-lineage": {
+      "kind": "record",
+      "description": "Provenance, selection, preparation and transformations for data used by the AI system."
+    },
+    "event-logging-design": {
+      "kind": "record",
+      "description": "Declared events, retention and access controls for AI system logs."
+    },
+    "human-oversight-design": {
+      "kind": "record",
+      "description": "Human oversight roles, measures, competence and output-interpretation controls."
+    },
+    "model-description": {
+      "kind": "document",
+      "description": "Original description of AI system purpose, version, behavior, limits and use."
+    },
+    "post-market-monitoring-plan": {
+      "kind": "document",
+      "description": "Provider plan and evidence for post-market performance monitoring."
+    },
+    "release-record": {
+      "kind": "record",
+      "description": "Engineering-assurance release decision."
+    },
+    "risk-management-records": {
+      "kind": "record",
+      "description": "`spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records."
+    },
+    "security-risk-records": {
+      "kind": "record",
+      "description": "`spec-objects-security` threat, risk, and control records."
+    },
+    "software-architecture": {
+      "kind": "record",
+      "description": "`spec-objects-architecture` parts and connections."
+    },
+    "verification-records": {
+      "kind": "record",
+      "description": "Test matrix and retained evidence."
+    },
+    "written-procedure": {
+      "kind": "procedure",
+      "description": "Customer-owned written procedure."
+    }
+  },
+  "clauses": [
+    {
+      "id": "art-9",
+      "force": "mandatory",
+      "title": "Risk management and review",
+      "text": "The provider maintains a risk process that identifies, evaluates, and addresses risks through the system lifecycle.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "risk-management-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-10",
+      "force": "mandatory",
+      "title": "Training and test data",
+      "text": "The provider governs training, validation, and test data so that relevant data qualities and limitations are assessed and documented.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "data-lineage",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-11",
+      "force": "mandatory",
+      "title": "Technical documentation",
+      "text": "The provider prepares technical documentation that supports conformity assessment and keeps it current.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description",
+        "software-architecture",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-12",
+      "force": "mandatory",
+      "title": "Event logging",
+      "text": "The provider designs event logging that supports traceability of system operation and relevant events.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "event-logging-design"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-13",
+      "force": "mandatory",
+      "title": "Deployer information",
+      "text": "Information supplied to deployers explains intended use, capabilities, limits, and operating conditions.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-14",
+      "force": "mandatory",
+      "title": "Human oversight",
+      "text": "The provider designs human oversight measures that allow people to understand and intervene in system operation.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "human-oversight-design"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-15",
+      "force": "mandatory",
+      "title": "Accuracy, robustness, and cybersecurity",
+      "text": "The provider evaluates system accuracy, robustness, and cybersecurity over the intended operating conditions.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "verification-records",
+        "security-risk-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-16",
+      "force": "mandatory",
+      "title": "Provider responsibilities",
+      "text": "The provider maintains processes for conformity, documentation, corrective action, and cooperation with authorities.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description",
+        "release-record",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-17",
+      "force": "mandatory",
+      "title": "Quality management",
+      "text": "The provider maintains quality-management processes covering the system and its regulatory obligations.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "written-procedure",
+        "audit-trail"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-18",
+      "force": "mandatory",
+      "title": "Documentation and log retention",
+      "text": "The provider retains the required technical documentation and logs for the applicable retention period.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "model-description",
+        "event-logging-design"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-19",
+      "force": "mandatory",
+      "title": "Provider log control",
+      "text": "The provider retains automatically generated logs that are under its control.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "event-logging-design"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-20",
+      "force": "mandatory",
+      "title": "Corrective action and reporting",
+      "text": "The provider acts on non-conformity and communicates required corrective measures to relevant authorities.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "written-procedure",
+        "release-record"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-26",
+      "force": "mandatory",
+      "title": "Deployer operation and oversight",
+      "text": "The deployer uses the system according to its instructions, assigns competent oversight, monitors operation, and reports serious incidents.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "human-oversight-design",
+        "written-procedure",
+        "event-logging-design"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "deployer"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-43",
+      "force": "mandatory",
+      "title": "Conformity assessment",
+      "text": "The provider follows the applicable conformity-assessment route before placing the system on the market or putting it into service.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "conformity-declaration",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-47",
+      "force": "mandatory",
+      "title": "Declaration of conformity",
+      "text": "The provider completes and makes available the required EU declaration of conformity.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "conformity-declaration"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-72",
+      "force": "mandatory",
+      "title": "Post-market monitoring",
+      "text": "The provider establishes a post-market monitoring system and plan for the system.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "post-market-monitoring-plan",
+        "event-logging-design"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-73",
+      "force": "mandatory",
+      "title": "Serious incident reporting",
+      "text": "The provider reports qualifying serious incidents and serious malfunctions through the required process.",
+      "subjects": [
+        "ai-system",
+        "technical-documentation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "written-procedure",
+        "anomaly-list"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "ai_high_risk",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "ai_role",
+            "value": "provider"
+          }
+        ]
+      }
+    }
+  ],
+  "crosswalks": []
+}
