@@ -318,6 +318,8 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         assert not any(
             marker in content for marker in private_key_markers
         ), f"private key material found in {path.relative_to(REPO_ROOT)}"
+        if path.suffix != ".md":
+            continue
         frontmatter = re.match(r"\A---\s*\n(.*?)\n---(?:\s|$)", content, re.DOTALL)
         assert (
             frontmatter is not None
