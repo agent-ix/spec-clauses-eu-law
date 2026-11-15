@@ -124,12 +124,13 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
         re.DOTALL,
     )
     assert gdpr, "spec.md must declare the GDPR identity, source, and legal notice"
+    ai_design = specification.split("## AI Act Set Design", 1)[1].split("\n## ", 1)[0]
     ai_act = re.search(
         r"AI Act sets use authority `([^`]+)`, IDs `([^`]+)` and `([^`]+)`, "
         r"and version `([^`]+)`.*?Their official source is `(https://[^`]+)`.*?"
         r"Licence metadata states that (.+?)\. Attribution identifies .*?"
         r"references `(https://[^`]+)`",
-        design,
+        ai_design,
         re.DOTALL,
     )
     assert ai_act, "spec.md must declare the AI Act identity, source, and legal notice"
