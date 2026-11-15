@@ -883,8 +883,8 @@ def test_gdpr_person_supplied_applicability_contexts():
     """Evaluate controller, processor, risk, and records applicability cases.
 
     Assumptions: Context dimensions are supplied by a responsible person.
-    Criteria: Evaluation uses only those values and preserves unresolved
-    outcomes when a required value is absent.
+    Criteria: Evaluation uses only the supplied values and checks the role-
+    specific Article 30 outcomes when records applicability is absent.
     Trace: FR-011-AC-1, FR-011-AC-2, FR-011-AC-3, FR-011-AC-4, FR-011-AC-5
     """
     key = _spec_set_key("gdpr")
@@ -942,6 +942,28 @@ def test_gdpr_person_supplied_applicability_contexts():
         for clause_id in empty
         if clause_id.startswith(("art-25", "art-30", "art-35"))
     )
+    assert all(
+        empty[clause_id] == "unresolved"
+        for clause_id in empty
+        if clause_id.startswith("art-30")
+    )
+    for role in ("controller", "processor"):
+        missing_records = _outcomes(
+            evaluate_clause_set(PACKAGE_ROOT, key, f"gdpr_role={role}")
+        )
+        controller = role == "controller"
+        assert all(
+            missing_records[f"art-30(1)({letter})"]
+            == ("unresolved" if controller else "not_binding")
+            for letter in "abcdefg"
+        )
+        assert all(
+            missing_records[f"art-30(2)({letter})"]
+            == ("not_binding" if controller else "unresolved")
+            for letter in "abcd"
+        )
+        assert missing_records["art-30(3)"] == "unresolved"
+        assert missing_records["art-30(4)"] == "unresolved"
     for role in ("controller", "processor"):
         exempt = _outcomes(
             evaluate_clause_set(
