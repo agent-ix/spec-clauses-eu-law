@@ -145,6 +145,16 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
     mdr = spec_sets["mdr"]
     mdcg = spec_sets["mdcg"]
     gdpr = spec_sets["gdpr"]
+    gdpr_licence = (
+        "EUR-Lex legal documents may be reused for commercial or non-commercial "
+        "purposes unless otherwise specified. Consolidated texts are CC BY 4.0; "
+        "acknowledge the source and indicate changes."
+    )
+    gdpr_attribution = (
+        f"© European Union. Source: {gdpr['officialUrl']} | "
+        "This set contains original summaries and changes made. "
+        f"EUR-Lex legal notice: {gdpr['legalNoticeUrl']}"
+    )
     return {
         _set_key(mdr["identity"]): {
             "officialUrl": mdr["officialUrl"],
@@ -170,11 +180,12 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
         },
         _set_key(gdpr["identity"]): {
             "officialUrl": gdpr["officialUrl"],
-            "legalNoticeUrl": gdpr["legalNoticeUrl"],
             "rights": {
                 "structure": "citation_only",
                 "text": "original",
                 "clearance_ref": None,
+                "licence": gdpr_licence,
+                "attribution": gdpr_attribution,
             },
         },
     }
@@ -218,6 +229,23 @@ def _assert_set_metadata_matches_spec(clause_set: dict) -> None:
         assert (
             expected["listingUrl"] in rights["attribution"]
         ), f"{key}.rights.attribution omits the source listing URL"
+
+
+def _assert_gdpr_metadata_matches_spec(clause_set: dict) -> None:
+    """Check every GDPR identity, source, and rights field against spec.md."""
+    key = clause_set_key(clause_set)
+    expected = _spec_set_metadata()[key]
+    identity = (clause_set["authority"], clause_set["id"], clause_set["version"])
+    assert (
+        identity == _parsed_spec_sets()["gdpr"]["identity"]
+    ), f"{key}.identity differs from spec.md"
+    assert (
+        clause_set["source"]["officialUrl"] == expected["officialUrl"]
+    ), f"{key}.source.officialUrl differs from spec.md"
+    for field, value in expected["rights"].items():
+        assert (
+            clause_set["rights"][field] == value
+        ), f"{key}.rights.{field} differs from spec.md"
 
 
 def _mdr_set() -> dict:
@@ -358,7 +386,7 @@ def test_manifest_declares_all_m1_clause_sets():
     """Verify the module declares its three M1 clause set files.
 
     Assumptions: The canonical set identities are declared in spec.md.
-    Criteria: The manifest declares the matching MDR and MDCG clause files.
+    Criteria: The manifest declares the matching MDR, MDCG, and GDPR clause files.
     """
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
     assert manifest["clause_sets"] == [
@@ -594,16 +622,7 @@ def test_each_clause_set_rights_and_source_match_the_spec():
     assert {clause_set_key(item) for item in clause_sets} == set(expected)
     for clause_set in clause_sets:
         if clause_set_key(clause_set) == _spec_set_key("gdpr"):
-            key = clause_set_key(clause_set)
-            assert clause_set["rights"]["structure"] == "citation_only"
-            assert clause_set["rights"]["text"] == "original"
-            assert clause_set["rights"]["clearance_ref"] is None
-            assert "CC BY 4.0" in clause_set["rights"]["licence"]
-            assert "original summaries" in clause_set["rights"]["attribution"]
-            assert (
-                expected[key]["legalNoticeUrl"] in clause_set["rights"]["attribution"]
-            )
-            assert clause_set["source"]["officialUrl"] == expected[key]["officialUrl"]
+            _assert_gdpr_metadata_matches_spec(clause_set)
         else:
             _assert_set_metadata_matches_spec(clause_set)
 
@@ -611,6 +630,16 @@ def test_each_clause_set_rights_and_source_match_the_spec():
     # exact-metadata assertions; GDPR's looser rights wording is checked above.
     for clause_set in clause_sets:
         if clause_set_key(clause_set) == _spec_set_key("gdpr"):
+            key = re.escape(clause_set_key(clause_set))
+            broken = json.loads(json.dumps(clause_set))
+            broken["source"]["officialUrl"] = "https://example.invalid/changed"
+            with pytest.raises(AssertionError, match=rf"{key}\.source\.officialUrl"):
+                _assert_gdpr_metadata_matches_spec(broken)
+
+            broken = json.loads(json.dumps(clause_set))
+            broken["rights"]["attribution"] = "changed"
+            with pytest.raises(AssertionError, match=rf"{key}\.rights\.attribution"):
+                _assert_gdpr_metadata_matches_spec(broken)
             continue
         key = re.escape(clause_set_key(clause_set))
         broken = json.loads(json.dumps(clause_set))
@@ -799,15 +828,8 @@ def test_gdpr_set_identity_rights_and_publish_check():
     Trace: FR-009-AC-1, FR-009-AC-2, FR-009-AC-3
     """
     clause_set = _gdpr_set()
-    expected = _spec_set_metadata()[_spec_set_key("gdpr")]
     assert clause_set_key(clause_set) == "eu/gdpr-2016-679@2016-05-04"
-    assert clause_set["source"]["officialUrl"] == expected["officialUrl"]
-    assert clause_set["rights"]["structure"] == "citation_only"
-    assert clause_set["rights"]["text"] == "original"
-    assert clause_set["rights"]["clearance_ref"] is None
-    assert "CC BY 4.0" in clause_set["rights"]["licence"]
-    assert expected["legalNoticeUrl"] in clause_set["rights"]["attribution"]
-    assert "© European Union" in clause_set["rights"]["attribution"]
+    _assert_gdpr_metadata_matches_spec(clause_set)
     result = run(engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT))
     assert result.returncode == 0, result.stderr + result.stdout
 
