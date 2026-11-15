@@ -8,6 +8,7 @@ import pathlib
 import shutil
 import subprocess
 import tarfile
+import tempfile
 import zipfile
 
 import pytest
@@ -18,7 +19,6 @@ from conftest import (
     REPO_ROOT,
     assert_crosswalk_targets_resolve,
     assert_output_catalog_consistent,
-    clause_set_key,
     engine_tool,
     load_clause_sets,
     run,
@@ -145,24 +145,28 @@ def test_quoin_detects_a_licensed_set_in_a_temporary_module(tmp_path):
     """
     licensed_set = _synthetic_set("example.invalid", "licensed", "1.0.0")
     licensed_set["rights"]["text"] = "licensed"
-    module_root = stage_clause_sets(tmp_path, licensed_set)
-    home = tmp_path / "licensed-home"
-    config_root = tmp_path / "licensed-config"
-    home.mkdir()
-    config_root.mkdir()
-    env = {**os.environ, "HOME": str(home), "IX_CONFIG_ROOT": str(config_root)}
-    installed = run(
-        engine_tool("quoin"),
-        "module",
-        "install",
-        f"path:{module_root}",
-        env=env,
-    )
-    assert installed.returncode == 0, installed.stderr + installed.stdout
-    listed = run(engine_tool("quoin"), "module", "list", env=env)
-    assert listed.returncode == 0, listed.stderr + listed.stdout
-    module = json.loads(listed.stdout)["plugins"][0]
-    assert module["pack"] is True
+    source_root = pathlib.Path(tempfile.mkdtemp(prefix="eu-pack-", dir="/var/tmp"))
+    try:
+        module_root = stage_clause_sets(source_root, licensed_set)
+        home = tmp_path / "licensed-home"
+        config_root = tmp_path / "licensed-config"
+        home.mkdir()
+        config_root.mkdir()
+        env = {**os.environ, "HOME": str(home), "IX_CONFIG_ROOT": str(config_root)}
+        installed = run(
+            engine_tool("quoin"),
+            "module",
+            "install",
+            f"path:{module_root}",
+            env=env,
+        )
+        assert installed.returncode == 0, installed.stderr + installed.stdout
+        listed = run(engine_tool("quoin"), "module", "list", env=env)
+        assert listed.returncode == 0, listed.stderr + listed.stdout
+        module = json.loads(listed.stdout)["plugins"][0]
+        assert module["pack"] is True
+    finally:
+        shutil.rmtree(source_root)
 
 
 @pytest.mark.trace("TC-005", "FR-006-AC-1")
