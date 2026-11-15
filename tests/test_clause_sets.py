@@ -117,6 +117,12 @@ def _spec_ai_act_annex_rows() -> list[dict[str, str]]:
     return rows
 
 
+def _ai_act_annex_dimension(clause_id: str) -> str:
+    """Return the point-applicability dimension for one Annex IV clause."""
+    point_id = clause_id[3:].replace("(", "_").replace(")", "").replace(".", "_")
+    return f"ai_annex_iv_{point_id}_applicable"
+
+
 def _parsed_spec_sets() -> dict[str, dict[str, object]]:
     """Parse canonical identities and rights metadata from spec.md once."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
@@ -1584,10 +1590,7 @@ def test_ai_act_annex_rows_match_the_normative_table():
     clause_set = _ai_act_annex_set()
     rows = _spec_ai_act_annex_rows()
     _assert_ai_act_annex_clause_fields(clause_set)
-    point_dimensions = {
-        f"ai_annex_iv_{row['id'][3:].replace('(', '_').replace(')', '').replace('.', '_')}_applicable"
-        for row in rows
-    }
+    point_dimensions = {_ai_act_annex_dimension(row["id"]) for row in rows}
     common_dimensions = {"ai_high_risk", "ai_role"}
     assert len(point_dimensions) == 23
     assert set(clause_set["classificationDimensions"]) == (
@@ -1704,10 +1707,7 @@ def test_ai_act_annex_applicability_is_person_supplied_and_independent():
             )
         )
         clause_id = next(
-            row["id"]
-            for row in rows
-            if point
-            == f"ai_annex_iv_{row['id'][3:].replace('(', '_').replace(')', '').replace('.', '_')}_applicable"
+            row["id"] for row in rows if point == _ai_act_annex_dimension(row["id"])
         )
         assert not_applicable[clause_id] == "not_binding", f"{clause_id} for {point}=no"
         assert all(
