@@ -80,7 +80,7 @@ def scan_archive(
         initialized = _run(["git", "init", "--quiet", "-b", "main"], cwd=root)
         if initialized.returncode != 0:
             return False, ["could not initialize the extracted package scan tree"]
-        added = _run(["git", "add", "--all"], cwd=root)
+        added = _run(["git", "add", "--force", "--all"], cwd=root)
         if added.returncode != 0:
             return False, ["could not select the extracted package files for scanning"]
         scanned = _run(

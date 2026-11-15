@@ -9,6 +9,7 @@ import subprocess
 import tarfile
 from importlib.util import module_from_spec, spec_from_file_location
 
+import pytest
 import yaml
 from conftest import REPO_ROOT, engine_tool, run
 
@@ -96,6 +97,7 @@ def test_content_rights_tree_accepts_allowed_public_identifiers(tmp_path):
     assert report["findings"] == []
 
 
+@pytest.mark.trace("NFR-001-AC-2")
 def test_content_rights_tree_rejects_synthetic_designator_without_source_text(
     tmp_path,
 ):
@@ -153,6 +155,7 @@ def test_scan_archive_runs_content_rights_over_wheel_and_npm_tree(tmp_path):
     assert scan_archive(npm, _rights_tool()) == (True, [])
 
 
+@pytest.mark.trace("NFR-001-AC-2")
 def test_scan_archive_checks_nonlicense_wheel_contents(tmp_path):
     wheel_tree = tmp_path / "wheel-tree"
     package = wheel_tree / "spec_clauses_eu_law"
@@ -173,3 +176,24 @@ def test_scan_archive_checks_nonlicense_wheel_contents(tmp_path):
     assert findings == [
         "spec_clauses_eu_law/bad.json:1: external-publication-identifier"
     ]
+
+
+@pytest.mark.trace("NFR-001-AC-2")
+def test_scan_archive_checks_clause_ignored_by_package_gitignore(tmp_path):
+    npm_tree = tmp_path / "npm-tree"
+    package = npm_tree / "package"
+    clauses = package / "clauses"
+    clauses.mkdir(parents=True)
+    (package / ".gitignore").write_text("clauses/evil.json\n")
+    (package / "manifest.yaml").write_text("clause_sets: []\n")
+    (clauses / "evil.json").write_text(
+        '{"text":"Synthetic fixture cites ISO 999999999"}\n'
+    )
+    npm = tmp_path / "fixture.tgz"
+    with tarfile.open(npm, "w:gz") as archive:
+        archive.add(package, arcname="package")
+
+    accepted, findings = scan_archive(npm, _rights_tool())
+
+    assert not accepted
+    assert findings == ["package/clauses/evil.json:1: external-publication-identifier"]
