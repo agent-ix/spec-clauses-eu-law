@@ -124,6 +124,15 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
         re.DOTALL,
     )
     assert gdpr, "spec.md must declare the GDPR identity, source, and legal notice"
+    ai_act = re.search(
+        r"AI Act sets use authority `([^`]+)`, IDs `([^`]+)` and `([^`]+)`, "
+        r"and version `([^`]+)`.*?Their official source is `(https://[^`]+)`.*?"
+        r"Licence metadata states that (.+?)\. Attribution identifies .*?"
+        r"references `(https://[^`]+)`",
+        design,
+        re.DOTALL,
+    )
+    assert ai_act, "spec.md must declare the AI Act identity, source, and legal notice"
     return {
         "mdr": {
             "identity": (mdr.group(1), mdr.group(2), mdr.group(3)),
@@ -147,6 +156,11 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
             "identity": (gdpr.group(1), gdpr.group(2), gdpr.group(3)),
             "officialUrl": gdpr.group(4),
             "legalNoticeUrl": gdpr.group(5),
+        },
+        "ai_act": {
+            "identity": (ai_act.group(1), ai_act.group(2), ai_act.group(4)),
+            "officialUrl": ai_act.group(5),
+            "legalNoticeUrl": ai_act.group(7),
         },
     }
 
@@ -173,6 +187,7 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
     mdr = spec_sets["mdr"]
     mdcg = spec_sets["mdcg"]
     gdpr = spec_sets["gdpr"]
+    ai_act = spec_sets["ai_act"]
     gdpr_licence = (
         "EUR-Lex legal documents may be reused for commercial or non-commercial "
         "purposes unless otherwise specified. Consolidated texts are CC BY 4.0; "
@@ -214,6 +229,25 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
                 "clearance_ref": None,
                 "licence": gdpr_licence,
                 "attribution": gdpr_attribution,
+            },
+        },
+        _set_key(ai_act["identity"]): {
+            "officialUrl": ai_act["officialUrl"],
+            "licence": (
+                "EUR-Lex legal documents may be reused for commercial or "
+                "non-commercial purposes unless otherwise specified and that "
+                "the consolidated text is under CC BY 4.0 with source attribution "
+                "and indication of changes"
+            ),
+            "attribution": (
+                f"© European Union. Source: {ai_act['officialUrl']} | This set "
+                f"contains original summaries and changes made. EUR-Lex legal "
+                f"notice: {ai_act['legalNoticeUrl']}"
+            ),
+            "rights": {
+                "structure": "citation_only",
+                "text": "original",
+                "clearance_ref": None,
             },
         },
     }
@@ -1065,25 +1099,8 @@ def test_ai_act_set_identity_rights_and_application_date():
     Article 113 application-date metadata is present and exact.
     """
     clause_set = _ai_act_set()
-    source_url = "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng"
-    legal_notice = (
-        "https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en"
-    )
-    licence = (
-        "EUR-Lex legal documents may be reused for commercial or non-commercial "
-        "purposes unless otherwise specified. Consolidated texts are CC BY 4.0; "
-        "acknowledge the source and indicate changes."
-    )
     assert clause_set_key(clause_set) == "eu/ai-act-2024-1689@2026-07-27"
-    assert clause_set["source"]["officialUrl"] == source_url
-    assert clause_set["rights"]["structure"] == "citation_only"
-    assert clause_set["rights"]["text"] == "original"
-    assert clause_set["rights"]["clearance_ref"] is None
-    assert clause_set["rights"]["licence"] == licence
-    assert clause_set["rights"]["attribution"] == (
-        f"© European Union. Source: {source_url} | This set contains original "
-        f"summaries and changes made. EUR-Lex legal notice: {legal_notice}"
-    )
+    _assert_set_metadata_matches_spec(clause_set)
     assert clause_set["source"]["applicationDate"] == {
         "date": "2028-08-02",
         "source": "Article 113",
