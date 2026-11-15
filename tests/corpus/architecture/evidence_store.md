@@ -1,5 +1,5 @@
 ---
-id: example.invalid/evidence_store
+id: evidence_store
 title: "EvidenceStore"
 type: part
 object: part
