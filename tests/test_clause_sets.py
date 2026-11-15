@@ -420,9 +420,7 @@ def test_mdr_single_set_discharge_renders_expected_rows(tmp_path):
     )
     assert rendered.returncode == 0, rendered.stderr + rendered.stdout
     assert "| I-17.2 | Applicable | Compliant |" in rendered.stdout
-    assert (
-        "| I-18.8 | Applicable | Not compliant - undischarged:" in rendered.stdout
-    )
+    assert "| I-18.8 | Applicable | Not compliant - undischarged:" in rendered.stdout
 
 
 @pytest.mark.trace("FR-006-AC-2")
