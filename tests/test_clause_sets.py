@@ -407,12 +407,14 @@ def test_manifest_declares_no_non_clause_contributions():
     assert not {"object_types", "archetypes", "edges"}.intersection(manifest)
 
 
+@pytest.mark.trace("FR-014-AC-4")
 def test_quire_validates_the_module_and_spec_bundle():
-    """Validate the empty module and its specification documents.
+    """Validate the clause module and its specification documents.
 
     Assumptions: The installed ISO artifacts module supplies validation
     schemas.
     Criteria: Quire exits successfully for the EU module and spec documents.
+    Trace: FR-014-AC-4
     """
     iso_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-iso"
     process_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-process"
@@ -800,6 +802,184 @@ def test_mdcg_missing_mdr_target_fails_with_source_and_target_key(tmp_path):
         assert_crosswalk_targets_resolve(load_clause_sets(fixture / "manifest.yaml"))
 
 
+def _assert_exact_crosswalk_source_rows(
+    crosswalks: list[dict], expected_sources: set[str]
+) -> None:
+    """Require Article 32 crosswalk rows to use exactly the selected clauses."""
+    actual_sources = {item["sourceClause"] for item in crosswalks}
+    unexpected = sorted(actual_sources - expected_sources)
+    missing = sorted(expected_sources - actual_sources)
+    assert (
+        not unexpected
+    ), "unexpected sourceClause row(s) in Article 32 crosswalks: " + ", ".join(
+        unexpected
+    )
+    assert (
+        not missing
+    ), "missing sourceClause row(s) in Article 32 crosswalks: " + ", ".join(missing)
+
+
+@pytest.mark.trace("FR-014-AC-1")
+def test_gdpr_article32_crosswalks_reject_article32_three():
+    """Reject an Article 32(3) source row outside the selected clause set.
+
+    Assumptions: The selected GDPR clause rows are valid.
+    Criteria: Exact source coverage rejects an unexpected Article 32(3) row
+    and identifies its sourceClause value.
+    Trace: FR-014-AC-1
+    """
+    expected_sources = {
+        "art-32(1)(a)",
+        "art-32(1)(b)",
+        "art-32(1)(c)",
+        "art-32(1)(d)",
+        "art-32(2)",
+        "art-32(4)",
+    }
+    crosswalks = [{"sourceClause": source} for source in expected_sources]
+    unexpected_row = {"sourceClause": "art-32(3)"}
+
+    with pytest.raises(
+        AssertionError,
+        match=r"unexpected sourceClause row\(s\).*art-32\(3\)",
+    ):
+        _assert_exact_crosswalk_source_rows(
+            [*crosswalks, unexpected_row], expected_sources
+        )
+
+
+@pytest.mark.trace("FR-014-AC-1", "FR-014-AC-2", "FR-014-AC-3")
+def test_gdpr_article32_crosswalks_use_the_selected_nist_and_hipaa_sets():
+    """Check Article 32 mappings against the two selected installed sets.
+
+    Assumptions: The NIST 5.2.0 and HIPAA 2026-11-12 modules are installed as
+    test dependencies, and the GDPR set is loaded from its declared manifest.
+    Criteria: Each required Article 32 clause has the intended targets in both
+    exact sets, every rationale is non-empty, relations are non-equivalent,
+    and every external clause target resolves in the installed module.
+    """
+    clause_sets = load_clause_sets()
+    gdpr = _gdpr_set()
+    expected = {
+        "art-32(1)(a)": {
+            ("nist/sp800-53@5.2.0", "SC-8"),
+            ("nist/sp800-53@5.2.0", "SC-28"),
+            ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.312(a)(2)(iv)"),
+            ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.312(e)(2)(ii)"),
+        },
+        "art-32(1)(b)": {
+            ("nist/sp800-53@5.2.0", "SC-5"),
+            ("nist/sp800-53@5.2.0", "SI-7"),
+            ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.312(c)(1)"),
+        },
+        "art-32(1)(c)": {
+            ("nist/sp800-53@5.2.0", "CP-9"),
+            ("nist/sp800-53@5.2.0", "CP-10"),
+            ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.308(a)(7)(ii)(B)"),
+        },
+        "art-32(1)(d)": {
+            ("nist/sp800-53@5.2.0", "CA-2"),
+            ("nist/sp800-53@5.2.0", "CA-8"),
+            ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.308(a)(8)"),
+        },
+        "art-32(2)": {
+            ("nist/sp800-53@5.2.0", "RA-3"),
+            ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.308(a)(1)(ii)(A)"),
+        },
+        "art-32(4)": {
+            ("nist/sp800-53@5.2.0", "AC-6"),
+            ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.308(a)(4)(i)"),
+        },
+    }
+    _assert_exact_crosswalk_source_rows(gdpr["crosswalks"], set(expected))
+    actual = {
+        source: {
+            (
+                f"{item['target']['set']['authority']}/{item['target']['set']['id']}@"
+                f"{item['target']['set']['version']}",
+                item["target"]["clause"],
+            )
+            for item in gdpr["crosswalks"]
+            if item["sourceClause"] == source
+        }
+        for source in expected
+    }
+    assert actual == expected
+    assert all(
+        item["relation"] in {"partial", "informative"} and item["rationale"].strip()
+        for item in gdpr["crosswalks"]
+    )
+    assert_crosswalk_targets_resolve(clause_sets)
+
+
+@pytest.mark.trace("FR-014-AC-2")
+def test_gdpr_article32_missing_nist_target_names_source_and_target():
+    """Reject an Article 32 crosswalk whose installed NIST target is absent.
+
+    Assumptions: The real NIST target module is installed and the GDPR set
+    otherwise contains its valid Article 32 mappings.
+    Criteria: Resolution fails and names the source clause and exact missing
+    target set key and clause id.
+    """
+    source = json.loads(json.dumps(_gdpr_set()))
+    crosswalk = next(
+        item
+        for item in source["crosswalks"]
+        if item["target"]["set"]["authority"] == "nist"
+    )
+    crosswalk["target"]["clause"] = "XX-99"
+    source_key = re.escape(_spec_set_key("gdpr"))
+    source_clause = re.escape(crosswalk["sourceClause"])
+    with pytest.raises(
+        AssertionError,
+        match=rf"{source_key}#{source_clause}.*nist/sp800-53@5\.2\.0#XX-99",
+    ):
+        assert_crosswalk_targets_resolve([source])
+
+
+@pytest.mark.trace("FR-014-AC-2")
+def test_gdpr_article32_missing_nist_set_names_source_and_target():
+    """Reject an Article 32 crosswalk whose NIST target set is not installed.
+
+    Assumptions: The real GDPR set has a valid Article 32 crosswalk to NIST.
+    Criteria: Resolution fails and names the source clause and missing target
+    set key and clause id.
+    """
+    source = json.loads(json.dumps(_gdpr_set()))
+    crosswalk = next(
+        item
+        for item in source["crosswalks"]
+        if item["target"]["set"]["authority"] == "nist"
+    )
+    crosswalk["target"]["set"]["id"] = "missing-sp800-53"
+    source_key = re.escape(_spec_set_key("gdpr"))
+    source_clause = re.escape(crosswalk["sourceClause"])
+    with pytest.raises(
+        AssertionError,
+        match=rf"{source_key}#{source_clause}.*nist/missing-sp800-53@5\.2\.0#{crosswalk['target']['clause']}",
+    ):
+        assert_crosswalk_targets_resolve([source])
+
+
+@pytest.mark.trace("FR-014-AC-2")
+def test_nist_and_hipaa_clause_files_are_not_copied_into_the_eu_pack():
+    """Keep crosswalk targets in their installed modules instead of this repo.
+
+    Assumptions: The repository checkout contains its tracked file inventory.
+    Criteria: No tracked NIST or US HIPAA clause file is present in this module.
+    """
+    result = run("git", "ls-files", "-z", cwd=REPO_ROOT)
+    assert result.returncode == 0, result.stderr
+    tracked = result.stdout.split("\0")
+    copied = [
+        path
+        for path in tracked
+        if "nist-sp800-53" in pathlib.Path(path).name
+        or pathlib.Path(path).name.startswith("us-hhs-")
+    ]
+    assert copied == []
+
+
 @pytest.mark.trace("FR-006-AC-1")
 def test_mdcg_declares_the_spec_catalog_subset_used_by_its_clauses():
     """Check that the MDCG set uses its exact canonical output subset.
@@ -818,14 +998,14 @@ def test_mdcg_declares_the_spec_catalog_subset_used_by_its_clauses():
     assert clause_set["outputCatalog"] == {name: catalog[name] for name in sorted(used)}
 
 
-@pytest.mark.trace("FR-009-AC-1", "FR-009-AC-2", "FR-009-AC-3")
+@pytest.mark.trace("FR-009-AC-1", "FR-009-AC-2", "FR-009-AC-3", "FR-014-AC-4")
 def test_gdpr_set_identity_rights_and_publish_check():
     """Check GDPR identity, attribution metadata, and publishability.
 
     Assumptions: spec.md declares the consulted EUR-Lex consolidation.
     Criteria: The manifest set matches its declared identity and rights, and
     Quire accepts the public module for publication.
-    Trace: FR-009-AC-1, FR-009-AC-2, FR-009-AC-3
+    Trace: FR-009-AC-1, FR-009-AC-2, FR-009-AC-3, FR-014-AC-4
     """
     clause_set = _gdpr_set()
     assert clause_set_key(clause_set) == "eu/gdpr-2016-679@2016-05-04"

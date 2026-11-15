@@ -21,6 +21,11 @@ jobs:
           repository: agent-ix/engineering-assurance
           ref: v0.10.1
           path: .deps/engineering-assurance
+      - uses: actions/checkout@v4
+        with:
+          repository: agent-ix/spec-clauses-us-health
+          ref: ca78ac063186e5ff8d8e074382a3527b6b84d0b8
+          path: .deps/spec-clauses-us-health
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.98.1
@@ -34,6 +39,14 @@ jobs:
         run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
       - name: Install default Quire modules
         run: quoin module ensure-defaults
+      - name: Validate specification documents
+        run: quire validate 'spec/**/*.md' --module "$GITHUB_WORKSPACE/spec_clauses_eu_law" --module "$HOME/.ix/filament/modules/spec-artifacts-iso" --module "$HOME/.ix/filament/modules/spec-artifacts-process"
+      - name: Check clause-set publication rights
+        run: quire publish-check --module "$GITHUB_WORKSPACE/spec_clauses_eu_law"
+      - name: Install the pinned NIST module for crosswalk tests
+        run: quoin module install github:agent-ix/spec-objects-security//spec_objects_security@v0.13.0
+      - name: Install the pinned HIPAA module for crosswalk tests
+        run: quoin module install path:$GITHUB_WORKSPACE/.deps/spec-clauses-us-health/spec_clauses_us_health
       - name: Build engineering-assurance content rights checker
         run: cargo build --locked --features full --manifest-path .deps/engineering-assurance/Cargo.toml
       - name: Add engineering-assurance to PATH

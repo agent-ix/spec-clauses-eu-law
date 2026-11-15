@@ -879,5 +879,227 @@
       }
     }
   ],
-  "crosswalks": []
+  "crosswalks": [
+    {
+      "sourceClause": "art-32(1)(a)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "SC-8"
+      },
+      "relation": "partial",
+      "rationale": "Transmission protection reduces exposure while data moves, but does not cover the full selection of security measures."
+    },
+    {
+      "sourceClause": "art-32(1)(a)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "SC-28"
+      },
+      "relation": "partial",
+      "rationale": "Protection of information at rest contributes to confidentiality, but is only one part of the required risk-appropriate measures."
+    },
+    {
+      "sourceClause": "art-32(1)(a)",
+      "target": {
+        "set": {
+          "authority": "us-hhs",
+          "id": "45-cfr-164-subpart-c",
+          "version": "2026-11-12"
+        },
+        "clause": "164.312(a)(2)(iv)"
+      },
+      "relation": "partial",
+      "rationale": "Encryption and decryption support confidentiality at rest, but do not define the full security-of-processing duty."
+    },
+    {
+      "sourceClause": "art-32(1)(a)",
+      "target": {
+        "set": {
+          "authority": "us-hhs",
+          "id": "45-cfr-164-subpart-c",
+          "version": "2026-11-12"
+        },
+        "clause": "164.312(e)(2)(ii)"
+      },
+      "relation": "partial",
+      "rationale": "Transmission encryption supports confidentiality in transit, but does not cover the full security-of-processing duty."
+    },
+    {
+      "sourceClause": "art-32(1)(b)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "SC-5"
+      },
+      "relation": "partial",
+      "rationale": "Denial-of-service protection supports availability, but addresses only one part of resilience."
+    },
+    {
+      "sourceClause": "art-32(1)(b)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "SI-7"
+      },
+      "relation": "partial",
+      "rationale": "Software integrity controls support integrity of system information, but do not cover every processing-security outcome."
+    },
+    {
+      "sourceClause": "art-32(1)(b)",
+      "target": {
+        "set": {
+          "authority": "us-hhs",
+          "id": "45-cfr-164-subpart-c",
+          "version": "2026-11-12"
+        },
+        "clause": "164.312(c)(1)"
+      },
+      "relation": "partial",
+      "rationale": "Protection against improper alteration or destruction contributes to integrity, but covers only part of the required outcomes."
+    },
+    {
+      "sourceClause": "art-32(1)(c)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "CP-9"
+      },
+      "relation": "partial",
+      "rationale": "System backup supports recovery of available data, but does not by itself establish timely restoration."
+    },
+    {
+      "sourceClause": "art-32(1)(c)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "CP-10"
+      },
+      "relation": "partial",
+      "rationale": "System recovery supports restoration after disruption, but does not cover every restoration circumstance."
+    },
+    {
+      "sourceClause": "art-32(1)(c)",
+      "target": {
+        "set": {
+          "authority": "us-hhs",
+          "id": "45-cfr-164-subpart-c",
+          "version": "2026-11-12"
+        },
+        "clause": "164.308(a)(7)(ii)(B)"
+      },
+      "relation": "partial",
+      "rationale": "Restoration of lost data supports availability recovery, but does not establish the full GDPR restoration obligation."
+    },
+    {
+      "sourceClause": "art-32(1)(d)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "CA-2"
+      },
+      "relation": "partial",
+      "rationale": "Security control assessments contribute to regular evaluation, but do not encompass every technical and organisational measure."
+    },
+    {
+      "sourceClause": "art-32(1)(d)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "CA-8"
+      },
+      "relation": "partial",
+      "rationale": "Penetration testing is one assessment method and cannot establish the effectiveness of all measures."
+    },
+    {
+      "sourceClause": "art-32(1)(d)",
+      "target": {
+        "set": {
+          "authority": "us-hhs",
+          "id": "45-cfr-164-subpart-c",
+          "version": "2026-11-12"
+        },
+        "clause": "164.308(a)(8)"
+      },
+      "relation": "partial",
+      "rationale": "Periodic evaluation contributes to effectiveness review, but is not the same complete set of GDPR testing duties."
+    },
+    {
+      "sourceClause": "art-32(2)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "RA-3"
+      },
+      "relation": "partial",
+      "rationale": "Risk assessment supports consideration of processing risks, but applies a different control framework and does not replace the GDPR assessment."
+    },
+    {
+      "sourceClause": "art-32(2)",
+      "target": {
+        "set": {
+          "authority": "us-hhs",
+          "id": "45-cfr-164-subpart-c",
+          "version": "2026-11-12"
+        },
+        "clause": "164.308(a)(1)(ii)(A)"
+      },
+      "relation": "partial",
+      "rationale": "Risk analysis supports assessment of electronic protected health information risks, but does not cover all GDPR risk factors or duties."
+    },
+    {
+      "sourceClause": "art-32(4)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "AC-6"
+      },
+      "relation": "partial",
+      "rationale": "Least-privilege access restrictions can limit a person's or process's access, but they do not establish that processing follows the controller's or processor's instructions."
+    },
+    {
+      "sourceClause": "art-32(4)",
+      "target": {
+        "set": {
+          "authority": "us-hhs",
+          "id": "45-cfr-164-subpart-c",
+          "version": "2026-11-12"
+        },
+        "clause": "164.308(a)(4)(i)"
+      },
+      "relation": "partial",
+      "rationale": "Access-authorization policies address the authorization boundary for access, but they do not establish instruction-bound processing or cover personal data beyond the HIPAA scope."
+    }
+  ]
 }
