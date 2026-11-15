@@ -134,6 +134,20 @@ def _assert_fact_refs_resolve(corpus: pathlib.Path, facts: list[dict]) -> None:
                 ) from error
 
 
+def _report_clause_rows(value: object, clause_id: str) -> list[dict]:
+    """Find structured RMM rows for one clause in a nested report value."""
+    if isinstance(value, dict):
+        matches = [value] if value.get("clauseId") == clause_id else []
+        return matches + [
+            row
+            for child in value.values()
+            for row in _report_clause_rows(child, clause_id)
+        ]
+    if isinstance(value, list):
+        return [row for child in value for row in _report_clause_rows(child, clause_id)]
+    return []
+
+
 def _stage_mdr_mdcg_module(tmp_path: pathlib.Path) -> pathlib.Path:
     """Stage only the two sets this ticket requires in the pack index."""
     module = tmp_path / "module"
@@ -280,7 +294,7 @@ def _facts_for_binding(
     return facts
 
 
-@pytest.mark.trace("FR-008-AC-1", "FR-008-AC-8")
+@pytest.mark.trace("FR-008-AC-1")
 def test_synthetic_corpus_validates_and_contains_no_secret_material():
     """Validate the synthetic Markdown corpus and its identifiers.
 
@@ -288,6 +302,7 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
     dependencies installed.
     Criteria: The corpus glob validates, references use the reserved domain, and
     no private key material is present.
+    Trace: FR-008-AC-1
     """
     quire, _, _ = _preflight()
     validated = run(
@@ -324,13 +339,14 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
     assert all("example.invalid" in reference for reference in refs), refs
 
 
-@pytest.mark.trace("FR-008-AC-4")
+@pytest.mark.trace("FR-007-AC-2")
 def test_customer_owned_clause_rejects_direct_fixture_fact():
     """Reject direct facts for all-procedure clauses and require approval.
 
     Assumptions: Procedure output kinds define customer-owned clauses.
     Criteria: A direct fixture fails with the clause named; a delegated fixture
     passes only with rationale and customer approval reference.
+    Trace: FR-007-AC-2
     """
     fixture = {
         "outputCatalog": {"written-procedure": {"kind": "procedure"}},
@@ -373,13 +389,7 @@ def test_dangling_evidence_fixture_fails_with_clause_id(tmp_path: pathlib.Path):
         )
 
 
-@pytest.mark.trace(
-    "FR-008-AC-2",
-    "FR-008-AC-3",
-    "FR-008-AC-5",
-    "FR-008-AC-6",
-    "FR-008-AC-7",
-)
+@pytest.mark.trace("FR-008-AC-2", "FR-008-AC-3", "FR-007-AC-2")
 def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     """Record facts from signed corpus evidence and render the pack RMM.
 
@@ -388,6 +398,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     Criteria: Every binding clause except I-18.8 has one fact; references
     resolve; the pack index and clause statuses match the acceptance contract;
     report output excludes clause titles and text.
+    Trace: FR-008-AC-2, FR-008-AC-3, FR-007-AC-2
     """
     quire, quoin, assurance = _preflight()
     corpus = _signed_corpus(tmp_path, assurance)
@@ -403,7 +414,6 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         "eu/mdr-2017-745@2026-07-19",
         "eu-mdcg/mdcg-2019-16@rev1",
     }
-    clause_bindings: dict[str, dict] = {}
     for key in expected_keys:
         clause_set = keys[key]
         authority, set_id, version = _clause_set_args(key)
@@ -424,7 +434,6 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             "--json",
         )
         binding = json.loads(evaluated.stdout)
-        clause_bindings[key] = binding
         facts = _facts_for_binding(clause_set, binding, OPEN_CLAUSES.get(key))
         _assert_customer_owned_facts(clause_set, facts)
         binding_path = tmp_path / f"{set_id}-binding.json"
@@ -486,13 +495,46 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     assert report.get("schemaVersion") == "requirements-mapping-pack-v1"
     index = report.get("index")
     assert isinstance(index, list), "pack report must expose a clause-set index"
-    set_keys = [entry.get("clauseSet") for entry in index]
+    set_keys = [
+        _clause_set_key(entry["clauseSet"])
+        for entry in index
+        if isinstance(entry.get("clauseSet"), dict)
+    ]
+    assert len(set_keys) == len(index), "every index entry must identify its clause set"
     assert set_keys == sorted(expected_keys, key=lambda value: value.encode()), set_keys
     assert len(index) == 2
     rendered = json.dumps(report)
     assert "I-17.3" in rendered and "Not applicable" in rendered
-    assert "I-18.8" in rendered and "Not compliant - undischarged" in rendered
-    assert "Compliant" in rendered and "signature-commit.json" in rendered
+    mdr_rows = _report_clause_rows(report, "I-18.8")
+    assert len(mdr_rows) == 1, mdr_rows
+    mdr_row = mdr_rows[0]
+    assert mdr_row["compliance"] == "undischarged"
+    compliant_rows = _report_clause_rows(report, "I-17.2")
+    assert len(compliant_rows) == 1, compliant_rows
+    assert compliant_rows[0]["compliance"] == "compliant"
+    assert any(
+        "signature-commit.json" in reference
+        for reference in compliant_rows[0]["evidenceRefs"]
+    )
+
+    markdown = _checked(
+        quoin,
+        "discharge",
+        "--rmm",
+        "--pack",
+        "spec_clauses_eu_law",
+        "--repo",
+        str(store),
+        "--as-of",
+        AS_OF,
+        "--context",
+        "mobile_platform=no",
+        env=env,
+    ).stdout
+    assert "I-18.8" in markdown
+    assert "Not compliant - undischarged" in markdown
+    assert "I-17.2" in markdown and "Compliant" in markdown
+    assert "I-17.3" in markdown and "Not applicable" in markdown
     for clause_set in (keys[key] for key in expected_keys):
         for clause in clause_set["clauses"]:
             assert (
