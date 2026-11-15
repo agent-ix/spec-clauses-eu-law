@@ -40,9 +40,7 @@ def load_clause_sets(manifest_path: pathlib.Path = MANIFEST_PATH) -> list[dict]:
 
 def clause_set_key(clause_set: dict) -> str:
     """Return the stable key used to identify one clause set."""
-    return (
-        f"{clause_set['authority']}/{clause_set['id']}@{clause_set['version']}"
-    )
+    return f"{clause_set['authority']}/{clause_set['id']}@{clause_set['version']}"
 
 
 def evaluate_clause_set(module_root: pathlib.Path, key: str, *context: str) -> dict:
