@@ -97,18 +97,25 @@ The same artifact has the same name, kind and description in every EU-law set an
 
 | Name | Kind | Description |
 |---|---|---|
-| risk-management-records | record | Hazard, harm, risk-estimate and residual-risk records. |
+| risk-management-records | record | `spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records. |
 | software-requirements | record | Functional and non-functional requirements (FR/NFR). |
-| software-architecture | record | Parts and connections in the software architecture. |
-| verification-records | record | Test matrix and retained verification evidence. |
-| soup-list | record | Software of unknown provenance report. |
-| security-risk-records | record | Threat, risk and control records. |
+| software-architecture | record | `spec-objects-architecture` parts and connections. |
+| verification-records | record | Test matrix and retained evidence. |
+| soup-list | record | Software of unknown provenance (SOUP) report. |
+| security-risk-records | record | `spec-objects-security` threat, risk, and control records. |
 | anomaly-list | record | Unresolved anomaly report. |
 | release-record | record | Engineering-assurance release decision. |
 | it-requirements-statement | document | Minimum hardware, network and IT-security requirements for instructions for use. |
 | written-procedure | procedure | Customer-owned written procedure. |
-| signed-record | record | Signed commit or tag verified by the toolchain. |
+| signed-record | record | Signed commit or tag verified by `git verify-commit` or `git verify-tag`. |
 | audit-trail | record | Git history of the record. |
+| signer-registry | record | Allowed-signers mapping from signing key to named person. |
+| signature-meaning | record | The `Signed-off-meaning:` trailer. |
+| fda-certification-record | record | Evidence that the electronic-signature certification was submitted to FDA. |
+| approval-trail | record | Engineering-assurance approval-trail output. |
+| access-control | record | Repository permission and branch-rule settings. |
+| system-validation | record | Validation evidence for the toolchain's intended use. |
+| training-record | procedure | Customer-owned training record. |
 
 A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with rationale and customer approval reference, never a direct fact. `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
 
