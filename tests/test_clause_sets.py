@@ -1090,7 +1090,7 @@ def test_gdpr_person_supplied_applicability_contexts():
         )
 
 
-@pytest.mark.trace("FR-016-AC-2", "FR-016-AC-3", "FR-022-AC-1", "FR-022-AC-2")
+@pytest.mark.trace("FR-022-AC-1", "FR-022-AC-2")
 def test_ai_act_set_identity_rights_and_application_date():
     """Check the AI Act set's source metadata and dated legal scope.
 
@@ -1115,7 +1115,7 @@ def test_ai_act_set_identity_rights_and_application_date():
         ), "Article 113 application date must be 2028-08-02"
 
 
-@pytest.mark.trace("FR-017-AC-1", "FR-017-AC-2", "FR-017-AC-3", "FR-017-AC-4")
+@pytest.mark.trace("FR-017-AC-2", "FR-017-AC-3", "FR-017-AC-4")
 def test_ai_act_clause_ids_applicability_and_outputs_match_the_spec():
     """Check exact AI Act obligations and their declared output catalog.
 
@@ -1146,7 +1146,7 @@ def test_ai_act_clause_ids_applicability_and_outputs_match_the_spec():
     assert result.returncode == 0, result.stderr + result.stdout
 
 
-@pytest.mark.trace("FR-019-AC-1", "FR-019-AC-3", "FR-019-AC-4")
+@pytest.mark.trace("FR-017-AC-1")
 def test_ai_act_provider_and_deployer_applicability_is_person_supplied():
     """Evaluate high-risk, role, and missing-context outcomes independently.
 
