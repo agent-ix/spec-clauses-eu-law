@@ -63,6 +63,34 @@ def _spec_gdpr_rows() -> list[dict[str, str]]:
     return rows
 
 
+def _spec_ai_act_rows() -> list[dict[str, str]]:
+    """Read normative AI Act IDs, applicability, and outputs from spec.md."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("## AI Act High-Risk Obligations Table", 1)[1].split(
+        "\n## ", 1
+    )[0]
+    rows = []
+    for line in section.splitlines():
+        if (
+            not line.startswith("|")
+            or line.startswith("| Clause ID")
+            or line.startswith("|---")
+        ):
+            continue
+        clause_id, _coverage, applicability, force, outputs = [
+            cell.strip().replace("`", "") for cell in line.strip("|").split("|", 4)
+        ]
+        rows.append(
+            {
+                "id": clause_id,
+                "applicability": applicability,
+                "force": force,
+                "outputs": outputs,
+            }
+        )
+    return rows
+
+
 def _parsed_spec_sets() -> dict[str, dict[str, object]]:
     """Parse canonical identities and rights metadata from spec.md once."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
@@ -96,6 +124,16 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
         re.DOTALL,
     )
     assert gdpr, "spec.md must declare the GDPR identity, source, and legal notice"
+    ai_design = specification.split("## AI Act Set Design", 1)[1].split("\n## ", 1)[0]
+    ai_act = re.search(
+        r"AI Act sets use authority `([^`]+)`, IDs `([^`]+)` and `([^`]+)`, "
+        r"and version `([^`]+)`.*?Their official source is `(https://[^`]+)`.*?"
+        r"Licence metadata states that (.+?)\. Attribution identifies .*?"
+        r"references `(https://[^`]+)`",
+        ai_design,
+        re.DOTALL,
+    )
+    assert ai_act, "spec.md must declare the AI Act identity, source, and legal notice"
     return {
         "mdr": {
             "identity": (mdr.group(1), mdr.group(2), mdr.group(3)),
@@ -119,6 +157,11 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
             "identity": (gdpr.group(1), gdpr.group(2), gdpr.group(3)),
             "officialUrl": gdpr.group(4),
             "legalNoticeUrl": gdpr.group(5),
+        },
+        "ai_act": {
+            "identity": (ai_act.group(1), ai_act.group(2), ai_act.group(4)),
+            "officialUrl": ai_act.group(5),
+            "legalNoticeUrl": ai_act.group(7),
         },
     }
 
@@ -145,6 +188,7 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
     mdr = spec_sets["mdr"]
     mdcg = spec_sets["mdcg"]
     gdpr = spec_sets["gdpr"]
+    ai_act = spec_sets["ai_act"]
     gdpr_licence = (
         "EUR-Lex legal documents may be reused for commercial or non-commercial "
         "purposes unless otherwise specified. Consolidated texts are CC BY 4.0; "
@@ -186,6 +230,25 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
                 "clearance_ref": None,
                 "licence": gdpr_licence,
                 "attribution": gdpr_attribution,
+            },
+        },
+        _set_key(ai_act["identity"]): {
+            "officialUrl": ai_act["officialUrl"],
+            "licence": (
+                "EUR-Lex legal documents may be reused for commercial or "
+                "non-commercial purposes unless otherwise specified and that "
+                "the consolidated text is under CC BY 4.0 with source attribution "
+                "and indication of changes."
+            ),
+            "attribution": (
+                f"© European Union. Source: {ai_act['officialUrl']} | This set "
+                f"contains original summaries and changes made. EUR-Lex legal "
+                f"notice: {ai_act['legalNoticeUrl']}"
+            ),
+            "rights": {
+                "structure": "citation_only",
+                "text": "original",
+                "clearance_ref": None,
             },
         },
     }
@@ -273,6 +336,37 @@ def _gdpr_set() -> dict:
         for clause_set in load_clause_sets()
         if clause_set_key(clause_set) == _spec_set_key("gdpr")
     )
+
+
+def _ai_act_set() -> dict:
+    """Return the declared AI Act high-risk obligations set."""
+    return next(
+        clause_set
+        for clause_set in load_clause_sets()
+        if clause_set_key(clause_set) == "eu/ai-act-2024-1689@2026-07-27"
+    )
+
+
+def _assert_ai_act_clause_fields(clause_set: dict) -> None:
+    """Check each AI Act clause's force, applicability, and outputs."""
+    rows = _spec_ai_act_rows()
+    clauses = clause_set["clauses"]
+    assert [clause["id"] for clause in clauses] == [row["id"] for row in rows]
+    for clause, row in zip(clauses, rows, strict=True):
+        clause_id = clause["id"]
+        assert (
+            clause["force"] == row["force"] == "mandatory"
+        ), f"{clause_id}.force differs from the AI Act table"
+        assert clause["text"].strip(), f"{clause_id}.text must be nonempty"
+        assert clause[
+            "expectedOutputs"
+        ], f"{clause_id}.expectedOutputs must be nonempty"
+        assert (
+            _applicability_spec(clause.get("applicability")) == row["applicability"]
+        ), f"{clause_id}.applicability differs from the AI Act table"
+        assert clause["expectedOutputs"] == row["outputs"].split(
+            ", "
+        ), f"{clause_id}.expectedOutputs differs from the AI Act table"
 
 
 def _applicability_spec(expression: dict | None) -> str:
@@ -382,17 +476,18 @@ def _installed_clause_sets(module_name: str) -> list[dict]:
     return load_clause_sets(manifest_path)
 
 
-def test_manifest_declares_all_m1_clause_sets():
-    """Verify the module declares its three M1 clause set files.
+def test_manifest_declares_all_implemented_clause_sets():
+    """Verify the module declares its implemented MDR, GDPR, and AI Act sets.
 
     Assumptions: The canonical set identities are declared in spec.md.
-    Criteria: The manifest declares the matching MDR, MDCG, and GDPR clause files.
+    Criteria: The manifest declares each implemented clause file exactly once.
     """
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
     assert manifest["clause_sets"] == [
         _spec_set_path("mdr"),
         _spec_set_path("mdcg"),
         _spec_set_path("gdpr"),
+        "clauses/eu-ai-act-2024-1689-2026-07-27.json",
     ]
 
 
@@ -1173,6 +1268,100 @@ def test_gdpr_person_supplied_applicability_contexts():
             applied[f"art-30({role_paragraph})({letter})"] == "binding"
             for letter in letters
         )
+
+
+@pytest.mark.trace("FR-022-AC-1", "FR-022-AC-2")
+def test_ai_act_set_identity_rights_and_application_date():
+    """Check the AI Act set's source metadata and dated legal scope.
+
+    Assumptions: The consolidated EUR-Lex source and rights terms are declared
+    in spec.md.
+    Criteria: Set identity and rights match the declared source, and the
+    Article 113 application-date metadata is present and exact.
+    """
+    clause_set = _ai_act_set()
+    assert clause_set_key(clause_set) == "eu/ai-act-2024-1689@2026-07-27"
+    _assert_set_metadata_matches_spec(clause_set)
+    assert clause_set["source"]["applicationDate"] == {
+        "date": "2028-08-02",
+        "source": "Article 113",
+        "scope": "Article 6(1) Annex I high-risk AI systems; Chapter III Sections 1–3",
+    }
+    broken = json.loads(json.dumps(clause_set))
+    broken["source"]["applicationDate"]["date"] = "2028-08-03"
+    with pytest.raises(AssertionError, match="Article 113 application date"):
+        assert (
+            broken["source"]["applicationDate"]["date"] == "2028-08-02"
+        ), "Article 113 application date must be 2028-08-02"
+
+
+@pytest.mark.trace("FR-017-AC-2", "FR-017-AC-3", "FR-017-AC-4")
+def test_ai_act_clause_ids_applicability_and_outputs_match_the_spec():
+    """Check exact AI Act obligations and their declared output catalog.
+
+    Assumptions: The AI Act High-Risk Obligations Table is normative.
+    Criteria: Every listed clause matches its force, applicability, outputs,
+    and catalog entries, with no out-of-scope clause present.
+    """
+    clause_set = _ai_act_set()
+    clauses = clause_set["clauses"]
+    _assert_ai_act_clause_fields(clause_set)
+    used = {output for clause in clauses for output in clause["expectedOutputs"]}
+    catalog = _spec_output_catalog()
+    assert clause_set["outputCatalog"] == {name: catalog[name] for name in sorted(used)}
+    assert set(clause_set["classificationDimensions"]) == {"ai_high_risk", "ai_role"}
+    assert not {"art-21", "art-22", "art-23", "art-24", "art-49"}.intersection(
+        clause["id"] for clause in clauses
+    )
+    for field, value in (
+        ("applicability", {"op": "eq", "dimension": "ai_role", "value": "provider"}),
+        ("force", "recommended"),
+        ("expectedOutputs", ["undeclared-output"]),
+    ):
+        broken = json.loads(json.dumps(clause_set))
+        broken["clauses"][0][field] = value
+        with pytest.raises(AssertionError, match=rf"art-9\.{field}"):
+            _assert_ai_act_clause_fields(broken)
+    result = run(engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT))
+    assert result.returncode == 0, result.stderr + result.stdout
+
+
+@pytest.mark.trace("FR-017-AC-1")
+def test_ai_act_provider_and_deployer_applicability_is_person_supplied():
+    """Evaluate high-risk, role, and missing-context outcomes independently.
+
+    Assumptions: A person supplies the AI Act classification and operator role.
+    Criteria: Only the matching provider or deployer obligations bind, known
+    low-risk systems bind none, and missing context leaves every clause
+    unresolved.
+    """
+    key = "eu/ai-act-2024-1689@2026-07-27"
+    rows = _spec_ai_act_rows()
+    low_risk = _outcomes(evaluate_clause_set(PACKAGE_ROOT, key, "ai_high_risk=no"))
+    provider = _outcomes(
+        evaluate_clause_set(PACKAGE_ROOT, key, "ai_high_risk=yes", "ai_role=provider")
+    )
+    deployer = _outcomes(
+        evaluate_clause_set(PACKAGE_ROOT, key, "ai_high_risk=yes", "ai_role=deployer")
+    )
+    empty = _outcomes(evaluate_clause_set(PACKAGE_ROOT, key))
+    assert (
+        set(low_risk)
+        == set(provider)
+        == set(deployer)
+        == set(empty)
+        == {row["id"] for row in rows}
+    )
+    assert set(low_risk.values()) == {"not_binding"}
+    assert all(
+        provider[row["id"]] == ("not_binding" if row["id"] == "art-26" else "binding")
+        for row in rows
+    )
+    assert all(
+        deployer[row["id"]] == ("binding" if row["id"] == "art-26" else "not_binding")
+        for row in rows
+    )
+    assert set(empty.values()) == {"unresolved"}
 
 
 @pytest.mark.trace("FR-008-AC-2")
