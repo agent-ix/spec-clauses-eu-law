@@ -16,7 +16,7 @@ The repository SHALL use `spec/`, package `spec_clauses_eu_law`, and one `clause
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-001-AC-1 | Manifest lists exactly the MDR, MDCG, GDPR, AI Act high-risk, and AI Act Annex IV keys; `quire validate "spec/**/*.md" --module <spec-artifacts-iso-module-root>` exits 0. | Test |
+| FR-001-AC-1 | Manifest lists exactly the MDR, MDCG, GDPR, AI Act high-risk, and AI Act Annex IV keys; `quire validate "spec/**/*.md" --module <spec-artifacts-iso-module-root> --module <spec-artifacts-process-module-root>` exits 0. | Test |
 | FR-001-AC-2 | Module declares no object types, archetypes or edges; install reports `pack: false`. | Test |
 
 ## Dependencies
