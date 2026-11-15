@@ -27,7 +27,7 @@ score, or another dimension.
 | FR-011-AC-2 | For `gdpr_role=processor` and `article_30_records_applicability=applies`, Article 30(2) and Article 32 clauses are binding; Articles 25, 30(1), and 35 clauses are not binding. | Test |
 | FR-011-AC-3 | For `gdpr_role=controller`, `high_risk_processing=no`, and `article_30_records_applicability=applies`, Article 35 clauses are not binding while Articles 25, 30(1), and 32 retain their specified applicability. | Test |
 | FR-011-AC-4 | If a role- or high-risk-dependent dimension is missing, each clause depending on it is unresolved; clauses without applicability expressions remain binding. | Test |
-| FR-011-AC-5 | For either role, `article_30_records_applicability=exempt` makes Article 30(1) through (4) not binding; `applies` makes 30(3) and (4) binding for either role and gates 30(1)/(2) on their respective role; a missing value leaves 30(1) through (4) unresolved. | Test |
+| FR-011-AC-5 | `article_30_records_applicability=exempt` makes Article 30(1) through (4) not binding. When it is `applies`, Articles 30(3) and (4) are binding for either role; 30(1) is binding for a controller and not binding for a processor; 30(2) is binding for a processor and not binding for a controller. When the value is missing, 30(1) is unresolved for a controller and not binding for a processor; 30(2) is unresolved for a processor and not binding for a controller; and 30(3) and (4) are unresolved for either role. If `gdpr_role` is also missing, Articles 30(1) through (4) are all unresolved. | Test |
 
 ## Dependencies
 
