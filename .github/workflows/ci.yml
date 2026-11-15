@@ -16,6 +16,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - uses: actions/checkout@v4
+        with:
+          repository: agent-ix/engineering-assurance
+          ref: v0.8.2
+          path: .deps/engineering-assurance
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.98.1
       - name: Install Python test and packaging tools
         run: python -m pip install poetry pytest PyYAML black ruff
       - name: Install project test dependencies
@@ -26,6 +34,10 @@ jobs:
         run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
       - name: Install default Quire modules
         run: quoin module ensure-defaults
+      - name: Build engineering-assurance content rights checker
+        run: cargo build --locked --features full --manifest-path .deps/engineering-assurance/Cargo.toml
+      - name: Add engineering-assurance to PATH
+        run: echo "$GITHUB_WORKSPACE/.deps/engineering-assurance/target/debug" >> "$GITHUB_PATH"
       - name: Verify module, rights, catalog, and distributions
         run: pytest
       - name: Check Python style
