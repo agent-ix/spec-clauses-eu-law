@@ -1,0 +1,26 @@
+{
+  "name": "@agent-ix/spec-clauses-eu-law",
+  "version": "0.0.0-managed",
+  "description": "EU law compliance clause sets",
+  "license": "AGPL-3.0-or-later",
+  "author": "Agent IX <agents@agent-ix.dev>",
+  "keywords": ["agent-ix", "quire", "quoin", "clause-sets", "eu-law"],
+  "files": ["manifest.yaml", "clauses/", "README.md", "LICENSE"],
+  "scripts": {
+    "prepack": "node scripts/stage-npm.mjs",
+    "postpack": "node scripts/stage-npm.mjs --clean",
+    "test": "pytest"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agent-ix/spec-clauses-eu-law.git"
+  },
+  "devDependencies": {
+    "@agent-ix/quire-cli": "0.45.0",
+    "@agent-ix/quoin": "0.34.0"
+  }
+}

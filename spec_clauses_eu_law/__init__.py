@@ -1,2 +1,1 @@
-def hello():
-    return "Hello, World!"
+"""EU law clause set module resources."""
