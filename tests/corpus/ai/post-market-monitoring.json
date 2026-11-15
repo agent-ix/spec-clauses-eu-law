@@ -1,0 +1,6 @@
+{
+  "recordType": "synthetic-post-market-monitoring-plan",
+  "signals": ["recommendation override rate", "input drift"],
+  "reviewIntervalDays": 30,
+  "owner": "person://example.invalid/people/monitoring-owner"
+}

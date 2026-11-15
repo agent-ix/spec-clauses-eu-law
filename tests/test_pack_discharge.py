@@ -16,7 +16,24 @@ from conftest import PACKAGE_ROOT, REPO_ROOT, engine_tool, load_clause_sets, run
 
 CORPUS_ROOT = REPO_ROOT / "tests" / "corpus"
 AS_OF = "2026-11-15T00:00:00Z"
-OPEN_CLAUSES = {"eu/mdr-2017-745@2026-07-19": "I-18.8"}
+OPEN_CLAUSES = {
+    "eu/mdr-2017-745@2026-07-19": "I-18.8",
+    "eu/ai-act-2024-1689-annex-iv@2026-07-27": "IV-8",
+}
+AI_APPROVAL_CLAUSES = {"art-9", "art-14"}
+AI_EVIDENCE_REFS = {
+    "model-description": "evidence://example.invalid/ai/model-description.json",
+    "data-lineage": "evidence://example.invalid/ai/dataset-lineage.json",
+    "event-logging-design": "evidence://example.invalid/ai/logging-design.json",
+    "human-oversight-design": "evidence://example.invalid/ai/human-oversight.json",
+    "post-market-monitoring-plan": "evidence://example.invalid/ai/post-market-monitoring.json",
+}
+AI_ANNEX_KEY = "eu/ai-act-2024-1689-annex-iv@2026-07-27"
+
+
+def _provider_pack_context() -> list[str]:
+    """Return explicit product and AI inputs for the combined EU pack run."""
+    return ["mobile_platform=no", *_ai_annex_context()]
 
 
 def _checked(
@@ -253,7 +270,19 @@ def _facts_for_binding(
             "attestedAt": AS_OF,
             "expiresAt": "2027-11-15T00:00:00Z",
         }
-        if clause_id in owned:
+        if clause_id in AI_APPROVAL_CLAUSES:
+            facts.append(
+                {
+                    "kind": "disposition",
+                    "clauseId": clause_id,
+                    "decision": "accepted_risk",
+                    "owner": "person://example.invalid/people/ai-safety-reviewer",
+                    "rationale": "The named reviewer approved the synthetic record.",
+                    "approvalRef": "person://example.invalid/people/ai-safety-reviewer",
+                    "attestation": attestation,
+                }
+            )
+        elif clause_id in owned:
             facts.append(
                 {
                     "kind": "disposition",
@@ -267,11 +296,21 @@ def _facts_for_binding(
                 }
             )
         else:
+            outputs = clause_set.get("outputCatalog", {})
+            clause = next(
+                item for item in clause_set["clauses"] if item["id"] == clause_id
+            )
+            output_refs = [
+                AI_EVIDENCE_REFS[output]
+                for output in clause.get("expectedOutputs", [])
+                if output in AI_EVIDENCE_REFS and output in outputs
+            ]
             facts.append(
                 {
                     "kind": "direct",
                     "clauseId": clause_id,
                     "evidenceRefs": [
+                        *output_refs,
                         "evidence://example.invalid/evidence/signature-commit.json",
                         "evidence://example.invalid/evidence/signature-tag.json",
                     ],
@@ -279,6 +318,43 @@ def _facts_for_binding(
                 }
             )
     return facts
+
+
+def _assert_named_person_approvals(facts: list[dict]) -> None:
+    """Require explicit person-owned approval for risk and oversight clauses."""
+    by_clause = {item.get("clauseId"): item for item in facts}
+    for clause_id in AI_APPROVAL_CLAUSES.intersection(by_clause):
+        fact = by_clause[clause_id]
+        assert (
+            fact.get("kind") == "disposition"
+        ), f"{clause_id} requires an approved disposition"
+        assert (
+            fact.get("decision") == "accepted_risk"
+        ), f"{clause_id} requires an accepted-risk decision"
+        approval_ref = fact.get("approvalRef", "")
+        parsed = urlparse(approval_ref)
+        assert (
+            parsed.scheme == "person"
+            and parsed.netloc == "example.invalid"
+            and re.fullmatch(r"/people/[a-z][a-z0-9-]*", parsed.path)
+        ), f"{clause_id} approvalRef must name a person"
+
+
+def _ai_annex_context() -> list[str]:
+    """Return explicit provider inputs that bind every Annex IV point."""
+    clause_set = next(
+        item for item in load_clause_sets() if _clause_set_key(item) == AI_ANNEX_KEY
+    )
+    dimensions = [
+        name
+        for name in clause_set.get("classificationDimensions", {})
+        if name not in {"ai_high_risk", "ai_role"}
+    ]
+    return [
+        "ai_high_risk=yes",
+        "ai_role=provider",
+        *(f"{dimension}=yes" for dimension in dimensions),
+    ]
 
 
 @pytest.mark.trace("FR-008-AC-1")
@@ -436,15 +512,38 @@ def test_dangling_evidence_fixture_fails_with_clause_id(tmp_path: pathlib.Path):
         )
 
 
+@pytest.mark.trace("FR-020-AC-1")
+def test_ai_act_human_oversight_requires_named_person_approval():
+    """Reject AI Act risk or oversight dispositions without person approval.
+
+    Assumptions: Risk acceptance and human oversight are explicit dispositions.
+    Criteria: An art-14 disposition whose approval reference does not name a
+    person fails with the clause id; a named-person reference passes.
+    Trace: FR-020-AC-1
+    """
+    missing_approval = [
+        {
+            "kind": "disposition",
+            "clauseId": "art-14",
+            "decision": "accepted_risk",
+            "owner": "person://example.invalid/people/ai-safety-reviewer",
+            "rationale": "The oversight design was reviewed.",
+            "approvalRef": "",
+        }
+    ]
+    with pytest.raises(AssertionError, match="art-14.*approvalRef must name a person"):
+        _assert_named_person_approvals(missing_approval)
+
+
 @pytest.mark.trace("FR-008-AC-2", "FR-008-AC-3", "FR-007-AC-2")
 def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
-    """Record facts from signed corpus evidence and render the pack RMM.
+    """Record EU law facts and render the pack RMM across all authored sets.
 
     Assumptions: Quire, Quoin, and Engineering Assurance expose the required
     validation, signature-verification, evidence-store, and pack-RMM commands.
-    Criteria: Every binding clause except I-18.8 has one fact; references
-    resolve; the pack index and clause statuses match the acceptance contract;
-    report output excludes clause titles and text.
+    Criteria: Every binding MDR, MDCG, and AI Act clause except the two open
+    examples has one fact; references resolve; the report index and statuses
+    match the acceptance contract; report output excludes clause titles and text.
     Trace: FR-008-AC-2, FR-008-AC-3, FR-007-AC-2
     """
     quire, quoin, assurance = _preflight()
@@ -459,6 +558,8 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     expected_keys = {
         "eu/mdr-2017-745@2026-07-19",
         "eu-mdcg/mdcg-2019-16@rev1",
+        "eu/ai-act-2024-1689@2026-07-27",
+        AI_ANNEX_KEY,
     }
     assert expected_keys.issubset(
         keys
@@ -466,6 +567,11 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     for key in expected_keys:
         clause_set = keys[key]
         authority, set_id, version = _clause_set_args(key)
+        context = ["mobile_platform=no"]
+        if key == "eu/ai-act-2024-1689@2026-07-27":
+            context.extend(["ai_high_risk=yes", "ai_role=provider"])
+        elif key == AI_ANNEX_KEY:
+            context.extend(_ai_annex_context())
         evaluated = _checked(
             quire,
             "clauses",
@@ -478,13 +584,17 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             set_id,
             "--version",
             version,
-            "--context",
-            "mobile_platform=no",
+            *[argument for value in context for argument in ("--context", value)],
             "--json",
         )
         binding = json.loads(evaluated.stdout)
         facts = _facts_for_binding(clause_set, binding, OPEN_CLAUSES.get(key))
         _assert_customer_owned_facts(clause_set, facts)
+        if key == "eu/ai-act-2024-1689@2026-07-27":
+            _assert_named_person_approvals(facts)
+            assert AI_APPROVAL_CLAUSES.issubset(
+                {fact.get("clauseId") for fact in facts}
+            )
         binding_path = tmp_path / f"{set_id}-binding.json"
         facts_path = tmp_path / f"{set_id}-facts.json"
         binding_path.write_text(json.dumps(binding))
@@ -531,8 +641,11 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         str(store),
         "--as-of",
         AS_OF,
-        "--context",
-        "mobile_platform=no",
+        *[
+            argument
+            for value in _provider_pack_context()
+            for argument in ("--context", value)
+        ],
         "--json",
         env=env,
     )
@@ -578,14 +691,52 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         str(store),
         "--as-of",
         AS_OF,
-        "--context",
-        "mobile_platform=no",
+        *[
+            argument
+            for value in _provider_pack_context()
+            for argument in ("--context", value)
+        ],
         env=env,
     ).stdout
     assert "I-18.8" in markdown
     assert "Not compliant - undischarged" in markdown
     assert "I-17.2" in markdown and "Compliant" in markdown
     assert "I-17.3" in markdown and "Not applicable" in markdown
+    assert "IV-8" in rendered and "undischarged" in rendered
+    assert "IV-8" in markdown and "Not compliant - undischarged" in markdown
+    ai_act_row = _report_clause_rows(report, "art-10")
+    assert len(ai_act_row) == 1 and ai_act_row[0]["compliance"] == "compliant"
+    assert any("dataset-lineage.json" in ref for ref in ai_act_row[0]["evidenceRefs"])
+
+    deployer_report = json.loads(
+        _checked(
+            quoin,
+            "discharge",
+            "--rmm",
+            "--pack",
+            "spec_clauses_eu_law",
+            "--repo",
+            str(store),
+            "--as-of",
+            AS_OF,
+            "--context",
+            "mobile_platform=no",
+            "--context",
+            "ai_high_risk=yes",
+            "--context",
+            "ai_role=deployer",
+            "--json",
+            env=env,
+        ).stdout
+    )
+    annex_rows = [
+        row
+        for clause_set in keys[AI_ANNEX_KEY]["clauses"]
+        for row in _report_clause_rows(deployer_report, clause_set["id"])
+        if "compliance" in row
+    ]
+    assert len(annex_rows) == 23, annex_rows
+    assert all(row["compliance"] == "not_applicable" for row in annex_rows)
     for clause_set in sets:
         for clause in clause_set["clauses"]:
             assert (
