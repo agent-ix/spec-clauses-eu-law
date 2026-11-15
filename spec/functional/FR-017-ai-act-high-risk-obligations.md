@@ -14,7 +14,7 @@ relationships:
 
 ## Description
 
-The provider set SHALL contain exactly the Article 9–20, 43, 47, 49, 72 and 73 obligations in the AI Act High-Risk Obligations Table in `spec.md`. The deployer set SHALL contain exactly the Article 26 obligation in that table. Every clause SHALL be mandatory, use the table's applicability and outputs, and have an original, nonempty summary.
+The provider set SHALL contain exactly the Article 9–20, 43, 47, 72 and 73 obligations in the AI Act High-Risk Obligations Table in `spec.md`. The deployer set SHALL contain exactly the Article 26 obligation in that table. Every clause SHALL be mandatory when its applicability expression binds, use the table's applicability and outputs, and have an original, nonempty summary.
 
 ## Acceptance Criteria
 
@@ -27,4 +27,4 @@ The provider set SHALL contain exactly the Article 9–20, 43, 47, 49, 72 and 73
 
 ## Dependencies
 
-Depends on [FR-016](./FR-016-ai-act-sets-declared.md) for the set identities and [FR-006](./FR-006-pack-wide-output-catalog.md) for output definitions. The complete clause IDs, force, applicability and output mapping are the table in `spec.md`.
+Depends on [FR-016](./FR-016-ai-act-sets-declared.md) for the set identities and [FR-006](./FR-006-pack-wide-output-catalog.md) for output definitions. Article 49 is excluded: paragraphs (1) and (3) concern applicable Annex III systems, while paragraph (2) concerns systems determined not high-risk under Article 6(3); neither creates a provider registration duty for this Annex I scope. The complete clause IDs, force, applicability and output mapping are the table in `spec.md`.

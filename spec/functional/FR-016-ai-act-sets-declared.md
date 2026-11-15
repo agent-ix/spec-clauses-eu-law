@@ -23,7 +23,7 @@ The module SHALL declare exactly the AI Act set keys `eu/ai-act-2024-1689@2026-0
 | FR-016-AC-1 | The manifest contains both specified keys exactly once and references the respective declared clause files. | Test |
 | FR-016-AC-2 | Both sets use the exact EUR-Lex 2026-07-27 official source URL, authority, ID, version, `structure: citation_only`, `text: original`, and `clearance_ref: null` specified in `spec.md`; a changed or missing field fails with its field path. | Test |
 | FR-016-AC-3 | Both sets' licence and attribution fields match the EUR-Lex reuse statement, exact source URL, change indication, and legal-notice URL specified in `spec.md`; an injected mismatch fails with its set and field path. | Test |
-| FR-016-AC-4 | `quire validate --module <pkg>` and `quire publish-check --module <pkg>` exit 0 for the module. | Test |
+| FR-016-AC-4 | `quire validate "spec/**/*.md" --module <spec-artifacts-iso-module-root>` and `quire publish-check --module <pkg>` exit 0. | Test |
 
 ## Dependencies
 

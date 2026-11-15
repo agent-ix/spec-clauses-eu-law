@@ -14,17 +14,17 @@ relationships:
 
 ## Description
 
-The clause sets SHALL use only the person-supplied `ai_high_risk` and `ai_role` dimensions defined in `spec.md`. The tool SHALL NOT infer either value from product characteristics or other records.
+The clause sets SHALL use the person-supplied `ai_high_risk` and `ai_role` dimensions and Annex IV point-applicability values defined in `spec.md`. The tool SHALL NOT infer any of these values from product characteristics or other records.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |---|---|---|
 | FR-019-AC-1 | With `ai_high_risk=no`, every clause in both sets is `not_binding`. | Test |
-| FR-019-AC-2 | With `ai_high_risk=yes` and `ai_role=provider`, all Article 26 clauses are `not_binding` and all provider clauses and Annex IV clauses are binding. | Test |
-| FR-019-AC-3 | With `ai_high_risk=yes` and `ai_role=deployer`, Article 26 clauses bind and every provider and Annex IV clause is `not_binding`. | Test |
-| FR-019-AC-4 | With an empty context, every clause is `unresolved`; when one dimension is omitted, only clauses depending on that dimension are unresolved. | Test |
-| FR-019-AC-5 | No set declares another applicability dimension, and no classification value is derived from a product fact or system output. | Test |
+| FR-019-AC-2 | With `ai_high_risk=yes`, `ai_role=provider`, and every Annex IV point-applicability value `yes`, all provider and Annex IV clauses bind and Article 26 is `not_binding`. | Test |
+| FR-019-AC-3 | With `ai_high_risk=yes` and `ai_role=deployer`, Article 26 binds and every provider and Annex IV clause is `not_binding`, regardless of Annex IV point-applicability values. | Test |
+| FR-019-AC-4 | With an empty context, every clause is `unresolved`; omitting any required common or per-point applicability dimension leaves only dependent clauses unresolved. | Test |
+| FR-019-AC-5 | The only applicability dimensions are `ai_high_risk`, `ai_role`, and the 23 `ai_annex_iv_<point>_applicable` values enumerated in the Annex IV table; no classification or point-applicability value is derived from a product fact or system output. | Test |
 
 ## Dependencies
 
