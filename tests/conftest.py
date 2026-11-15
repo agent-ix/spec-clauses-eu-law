@@ -100,7 +100,8 @@ def assert_output_catalog_consistent(clause_sets: list[dict]) -> None:
             if previous and previous[1] != definition:
                 previous_key = clause_set_key(previous[0])
                 raise AssertionError(
-                    f"output {output!r} differs between {previous_key} and {current_key}"
+                    f"output {output!r} differs between "
+                    f"{previous_key} and {current_key}"
                 )
             definitions[output] = (clause_set, definition)
 
