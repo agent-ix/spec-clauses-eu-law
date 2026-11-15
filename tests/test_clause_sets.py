@@ -18,6 +18,7 @@ from conftest import (
     REPO_ROOT,
     assert_crosswalk_targets_resolve,
     assert_output_catalog_consistent,
+    clause_set_key,
     engine_tool,
     evaluate_clause_set,
     load_clause_sets,
@@ -57,13 +58,19 @@ MDR_ATTRIBUTION = f"© European Union. Source: {MDR_SOURCE_URL}. Changes made."
 
 def _mdr_set() -> dict:
     """Return the declared MDR set."""
-    return next(clause_set for clause_set in load_clause_sets() if clause_set_key(clause_set) == MDR_KEY)
+    return next(
+        clause_set
+        for clause_set in load_clause_sets()
+        if clause_set_key(clause_set) == MDR_KEY
+    )
 
 
 def _spec_output_catalog() -> dict[str, dict[str, str]]:
     """Read the canonical output definitions from the master specification."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
-    section = specification.split("## EU Pack Output Catalog", 1)[1].split("\n## ", 1)[0]
+    section = specification.split("## EU Pack Output Catalog", 1)[1].split("\n## ", 1)[
+        0
+    ]
     catalog = {}
     for line in section.splitlines():
         if not line.startswith("|"):
@@ -330,9 +337,9 @@ def test_mdr_mobile_platform_applicability():
     assert no_context["I-17.3"] == "unresolved"
     assert set(no_context.values()) - {"binding"} == {"unresolved"}
     assert mobile_no["I-17.3"] == "not_binding"
-    assert {clause_id for clause_id, value in mobile_no.items() if value != "binding"} == {
-        "I-17.3"
-    }
+    assert {
+        clause_id for clause_id, value in mobile_no.items() if value != "binding"
+    } == {"I-17.3"}
     assert set(mobile_yes.values()) == {"binding"}
 
 
@@ -367,9 +374,7 @@ def test_mdr_publish_check_accepts_the_set_and_rejects_licensed_text(tmp_path):
     its set key in the diagnostic.
     Trace: FR-002-AC-2
     """
-    accepted = run(
-        engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT)
-    )
+    accepted = run(engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT))
     assert accepted.returncode == 0, accepted.stderr + accepted.stdout
 
     module_root = tmp_path / "licensed-module"
@@ -378,9 +383,7 @@ def test_mdr_publish_check_accepts_the_set_and_rejects_licensed_text(tmp_path):
     licensed = json.loads(clause_path.read_text())
     licensed["rights"]["text"] = "licensed"
     clause_path.write_text(json.dumps(licensed))
-    refused = run(
-        engine_tool("quire"), "publish-check", "--module", str(module_root)
-    )
+    refused = run(engine_tool("quire"), "publish-check", "--module", str(module_root))
     assert refused.returncode == 2
     assert MDR_KEY in refused.stderr + refused.stdout
 
@@ -401,9 +404,7 @@ def test_mdr_declares_the_spec_catalog_subset_used_by_its_clauses():
         for output in clause["expectedOutputs"]
     }
     catalog = _spec_output_catalog()
-    assert clause_set["outputCatalog"] == {
-        name: catalog[name] for name in sorted(used)
-    }
+    assert clause_set["outputCatalog"] == {name: catalog[name] for name in sorted(used)}
 
 
 def test_mdr_single_set_discharge_renders_expected_rows(tmp_path):
