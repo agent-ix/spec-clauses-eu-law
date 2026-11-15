@@ -1074,6 +1074,32 @@
       },
       "relation": "partial",
       "rationale": "Risk analysis supports assessment of electronic protected health information risks, but does not cover all GDPR risk factors or duties."
+    },
+    {
+      "sourceClause": "art-32(4)",
+      "target": {
+        "set": {
+          "authority": "nist",
+          "id": "sp800-53",
+          "version": "5.2.0"
+        },
+        "clause": "AC-6"
+      },
+      "relation": "partial",
+      "rationale": "Least-privilege access restrictions can limit a person's or process's access, but they do not establish that processing follows the controller's or processor's instructions."
+    },
+    {
+      "sourceClause": "art-32(4)",
+      "target": {
+        "set": {
+          "authority": "us-hhs",
+          "id": "45-cfr-164-subpart-c",
+          "version": "2026-11-12"
+        },
+        "clause": "164.308(a)(4)(i)"
+      },
+      "relation": "partial",
+      "rationale": "Access-authorization policies address the authorization boundary for access, but they do not establish instruction-bound processing or cover personal data beyond the HIPAA scope."
     }
   ]
 }

@@ -838,6 +838,10 @@ def test_gdpr_article32_crosswalks_use_the_selected_nist_and_hipaa_sets():
             ("nist/sp800-53@5.2.0", "RA-3"),
             ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.308(a)(1)(ii)(A)"),
         },
+        "art-32(4)": {
+            ("nist/sp800-53@5.2.0", "AC-6"),
+            ("us-hhs/45-cfr-164-subpart-c@2026-11-12", "164.308(a)(4)(i)"),
+        },
     }
     actual = {
         source: {

@@ -39,6 +39,10 @@ jobs:
         run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
       - name: Install default Quire modules
         run: quoin module ensure-defaults
+      - name: Validate specification documents
+        run: quire validate 'spec/**/*.md' --module "$HOME/.ix/filament/modules/spec-artifacts-iso"
+      - name: Check clause-set publication rights
+        run: quire publish-check --module "$GITHUB_WORKSPACE/spec_clauses_eu_law"
       - name: Install the pinned NIST module for crosswalk tests
         run: quoin module install github:agent-ix/spec-objects-security//spec_objects_security@v0.13.0
       - name: Install the pinned HIPAA module for crosswalk tests
