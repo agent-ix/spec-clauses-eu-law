@@ -40,3 +40,11 @@ Reviewed the new AI Act high-risk clause set, manifest entry, and tests against 
 - FR-022-AC-1 and AC-2: checked the date value, Article 113 reference, scope and absence from applicability dimensions.
 - Verified against the official consolidated EUR-Lex text at the declared source URL. Article 113 gives 2 August 2028 for Article 6(1) Annex I high-risk systems and Chapter III Sections 1–3.
 - Focused command: `locked-build.sh <worktree>/target poetry run pytest tests/test_clause_sets.py -k ai_act`; 3 passed, exit 0. Matrix commands and comparison are recorded in the gap-analysis artifact.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The test no longer tags FR-016-AC-2/3. Fixed text: `@pytest.mark.trace("FR-022-AC-1", "FR-022-AC-2")`. |
+| FND-002 | fixed | The high-risk-only applicability test no longer tags the both-set FR-019 criteria. Fixed text: `@pytest.mark.trace("FR-017-AC-1")`. |
+| FND-003 | fixed | FR-017-AC-1 is now tagged on the test that evaluates provider/deployer outcomes and compares returned IDs with the normative rows. Fixed text: `@pytest.mark.trace("FR-017-AC-1")`. |

@@ -36,3 +36,9 @@ The high-risk clause data is backed by normative requirements and has focused te
 - In the changed AI Act scope, FR-017-AC-1 through AC-3 and FR-022-AC-1 through AC-2 are tagged. FR-016-AC-1 and AC-4 and FR-019-AC-2 and AC-5 remain untagged for the Annex IV implementation. FR-016-AC-2 and AC-3 and FR-019-AC-1, AC-3 and AC-4 are tagged by high-risk-only tests, although each criterion covers both sets. FR-017-AC-1 is tagged by a test that reads clause JSON but does not evaluate the set.
 - The diff adds no production-code modules, stubs, or behavior without a requirement. New clause data is sourced from the declared normative table and rights requirements. No plan was supplied. Plan completion: not assessed.
 - Focused command: `locked-build.sh <worktree>/target poetry run pytest tests/test_clause_sets.py -k ai_act`; 3 passed, exit 0.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The incorrect cross-set FR-016/FR-019 tags were removed, and FR-017-AC-1 moved to the evaluator test that checks provider/deployer result IDs. |
