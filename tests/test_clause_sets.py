@@ -61,7 +61,7 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
         r"MDCG identity is authority `([^`]+)`, ID `([^`]+)`, "
         r"version `([^`]+)`, with source `([^`]+)` and listing `([^`]+)`.*?"
         r"Licence metadata SHALL state that (.+?)\. "
-        r"Attribution SHALL identify the (.+?), and the official PDF URL",
+        r"Attribution SHALL say `(.+?)` The guidance is non-binding",
         design,
         re.DOTALL,
     )
@@ -73,14 +73,19 @@ def _parsed_spec_sets() -> dict[str, dict[str, object]]:
             "identity": (mdr.group(1), mdr.group(2), mdr.group(3)),
             "officialUrl": mdr.group(4),
             "licence": mdr.group(5),
-            "attribution": mdr.group(6).replace("<official URL>", mdr.group(4)),
+            "attribution": mdr.group(6).replace("{official URL}", mdr.group(4)),
         },
         "mdcg": {
             "identity": (mdcg.group(1), mdcg.group(2), mdcg.group(3)),
             "officialUrl": mdcg.group(4),
             "listingUrl": mdcg.group(5),
             "licence": mdcg.group(6),
-            "attribution_terms": mdcg.group(7).replace("*", ""),
+            "attribution": (
+                mdcg.group(7)
+                .replace("*", "")
+                .replace("{source URL}", mdcg.group(4))
+                .replace("{listing URL}", mdcg.group(5))
+            ),
         },
     }
 
@@ -122,7 +127,7 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
             "listingUrl": mdcg["listingUrl"],
             "licence": mdcg["licence"],
             "licence_exact": False,
-            "attribution_terms": mdcg["attribution_terms"],
+            "attribution": mdcg["attribution"],
             "rights": {
                 "structure": "citation_only",
                 "text": "original",
@@ -159,14 +164,10 @@ def _assert_set_metadata_matches_spec(clause_set: dict) -> None:
             rights["attribution"] == expected["attribution"]
         ), f"{key}.rights.attribution differs from spec.md"
     else:
-        for term in (
-            *expected["attribution_terms"].split(", "),
-            expected["officialUrl"],
-            "Agent-IX",
-        ):
+        for url in (expected["officialUrl"], expected["listingUrl"]):
             assert (
-                term in rights["attribution"]
-            ), f"{key}.rights.attribution omits {term!r} from spec.md"
+                f"<{url}>." in rights["attribution"]
+            ), f"{key}.rights.attribution must bracket {url!r} before punctuation"
     assert (
         clause_set["source"]["officialUrl"] == expected["officialUrl"]
     ), f"{key}.source.officialUrl differs from spec.md"
@@ -541,6 +542,15 @@ def test_each_clause_set_rights_and_source_match_the_spec():
         broken["source"]["officialUrl"] = "https://example.invalid/changed"
         with pytest.raises(AssertionError, match=rf"{key}\.source\.officialUrl"):
             _assert_set_metadata_matches_spec(broken)
+
+
+def test_npm_publish_config_uses_public_default_registry():
+    """Keep public access while relying on npm's default public registry."""
+    package = json.loads((REPO_ROOT / "package.json").read_text())
+    publish_config = package["publishConfig"]
+
+    assert publish_config["access"] == "public"
+    assert "registry" not in publish_config
 
 
 @pytest.mark.trace("FR-002-AC-2")
