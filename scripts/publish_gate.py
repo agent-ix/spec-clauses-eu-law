@@ -23,7 +23,8 @@ def _run(
 def _safe_finding(result: dict) -> list[str]:
     findings = result.get("findings", [])
     return [
-        f"{item.get('path') or '<tree>'}:{item.get('line', 0)}: {item.get('category', 'unknown')}"
+        f"{item.get('path') or '<tree>'}:{item.get('line', 0)}: "
+        f"{item.get('category', 'unknown')}"
         for item in findings
     ]
 
