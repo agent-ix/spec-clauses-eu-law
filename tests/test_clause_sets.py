@@ -1626,6 +1626,38 @@ def test_ai_act_annex_rows_match_the_normative_table():
         _assert_ai_act_annex_clause_fields(broken)
 
 
+def test_ai_act_annex_point_seven_has_no_standards_designator(tmp_path):
+    """Run the publication rights scanner on the generic point-seven summary.
+
+    Assumptions: The engineering-assurance content-rights-tree command is on
+    PATH in the validation environment.
+    Criteria: The point-seven summary has no protected external designator.
+    """
+    executable = shutil.which("engineering-assurance")
+    assert executable is not None, "engineering-assurance CLI is unavailable"
+    point_seven = next(
+        clause for clause in _ai_act_annex_set()["clauses"] if clause["id"] == "IV-7"
+    )
+    (tmp_path / "point-seven.json").write_text(
+        json.dumps({"text": point_seven["text"]})
+    )
+    initialized = run("git", "init", "--quiet", "-b", "main", cwd=tmp_path)
+    assert initialized.returncode == 0, initialized.stderr
+    selected = run("git", "add", "--all", cwd=tmp_path)
+    assert selected.returncode == 0, selected.stderr
+    scanned = run(
+        executable,
+        "content-rights-tree",
+        "--root",
+        str(tmp_path),
+        cwd=tmp_path,
+    )
+    assert scanned.returncode == 0, scanned.stderr + scanned.stdout
+    report = json.loads(scanned.stdout)
+    assert report["outcome"] == "accepted"
+    assert report["findings"] == []
+
+
 @pytest.mark.trace(
     "FR-018-AC-3", "FR-019-AC-1", "FR-019-AC-2", "FR-019-AC-3", "FR-019-AC-4"
 )
