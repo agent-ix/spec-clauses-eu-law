@@ -42,8 +42,8 @@ def _spec_mdr_ids() -> list[str]:
     ]
 
 
-def _spec_set_identities() -> dict[str, tuple[str, str, str]]:
-    """Read canonical set identities from spec.md."""
+def _parsed_spec_sets() -> dict[str, dict[str, object]]:
+    """Parse canonical identities and rights metadata from spec.md once."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
     design = specification.split("## Set Design", 1)[1].split("\n## ", 1)[0]
     mdr = re.search(
@@ -69,61 +69,60 @@ def _spec_set_identities() -> dict[str, tuple[str, str, str]]:
         mdcg
     ), "spec.md must declare the MDCG identity, source, licence, and attribution"
     return {
-        "mdr": (mdr.group(1), mdr.group(2), mdr.group(3)),
-        "mdcg": (mdcg.group(1), mdcg.group(2), mdcg.group(3)),
+        "mdr": {
+            "identity": (mdr.group(1), mdr.group(2), mdr.group(3)),
+            "officialUrl": mdr.group(4),
+            "licence": mdr.group(5),
+            "attribution": mdr.group(6).replace("<official URL>", mdr.group(4)),
+        },
+        "mdcg": {
+            "identity": (mdcg.group(1), mdcg.group(2), mdcg.group(3)),
+            "officialUrl": mdcg.group(4),
+            "listingUrl": mdcg.group(5),
+            "licence": mdcg.group(6),
+            "attribution_terms": mdcg.group(7).replace("*", ""),
+        },
     }
+
+
+def _set_key(identity: tuple[str, str, str]) -> str:
+    authority, identifier, version = identity
+    return f"{authority}/{identifier}@{version}"
 
 
 def _spec_set_key(kind: str) -> str:
     """Return a canonical set key parsed from spec.md."""
-    authority, identifier, version = _spec_set_identities()[kind]
-    return f"{authority}/{identifier}@{version}"
+    return _set_key(_parsed_spec_sets()[kind]["identity"])
 
 
 def _spec_set_path(kind: str) -> str:
     """Return the clause file path derived from its spec.md identity."""
-    authority, identifier, version = _spec_set_identities()[kind]
+    authority, identifier, version = _parsed_spec_sets()[kind]["identity"]
     return f"clauses/{authority}-{identifier}-{version}.json"
 
 
 def _spec_set_metadata() -> dict[str, dict[str, object]]:
     """Read canonical set metadata values from spec.md."""
-    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
-    design = specification.split("## Set Design", 1)[1].split("\n## ", 1)[0]
-    mdr = re.search(
-        r"MDR identity is authority `([^`]+)`, ID `([^`]+)`, and version `([^`]+)`.*?"
-        r"official URL is `(https://[^`]+)`.*?"
-        r"Licence metadata shall say: `([^`]+)` "
-        r"Attribution metadata shall say `([^`]+)`",
-        design,
-        re.DOTALL,
-    )
-    mdcg = re.search(
-        r"MDCG identity is authority `([^`]+)`, ID `([^`]+)`, "
-        r"version `([^`]+)`, with source `([^`]+)` and listing `([^`]+)`.*?"
-        r"Licence metadata SHALL state that (.+?)\. "
-        r"Attribution SHALL identify the (.+?), and the official PDF URL",
-        design,
-        re.DOTALL,
-    )
-    assert mdr and mdcg, "spec.md must declare MDR and MDCG rights metadata"
+    spec_sets = _parsed_spec_sets()
+    mdr = spec_sets["mdr"]
+    mdcg = spec_sets["mdcg"]
     return {
-        _spec_set_key("mdr"): {
-            "officialUrl": mdr.group(4),
-            "licence": mdr.group(5),
-            "attribution": mdr.group(6).replace("<official URL>", mdr.group(4)),
+        _set_key(mdr["identity"]): {
+            "officialUrl": mdr["officialUrl"],
+            "licence": mdr["licence"],
+            "attribution": mdr["attribution"],
             "rights": {
                 "structure": "citation_only",
                 "text": "original",
                 "clearance_ref": None,
             },
         },
-        _spec_set_key("mdcg"): {
-            "officialUrl": mdcg.group(4),
-            "listingUrl": mdcg.group(5),
-            "licence": mdcg.group(6),
+        _set_key(mdcg["identity"]): {
+            "officialUrl": mdcg["officialUrl"],
+            "listingUrl": mdcg["listingUrl"],
+            "licence": mdcg["licence"],
             "licence_exact": False,
-            "attribution_terms": mdcg.group(7).replace("*", ""),
+            "attribution_terms": mdcg["attribution_terms"],
             "rights": {
                 "structure": "citation_only",
                 "text": "original",
@@ -637,7 +636,7 @@ def test_mdcg_crosswalks_match_spec_and_resolve_to_mdr():
         item for item in clause_sets if clause_set_key(item) == _spec_set_key("mdcg")
     )
     expected_rows = _spec_mdcg_crosswalks()
-    mdr_authority, mdr_id, mdr_version = _spec_set_identities()["mdr"]
+    mdr_authority, mdr_id, mdr_version = _parsed_spec_sets()["mdr"]["identity"]
     expected = [
         {
             "sourceClause": row["sourceClause"],
