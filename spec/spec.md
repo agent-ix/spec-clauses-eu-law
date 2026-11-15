@@ -24,7 +24,7 @@ This specification defines the clause-only EU-law module and its sets for softwa
 - Repository `agent-ix/spec-clauses-eu-law`, Python package `spec_clauses_eu_law`, module `clause_sets`.
 - MDR set `eu/mdr-2017-745@2026-07-19`, MDCG set `eu-mdcg/mdcg-2019-16@rev1`, and GDPR set `eu/gdpr-2016-679@2016-05-04`.
 - Set identities, sources, rights metadata, clause identifiers, applicability, expected outputs, MDCG-to-MDR and GDPR-to-NIST/HIPAA crosswalks, shared output catalog, customer-owned obligations, and synthetic reference corpus rules.
-- GDPR Articles 25, 30, 32 and 35; the modeled controller/processor and high-risk-processing values; human approval for DPIA residual-risk acceptance; and the security-analysis skill's coverage boundary for GDPR material.
+- GDPR Articles 25, 30, 32 and 35; the person-supplied controller/processor, high-risk-processing, and Article 30(5) applicability values; human approval for DPIA residual-risk acceptance; and the security-analysis skill's coverage boundary for GDPR material.
 
 ### Out of Scope
 
@@ -48,7 +48,9 @@ MDCG identity is authority `eu-mdcg`, ID `mdcg-2019-16`, version `rev1`, with so
 
 Clause IDs are `<annex roman>-<section>` with subparagraphs in parentheses, e.g. `I-17.3`, `I-23.4(ab)`, `II-6.1(b)`. MDCG IDs are section identifiers without a prefix, e.g. `3.2`. IDs contain no slash. `mobile_platform` has values `yes` and `no`; only `I-17.3` uses it (`eq mobile_platform yes`). Other MDR clauses always bind. Device class is not a dimension because no in-scope clause depends on it.
 
-GDPR clause IDs use the article and paragraph designators, retaining subparagraph letters in parentheses, e.g. `art-30(1)(a)`. `gdpr_role` has values `controller` and `processor`; `high_risk_processing` has values `yes` and `no`. Both are supplied by a person and are never inferred from product or data-flow content. Health data may inform a person's assessment, but it does not determine the high-risk value. Articles 25, 30(1) and 35 apply to controllers; Article 30(2) applies to processors; Article 30(3), 30(4), and 32 apply to both roles. Article 35 applies only when a person sets `high_risk_processing` to `yes` for a controller. Articles 25(3) and 32(3) are not clauses because they describe optional ways to demonstrate compliance. Article 30(5)'s small-organization exemption is not modeled; its exceptions require facts outside the selected dimensions, including whether special-category data are processed. These exclusions do not make another GDPR clause non-binding. Article 35(3) and (4) are triggers used to inform the person's high-risk classification, not separate clauses. Articles 35(5) and (6) assign duties to supervisory authorities, Article 35(8) is conditional on adherence to an approved code, and Article 35(10) is an exception tied to an existing legal basis and prior impact assessment; these are explicit coverage limits because their actors or triggers are outside the selected dimensions. No tool decides the high-risk classification or accepts a DPIA's residual risk.
+GDPR clause IDs use the article and paragraph designators, retaining subparagraph letters in parentheses, e.g. `art-30(1)(a)`. `gdpr_role` has values `controller` and `processor`; `high_risk_processing` has values `yes` and `no`; and `article_30_records_applicability` has values `applies` and `exempt`. A responsible person supplies all three values. The module never infers them from product type, data type, risk score, or role. Health data may inform a person's assessment but does not determine `high_risk_processing`. For Article 30(5), the person sets `exempt` only after determining the organization employs fewer than 250 people and none of the statutory exceptions applies: processing is not occasional, is likely to result in risk to data-subject rights and freedoms, or includes special-category or criminal-conviction data. In every other case the person sets `applies`. If this applicability decision is missing, Article 30(1) through (4) remain unresolved. If it is `exempt`, Article 30(1) through (4) are not binding. If it is `applies`, Article 30(1) applies to controllers, 30(2) applies to processors, and 30(3) and (4) apply to the records required under either role. The input is a classification of statutory applicability, not an accepted-risk disposition.
+
+Articles 25 and 35 apply to controllers; Article 32 applies to both roles. Article 35 applies only when a person sets `high_risk_processing` to `yes` for a controller. Articles 25(3) and 32(3) are not clauses because they describe optional ways to demonstrate compliance. Article 35(3) and (4) are triggers used to inform the person's high-risk classification, not separate clauses. Articles 35(5) and (6) assign duties to supervisory authorities, Article 35(8) is conditional on adherence to an approved code, and Article 35(10) is an exception tied to an existing legal basis and prior impact assessment; these are explicit coverage limits because their actors or triggers are outside the selected dimensions. No tool decides the high-risk classification or accepts a DPIA's residual risk.
 
 ## MDR Clause Table
 
@@ -82,19 +84,19 @@ The table is normative for clause IDs, force, applicability, and expected output
 |---|---|---|
 | `art-25(1)` | `eq gdpr_role controller` | `privacy-by-default-settings`, `data-flow-model`, `software-architecture`, `security-risk-records` |
 | `art-25(2)` | `eq gdpr_role controller` | `privacy-by-default-settings`, `data-flow-model` |
-| `art-30(1)(a)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
-| `art-30(1)(b)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
-| `art-30(1)(c)` | `eq gdpr_role controller` | `records-of-processing` |
-| `art-30(1)(d)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
-| `art-30(1)(e)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
-| `art-30(1)(f)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
-| `art-30(1)(g)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
-| `art-30(2)(a)` | `eq gdpr_role processor` | `records-of-processing`, `data-flow-model` |
-| `art-30(2)(b)` | `eq gdpr_role processor` | `records-of-processing`, `data-flow-model` |
-| `art-30(2)(c)` | `eq gdpr_role processor` | `records-of-processing`, `data-flow-model` |
-| `art-30(2)(d)` | `eq gdpr_role processor` | `records-of-processing`, `data-flow-model` |
-| `art-30(3)` | always | `records-of-processing` |
-| `art-30(4)` | always | `records-of-processing` |
+| `art-30(1)(a)` | `all[eq gdpr_role controller, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(b)` | `all[eq gdpr_role controller, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(c)` | `all[eq gdpr_role controller, eq article_30_records_applicability applies]` | `records-of-processing` |
+| `art-30(1)(d)` | `all[eq gdpr_role controller, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(e)` | `all[eq gdpr_role controller, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(f)` | `all[eq gdpr_role controller, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(g)` | `all[eq gdpr_role controller, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(2)(a)` | `all[eq gdpr_role processor, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(2)(b)` | `all[eq gdpr_role processor, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(2)(c)` | `all[eq gdpr_role processor, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(2)(d)` | `all[eq gdpr_role processor, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
+| `art-30(3)` | `eq article_30_records_applicability applies` | `records-of-processing` |
+| `art-30(4)` | `eq article_30_records_applicability applies` | `records-of-processing` |
 | `art-32(1)(a)` | always | `security-risk-records`, `verification-records` |
 | `art-32(1)(b)` | always | `security-risk-records`, `verification-records` |
 | `art-32(1)(c)` | always | `security-risk-records`, `verification-records` |
@@ -110,7 +112,11 @@ The table is normative for clause IDs, force, applicability, and expected output
 | `art-35(9)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia` |
 | `art-35(11)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model`, `security-risk-records` |
 
-Articles 25(3) and 32(3) are not clauses because they describe optional ways to demonstrate compliance. Article 30(5) is not modeled as an exemption: processing special-category data is one of its explicit exceptions, so the medical-product context does not justify assuming the exemption. Article 35(3) and (4) are triggers rather than separate clauses; paragraphs (5) and (6) are supervisory-authority duties; paragraph (8) is conditional on a code-of-conduct circumstance not represented by the selected dimensions; paragraph (10) is an exception dependent on external legal-basis and prior-assessment facts. Those paragraphs are identified as coverage limits and are not evaluated by this set. Any residual-risk decision associated with a DPIA remains with a named person.
+Articles 25(3) and 32(3) are not clauses because they describe optional ways to demonstrate compliance. Article 30(5)'s exemption decision is represented by the person-supplied `article_30_records_applicability` value; a medical-product context or assumed health-data use is not enough to resolve it. Article 30(3) and (4) explicitly inherit this value because they concern records required under paragraphs 1 and 2. Article 35(3) and (4) are triggers rather than separate clauses; paragraphs (5) and (6) are supervisory-authority duties; paragraph (8) is conditional on a code-of-conduct circumstance not represented by the selected dimensions; paragraph (10) is an exception dependent on external legal-basis and prior-assessment facts. Those Article 35 paragraphs are identified as coverage limits and are not evaluated by this set. Any residual-risk decision associated with a DPIA remains with a named person.
+
+## Security-Analysis Skill Disposition
+
+For PLAT-1628, retain `skills/spec-security-analysis/references/gdpr/ChII-Principles.md`, `ChIII-DataSubjectRights.md`, and `ChV-DataTransfers.md` as clearly labeled untyped context until future clause sets cover those chapters. Do not delete their summaries or treat them as evaluated clauses. Modify `skills/spec-security-analysis/references/gdpr/ChIV-ControllerProcessor.md` to replace the covered Article 25, 30, 32, and 35 summaries with links to `eu/gdpr-2016-679@2016-05-04`. Modify `skills/spec-security-analysis/references/gdpr/index.md`, `skills/spec-security-analysis/SKILL.md`, and `skills/spec-security-analysis/references/standards-index.md` to link the set and state the uncovered-topic boundary. These are the complete affected Quoin files; no other GDPR reference files are to be deleted or modified for this set.
 
 ## Article 32 Crosswalk Policy
 

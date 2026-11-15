@@ -14,10 +14,10 @@ relationships:
 
 ## Description
 
-The GDPR set SHALL contain exactly the clause identifiers and forces in the
-GDPR Clause Table in `spec.md`. Each clause SHALL have an original, non-empty
-summary and at least one expected output declared in the EU Pack Output
-Catalog.
+The GDPR set SHALL contain exactly the clause identifiers, forces,
+applicability expressions, and expected outputs in the GDPR Clause Table in
+`spec.md`. Each clause SHALL have an original, non-empty summary and at least
+one expected output declared in the EU Pack Output Catalog.
 
 ## Acceptance Criteria
 
