@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import re
 import shutil
 import tarfile
 import tempfile
@@ -28,32 +29,101 @@ from conftest import (
 )
 
 MDR_KEY = "eu/mdr-2017-745@2026-07-19"
-MDR_IDS = [
-    "I-1",
-    "I-2",
-    "I-3",
-    "I-4",
-    "I-5",
-    "I-8",
-    "I-14.2(d)",
-    "I-17.1",
-    "I-17.2",
-    "I-17.3",
-    "I-17.4",
-    "I-18.8",
-    "I-23.4(ab)",
-    "II-1.1",
-    "II-4",
-    "II-5",
-    "II-6.1(b)",
-]
-MDR_SOURCE_URL = "https://eur-lex.europa.eu/eli/reg/2017/745/2026-07-19/eng"
-MDR_LICENCE = (
-    "EUR-Lex legal documents may be reused for commercial or non-commercial "
-    "purposes unless otherwise specified. Consolidated texts are CC BY 4.0; "
-    "acknowledge the source and indicate changes."
-)
-MDR_ATTRIBUTION = f"© European Union. Source: {MDR_SOURCE_URL}. Changes made."
+
+
+def _spec_mdr_ids() -> list[str]:
+    """Read normative MDR IDs from the master specification table."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("## MDR Clause Table", 1)[1].split("\n## ", 1)[0]
+    return [
+        row.split("|", 2)[1].strip()
+        for row in section.splitlines()
+        if row.startswith("|")
+        and not row.startswith("| Clause ID")
+        and not row.startswith("|---")
+    ]
+
+
+def _spec_set_metadata() -> dict[str, dict[str, object]]:
+    """Read canonical set metadata values and identifiers from spec.md."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    design = specification.split("## Set Design", 1)[1].split("\n## ", 1)[0]
+    mdr = re.search(
+        r"MDR identity is authority `([^`]+)`, ID `([^`]+)`, and version `([^`]+)`.*?"
+        r"official URL is `(https://[^`]+)`.*?"
+        r"Licence metadata shall say: `([^`]+)` Attribution metadata shall say `([^`]+)`",
+        design,
+        re.DOTALL,
+    )
+    assert mdr, (
+        "spec.md must declare the MDR identity, source, licence, and attribution"
+    )
+    mdcg = re.search(
+        r"MDCG identity is authority `([^`]+)`, ID `([^`]+)`, version `([^`]+)`, with source `([^`]+)`.*?"
+        r"Licence metadata SHALL state that (.+?)\. Attribution SHALL identify the (.+?), and the official PDF URL",
+        design,
+        re.DOTALL,
+    )
+    assert mdcg, (
+        "spec.md must declare the MDCG identity, source, licence, and attribution"
+    )
+    return {
+        f"{mdr.group(1)}/{mdr.group(2)}@{mdr.group(3)}": {
+            "officialUrl": mdr.group(4),
+            "licence": mdr.group(5),
+            "attribution": mdr.group(6),
+            "rights": {
+                "structure": "citation_only",
+                "text": "original",
+                "clearance_ref": None,
+            },
+        },
+        f"{mdcg.group(1)}/{mdcg.group(2)}@{mdcg.group(3)}": {
+            "officialUrl": mdcg.group(4),
+            "licence": mdcg.group(5),
+            "attribution_terms": mdcg.group(6),
+            "rights": {
+                "structure": "citation_only",
+                "text": "original",
+                "clearance_ref": None,
+            },
+        },
+    }
+
+
+def _assert_set_metadata_matches_spec(clause_set: dict) -> None:
+    """Check a loaded set against its source-specific master-spec values."""
+    key = clause_set_key(clause_set)
+    expected = _spec_set_metadata()[key]
+    rights = clause_set["rights"]
+    for field, value in expected["rights"].items():
+        assert rights[field] == value, f"{key}.rights.{field} differs from spec.md"
+    assert rights["licence"].strip(), f"{key}.rights.licence must be nonblank"
+    assert rights["attribution"].strip(), f"{key}.rights.attribution must be nonblank"
+    if "licence" in expected:
+        assert rights["licence"] == expected["licence"], (
+            f"{key}.rights.licence differs from spec.md"
+        )
+    else:
+        assert expected["licence"] in rights["licence"], (
+            f"{key}.rights.licence omits its source-specific spec statement"
+        )
+    if "attribution" in expected:
+        assert rights["attribution"] == expected["attribution"], (
+            f"{key}.rights.attribution differs from spec.md"
+        )
+    else:
+        for term in (
+            *expected["attribution_terms"].split(", "),
+            expected["officialUrl"],
+            "Agent-IX",
+        ):
+            assert term in rights["attribution"], (
+                f"{key}.rights.attribution omits {term!r} from spec.md"
+            )
+    assert clause_set["source"]["officialUrl"] == expected["officialUrl"], (
+        f"{key}.source.officialUrl differs from spec.md"
+    )
 
 
 def _mdr_set() -> dict:
@@ -258,9 +328,10 @@ def test_mdr_clause_ids_and_required_fields_match_the_spec():
     """
     clause_set = _mdr_set()
     clauses = clause_set["clauses"]
-    assert [clause["id"] for clause in clauses] == MDR_IDS
+    spec_ids = _spec_mdr_ids()
+    assert [clause["id"] for clause in clauses] == spec_ids
     evaluation = evaluate_clause_set(PACKAGE_ROOT, MDR_KEY)
-    assert [item["clauseId"] for item in evaluation["clauses"]] == MDR_IDS
+    assert [item["clauseId"] for item in evaluation["clauses"]] == spec_ids
     assert all(clause["force"] == "mandatory" for clause in clauses)
     assert all(clause["text"].strip() for clause in clauses)
     assert all(clause["expectedOutputs"] for clause in clauses)
@@ -346,24 +417,34 @@ def test_mdr_mobile_platform_applicability():
 
 
 @pytest.mark.trace("FR-002-AC-1", "FR-002-AC-3")
-def test_mdr_rights_and_official_source_metadata_match_the_spec():
-    """Check the MDR reuse metadata and its official source URL.
+def test_each_clause_set_rights_and_source_match_the_spec():
+    """Check source-specific rights metadata for every set in the manifest.
 
-    Assumptions: The canonical values are maintained in the master
-    specification.
-    Criteria: The set uses the required rights fields and exact source values.
+    Assumptions: The master specification is the canonical metadata source.
+    Criteria: Both first-wave sets are checked as they enter the manifest;
+    failures identify the affected set and field.
     Trace: FR-002-AC-1, FR-002-AC-3
     """
-    clause_set = _mdr_set()
-    rights = clause_set["rights"]
-    assert rights == {
-        "structure": "citation_only",
-        "text": "original",
-        "clearance_ref": None,
-        "licence": MDR_LICENCE,
-        "attribution": MDR_ATTRIBUTION,
-    }
-    assert clause_set["source"]["officialUrl"] == MDR_SOURCE_URL
+    expected = _spec_set_metadata()
+    clause_sets = load_clause_sets()
+    assert {clause_set_key(item) for item in clause_sets} <= set(expected)
+    for clause_set in clause_sets:
+        _assert_set_metadata_matches_spec(clause_set)
+
+    # Prove a changed value is reported with the affected set and field.
+    broken = json.loads(json.dumps(_mdr_set()))
+    broken["rights"]["licence"] = "changed"
+    with pytest.raises(
+        AssertionError, match=r"eu/mdr-2017-745@2026-07-19\.rights\.licence"
+    ):
+        _assert_set_metadata_matches_spec(broken)
+
+    broken = json.loads(json.dumps(_mdr_set()))
+    broken["source"]["officialUrl"] = "https://example.invalid/changed"
+    with pytest.raises(
+        AssertionError, match=r"eu/mdr-2017-745@2026-07-19\.source\.officialUrl"
+    ):
+        _assert_set_metadata_matches_spec(broken)
 
 
 @pytest.mark.trace("FR-002-AC-2")
@@ -409,11 +490,13 @@ def test_mdr_declares_the_spec_catalog_subset_used_by_its_clauses():
     assert clause_set["outputCatalog"] == {name: catalog[name] for name in sorted(used)}
 
 
+@pytest.mark.trace("FR-008-AC-2")
 def test_mdr_single_set_discharge_renders_expected_rows(tmp_path):
     """Render a matrix with one discharged and one open MDR clause.
 
     Assumptions: The temporary evidence store starts empty.
     Criteria: I-17.2 is compliant and I-18.8 remains undischarged.
+    Trace: FR-008-AC-2
     """
     rendered = record_and_render_matrix(
         tmp_path, PACKAGE_ROOT, MDR_KEY, clause_id="I-17.2"
