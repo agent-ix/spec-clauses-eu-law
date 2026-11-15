@@ -809,14 +809,14 @@ def _assert_exact_crosswalk_source_rows(
     actual_sources = {item["sourceClause"] for item in crosswalks}
     unexpected = sorted(actual_sources - expected_sources)
     missing = sorted(expected_sources - actual_sources)
-    assert not unexpected, (
-        "unexpected sourceClause row(s) in Article 32 crosswalks: "
-        + ", ".join(unexpected)
+    assert (
+        not unexpected
+    ), "unexpected sourceClause row(s) in Article 32 crosswalks: " + ", ".join(
+        unexpected
     )
-    assert not missing, (
-        "missing sourceClause row(s) in Article 32 crosswalks: "
-        + ", ".join(missing)
-    )
+    assert (
+        not missing
+    ), "missing sourceClause row(s) in Article 32 crosswalks: " + ", ".join(missing)
 
 
 @pytest.mark.trace("FR-014-AC-1")
