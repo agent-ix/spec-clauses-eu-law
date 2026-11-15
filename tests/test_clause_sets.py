@@ -28,6 +28,7 @@ from conftest import (
     stage_clause_sets,
 )
 
+
 def _spec_mdr_ids() -> list[str]:
     """Read normative MDR IDs from the master specification table."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
