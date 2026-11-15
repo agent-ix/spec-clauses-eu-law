@@ -216,13 +216,16 @@ def _signed_corpus(tmp_path: pathlib.Path, assurance: str) -> pathlib.Path:
             "kind": kind,
             "allowed_signers": str(allowed_signers),
         }
-        request_path = signing / f"{kind}-request.json"
-        request_path.write_text(json.dumps(request))
-        result = _checked(
+        result = run(
             assurance,
             "signature-verify",
             "--request",
-            str(request_path),
+            "-",
+            input=json.dumps(request),
+        )
+        assert result.returncode == 0, (
+            f"{assurance} signature-verify exited {result.returncode}: "
+            f"{result.stderr}{result.stdout}"
         )
         output_path = evidence / f"signature-{kind}.json"
         output_path.write_text(result.stdout)
@@ -392,6 +395,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     config_root.mkdir()
     env = {**os.environ, "IX_CONFIG_ROOT": str(config_root)}
     store = tmp_path / "evidence-store"
+    module = _stage_mdr_mdcg_module(tmp_path)
     sets = load_clause_sets()
     assert len(sets) >= 2, "MDR and MDCG clause sets must be present"
     keys = {_clause_set_key(clause_set): clause_set for clause_set in sets}
@@ -408,7 +412,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             "clauses",
             "evaluate",
             "--module",
-            str(PACKAGE_ROOT),
+            str(module),
             "--authority",
             authority,
             "--set",
@@ -451,7 +455,6 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             1 if OPEN_CLAUSES.get(key) else 0
         ), f"{key} did not receive one fact per binding clause except open work"
 
-    module = _stage_mdr_mdcg_module(tmp_path)
     installed = _checked(
         quoin,
         "module",

@@ -1,0 +1,7 @@
+{
+  "projectId": "project://example.invalid/reference-corpus/device-software",
+  "evidenceRefs": [
+    "evidence://example.invalid/evidence/signature-commit.json",
+    "evidence://example.invalid/evidence/signature-tag.json"
+  ]
+}
