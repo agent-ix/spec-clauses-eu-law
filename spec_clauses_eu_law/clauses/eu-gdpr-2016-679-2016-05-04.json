@@ -1,0 +1,883 @@
+{
+  "schemaVersion": "clause-set-v1",
+  "authority": "eu",
+  "id": "gdpr-2016-679",
+  "title": "Selected GDPR controller, processor, security, and impact-assessment obligations",
+  "version": "2016-05-04",
+  "rights": {
+    "structure": "citation_only",
+    "text": "original",
+    "clearance_ref": null,
+    "licence": "EUR-Lex legal documents may be reused for commercial or non-commercial purposes unless otherwise specified. Consolidated texts are CC BY 4.0; acknowledge the source and indicate changes.",
+    "attribution": "© European Union. Source: https://eur-lex.europa.eu/eli/reg/2016/679/2016-05-04/eng | This set contains original summaries and changes made. EUR-Lex legal notice: https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en"
+  },
+  "source": {
+    "title": "Regulation (EU) 2016/679 (General Data Protection Regulation)",
+    "identifier": "Regulation (EU) 2016/679",
+    "officialUrl": "https://eur-lex.europa.eu/eli/reg/2016/679/2016-05-04/eng"
+  },
+  "classificationDimensions": {
+    "gdpr_role": {
+      "values": [
+        "controller",
+        "processor"
+      ]
+    },
+    "high_risk_processing": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "article_30_records_applicability": {
+      "values": [
+        "applies",
+        "exempt"
+      ]
+    }
+  },
+  "outputCatalog": {
+    "access-control": {
+      "kind": "record",
+      "description": "Repository permission and branch-rule settings."
+    },
+    "data-flow-model": {
+      "kind": "record",
+      "description": "Architecture connections with their declared data flows and classifications."
+    },
+    "dpia": {
+      "kind": "document",
+      "description": "Product-specific data protection impact assessment authored by people, with any residual-risk acceptance recorded by a named approver."
+    },
+    "privacy-by-default-settings": {
+      "kind": "record",
+      "description": "Declared default processing settings and data-minimisation choices."
+    },
+    "records-of-processing": {
+      "kind": "record",
+      "description": "Controller or processor record of processing activities derived from the declared data-flow model."
+    },
+    "security-risk-records": {
+      "kind": "record",
+      "description": "`spec-objects-security` threat, risk, and control records."
+    },
+    "software-architecture": {
+      "kind": "record",
+      "description": "`spec-objects-architecture` parts and connections."
+    },
+    "training-record": {
+      "kind": "procedure",
+      "description": "Customer-owned training record."
+    },
+    "verification-records": {
+      "kind": "record",
+      "description": "Test matrix and retained evidence."
+    },
+    "written-procedure": {
+      "kind": "procedure",
+      "description": "Customer-owned written procedure."
+    }
+  },
+  "clauses": [
+    {
+      "id": "art-25(1)",
+      "force": "mandatory",
+      "title": "Privacy-oriented design",
+      "text": "Architecture and development choices account for data-protection principles and safeguards across processing.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "privacy-by-default-settings",
+        "data-flow-model",
+        "software-architecture",
+        "security-risk-records"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gdpr_role",
+        "value": "controller"
+      }
+    },
+    {
+      "id": "art-25(2)",
+      "force": "mandatory",
+      "title": "Privacy-protective defaults",
+      "text": "Default settings limit personal-data collection, access, use, and retention to what the stated purpose needs.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "privacy-by-default-settings",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gdpr_role",
+        "value": "controller"
+      }
+    },
+    {
+      "id": "art-30(1)(a)",
+      "force": "mandatory",
+      "title": "Controller activity identity",
+      "text": "The controller records its name and contact details, any joint controller, its representative, and its data protection officer when applicable.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(1)(b)",
+      "force": "mandatory",
+      "title": "Controller purposes",
+      "text": "The controller records the purposes for which it processes personal data.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(1)(c)",
+      "force": "mandatory",
+      "title": "Controller data-subject groups",
+      "text": "The controller records the categories of people whose data is processed and the categories of personal data involved.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(1)(d)",
+      "force": "mandatory",
+      "title": "Controller recipient groups",
+      "text": "The controller records the categories of recipients to whom personal data has been or will be disclosed.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(1)(e)",
+      "force": "mandatory",
+      "title": "Controller transfer details",
+      "text": "The controller records transfers to third countries or international organisations and the applicable destination and safeguard details.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(1)(f)",
+      "force": "mandatory",
+      "title": "Controller retention periods",
+      "text": "The controller records expected time limits for erasure of the different categories of personal data when possible.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(1)(g)",
+      "force": "mandatory",
+      "title": "Controller security measures",
+      "text": "The controller records a general description of the technical and organisational security measures when possible.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(2)(a)",
+      "force": "mandatory",
+      "title": "Processor activity identity",
+      "text": "The processor records its name and contact details, each controller it serves, and the relevant representatives and data protection officers.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "processor"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(2)(b)",
+      "force": "mandatory",
+      "title": "Processor activity categories",
+      "text": "The processor records the categories of processing carried out for each controller.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "processor"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(2)(c)",
+      "force": "mandatory",
+      "title": "Processor transfer details",
+      "text": "The processor records transfers to third countries or international organisations and the applicable destination and safeguard details.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "processor"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(2)(d)",
+      "force": "mandatory",
+      "title": "Processor security measures",
+      "text": "The processor records a general description of the technical and organisational security measures when possible.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "processor"
+          },
+          {
+            "op": "eq",
+            "dimension": "article_30_records_applicability",
+            "value": "applies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-30(3)",
+      "force": "mandatory",
+      "title": "Record availability",
+      "text": "The records are maintained in writing, including in electronic form.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "article_30_records_applicability",
+        "value": "applies"
+      }
+    },
+    {
+      "id": "art-30(4)",
+      "force": "mandatory",
+      "title": "Supervisory access",
+      "text": "The records are made available to the supervisory authority on request.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "records-of-processing"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "article_30_records_applicability",
+        "value": "applies"
+      }
+    },
+    {
+      "id": "art-32(1)(a)",
+      "force": "mandatory",
+      "title": "Confidentiality safeguards",
+      "text": "Security measures are selected with regard to risk and may include encryption or pseudonymisation where appropriate.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "verification-records"
+      ]
+    },
+    {
+      "id": "art-32(1)(b)",
+      "force": "mandatory",
+      "title": "Service integrity and confidentiality",
+      "text": "Measures support the continuing confidentiality, integrity, availability, and resilience of processing systems and services.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "verification-records"
+      ]
+    },
+    {
+      "id": "art-32(1)(c)",
+      "force": "mandatory",
+      "title": "Recovery capability",
+      "text": "Measures support timely restoration of access to and availability of personal data after a physical or technical incident.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "verification-records"
+      ]
+    },
+    {
+      "id": "art-32(1)(d)",
+      "force": "mandatory",
+      "title": "Safeguard assurance",
+      "text": "The organisation has a process to test, assess, and evaluate the effectiveness of technical and organisational safeguards regularly.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "verification-records"
+      ]
+    },
+    {
+      "id": "art-32(2)",
+      "force": "mandatory",
+      "title": "Risk-sensitive security",
+      "text": "Security selection accounts for processing risks, including accidental or unlawful destruction, loss, alteration, unauthorised disclosure, or access.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records"
+      ]
+    },
+    {
+      "id": "art-32(4)",
+      "force": "mandatory",
+      "title": "Authorised processing",
+      "text": "People acting under the authority of a controller or processor process personal data only on instructions, unless law requires otherwise.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "access-control",
+        "written-procedure",
+        "training-record"
+      ]
+    },
+    {
+      "id": "art-35(1)",
+      "force": "mandatory",
+      "title": "Impact assessment trigger",
+      "text": "Before processing likely to create high risk to people, the controller assesses the proposed processing’s impact on personal-data protection.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "dpia",
+        "data-flow-model",
+        "security-risk-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "high_risk_processing",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-35(2)",
+      "force": "mandatory",
+      "title": "Assessment responsibility",
+      "text": "The controller seeks advice from its data protection officer when one is designated.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "dpia",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "high_risk_processing",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-35(7)(a)",
+      "force": "mandatory",
+      "title": "Processing description",
+      "text": "The assessment describes the processing operations and their purposes, including any legitimate interests pursued by the controller.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "dpia",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "high_risk_processing",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-35(7)(b)",
+      "force": "mandatory",
+      "title": "Necessity and proportionality",
+      "text": "The assessment evaluates whether processing is necessary and proportionate to its purposes.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "dpia",
+        "security-risk-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "high_risk_processing",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-35(7)(c)",
+      "force": "mandatory",
+      "title": "Risk assessment",
+      "text": "The assessment evaluates risks to people’s rights and freedoms.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "dpia",
+        "data-flow-model",
+        "privacy-by-default-settings"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "high_risk_processing",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-35(7)(d)",
+      "force": "mandatory",
+      "title": "Safeguards and demonstration",
+      "text": "The assessment identifies safeguards, security measures, and mechanisms for demonstrating compliance while considering affected people’s rights and legitimate interests.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "dpia",
+        "security-risk-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "high_risk_processing",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-35(9)",
+      "force": "mandatory",
+      "title": "Consultation in assessment",
+      "text": "Where appropriate, the controller seeks the views of affected people or their representatives without prejudice to commercial or public interests or processing security.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "dpia"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "high_risk_processing",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "art-35(11)",
+      "force": "mandatory",
+      "title": "Assessment review",
+      "text": "The controller reviews the assessment when the risk represented by processing operations changes.",
+      "subjects": [
+        "privacy",
+        "data-protection"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "dpia",
+        "data-flow-model",
+        "security-risk-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gdpr_role",
+            "value": "controller"
+          },
+          {
+            "op": "eq",
+            "dimension": "high_risk_processing",
+            "value": "yes"
+          }
+        ]
+      }
+    }
+  ],
+  "crosswalks": []
+}
