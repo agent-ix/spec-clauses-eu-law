@@ -123,7 +123,7 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | verification-records | record | Test matrix and retained evidence. |
 | soup-list | record | Software of unknown provenance (SOUP) report. |
 | security-risk-records | record | `spec-objects-security` threat, risk, and control records. |
-| anomaly-list | record | Unresolved anomaly report. |
+| anomaly-list | record | Unresolved-anomaly report. |
 | release-record | record | Engineering-assurance release decision. |
 | it-requirements-statement | document | Minimum hardware, network and IT-security requirements for instructions for use. |
 | written-procedure | procedure | Customer-owned written procedure. |
