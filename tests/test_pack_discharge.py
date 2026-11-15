@@ -123,10 +123,7 @@ def _resolve_evidence_ref(corpus: pathlib.Path, reference: str) -> pathlib.Path:
 def _assert_reserved_uri_authority(reference: str) -> None:
     """Require a synthetic URI to use the exact reserved example.invalid host."""
     parsed = urlparse(reference)
-    assert parsed.scheme in {
-        "evidence",
-        "person",
-    }, f"unsupported synthetic reference scheme in {reference}"
+    assert parsed.scheme, f"synthetic reference must be a URI: {reference}"
     assert (
         parsed.netloc == "example.invalid"
     ), f"synthetic reference authority must be exactly example.invalid: {reference}"
@@ -352,14 +349,14 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         set(identifiers)
     ), f"corpus frontmatter IDs must be unique: {identifiers}"
     refs = re.findall(
-        r"(?:evidence|person)://[^\s)]+",
+        r"\b[A-Za-z][A-Za-z0-9+.-]*://[^\s\"'<>]+",
         "\n".join(
             path.read_text(errors="replace")
             for path in CORPUS_ROOT.rglob("*")
             if path.is_file()
         ),
     )
-    assert refs, "corpus must include synthetic evidence references"
+    assert refs, "corpus must include synthetic URI-valued identifiers or references"
     for reference in refs:
         _assert_reserved_uri_authority(reference)
 
@@ -373,6 +370,7 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         "evidence://notexample.invalid/file.json",
         "evidence://user@example.invalid/file.json",
         "evidence://example.invalid:443/file.json",
+        "project://example.invalid.attacker.test/reference-corpus",
     ],
 )
 def test_synthetic_reference_rejects_unreserved_authority(reference: str):
