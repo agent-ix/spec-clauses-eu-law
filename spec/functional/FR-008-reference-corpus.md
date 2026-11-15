@@ -22,15 +22,16 @@ relationships:
 
 ## Description
 
-Pack discharge tests SHALL use a minimal synthetic project at `tests/corpus/`. Artifact-local identifiers SHALL follow the schema declared by their Quire archetype and remain unique within the corpus. URI-valued identifiers and references SHALL use the exact authority `example.invalid`. Test facts SHALL use a temporary evidence store.
+Pack discharge tests SHALL use a minimal synthetic project at `tests/corpus/`. Artifact-local identifiers with fixed archetype grammars SHALL follow those grammars, including `FR-NNN`, `NFR-NNN`, and `TM-NNN` identifiers. Free-form artifact-local identifiers SHALL use the synthetic namespace marker `example-invalid-` and remain unique within the corpus. URI-valued identifiers and references SHALL use the exact authority `example.invalid`. Test facts SHALL use a temporary evidence store. The corpus SHALL contain no secret material.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-008-AC-1 | Corpus validates; every schema-constrained artifact-local identifier follows its Quire archetype schema and is unique within the corpus; every URI-valued identifier or reference uses the exact authority `example.invalid`; no secret material is present. | Test |
+| FR-008-AC-1 | Corpus validates; fixed-grammar artifact-local identifiers follow their Quire archetype schema; free-form artifact-local identifiers use the `example-invalid-` prefix and are unique within the corpus; every URI-valued identifier or reference uses the exact authority `example.invalid`. | Test |
 | FR-008-AC-2 | Discharge tests write facts to a temporary store and remove it after execution. | Test |
 | FR-008-AC-3 | The test preflight detects `quire` and `quoin` with the required clause-set validation and discharge/RMM capabilities; if either is missing, the gate fails with the executable or capability named and no criterion is reported as passed. | Test |
+| FR-008-AC-4 | No secret material is committed under `tests/corpus/`. | Inspection |
 
 ## Dependencies
 
