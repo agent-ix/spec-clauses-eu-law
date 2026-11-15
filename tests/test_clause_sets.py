@@ -106,7 +106,7 @@ def test_quire_validates_the_module_and_spec_bundle():
     assert result.returncode == 0, result.stderr + result.stdout
 
 
-@pytest.mark.trace("TC-003", "FR-001-AC-2")
+@pytest.mark.trace("FR-001-AC-2")
 def test_path_install_reports_a_non_pack_clause_module(tmp_path):
     """Install the module in an isolated Quoin home.
 
@@ -185,7 +185,7 @@ def test_all_declared_sets_share_one_output_catalog():
     assert_output_catalog_consistent(clause_sets)
 
 
-@pytest.mark.trace("TC-006", "FR-006-AC-2")
+@pytest.mark.trace("FR-006-AC-2")
 def test_catalog_mismatch_error_names_both_sets():
     """Name both source sets when a shared output definition changes.
 
@@ -216,7 +216,7 @@ def test_catalog_mismatch_error_names_both_sets():
         assert_output_catalog_consistent(sets)
 
 
-@pytest.mark.trace("TC-007", "FR-005-AC-2")
+@pytest.mark.trace("FR-005-AC-2")
 def test_crosswalk_error_names_source_clause_and_missing_target_key(tmp_path):
     """Name the source clause and target set when a crosswalk target is absent.
 
