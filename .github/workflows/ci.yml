@@ -40,7 +40,7 @@ jobs:
       - name: Install default Quire modules
         run: quoin module ensure-defaults
       - name: Validate specification documents
-        run: quire validate 'spec/**/*.md' --module "$HOME/.ix/filament/modules/spec-artifacts-iso"
+        run: quire validate 'spec/**/*.md' --module "$GITHUB_WORKSPACE/spec_clauses_eu_law" --module "$HOME/.ix/filament/modules/spec-artifacts-iso" --module "$HOME/.ix/filament/modules/spec-artifacts-process"
       - name: Check clause-set publication rights
         run: quire publish-check --module "$GITHUB_WORKSPACE/spec_clauses_eu_law"
       - name: Install the pinned NIST module for crosswalk tests

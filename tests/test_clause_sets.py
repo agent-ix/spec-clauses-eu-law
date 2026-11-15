@@ -407,12 +407,14 @@ def test_manifest_declares_no_non_clause_contributions():
     assert not {"object_types", "archetypes", "edges"}.intersection(manifest)
 
 
+@pytest.mark.trace("FR-014-AC-4")
 def test_quire_validates_the_module_and_spec_bundle():
-    """Validate the empty module and its specification documents.
+    """Validate the clause module and its specification documents.
 
     Assumptions: The installed ISO artifacts module supplies validation
     schemas.
     Criteria: Quire exits successfully for the EU module and spec documents.
+    Trace: FR-014-AC-4
     """
     iso_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-iso"
     process_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-process"
@@ -949,14 +951,14 @@ def test_mdcg_declares_the_spec_catalog_subset_used_by_its_clauses():
     assert clause_set["outputCatalog"] == {name: catalog[name] for name in sorted(used)}
 
 
-@pytest.mark.trace("FR-009-AC-1", "FR-009-AC-2", "FR-009-AC-3")
+@pytest.mark.trace("FR-009-AC-1", "FR-009-AC-2", "FR-009-AC-3", "FR-014-AC-4")
 def test_gdpr_set_identity_rights_and_publish_check():
     """Check GDPR identity, attribution metadata, and publishability.
 
     Assumptions: spec.md declares the consulted EUR-Lex consolidation.
     Criteria: The manifest set matches its declared identity and rights, and
     Quire accepts the public module for publication.
-    Trace: FR-009-AC-1, FR-009-AC-2, FR-009-AC-3
+    Trace: FR-009-AC-1, FR-009-AC-2, FR-009-AC-3, FR-014-AC-4
     """
     clause_set = _gdpr_set()
     assert clause_set_key(clause_set) == "eu/gdpr-2016-679@2016-05-04"
