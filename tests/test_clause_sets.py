@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import os
 import pathlib
@@ -106,12 +107,24 @@ def _spec_ai_act_annex_rows() -> list[dict[str, str]]:
         cells = [cell.strip().replace("`", "") for cell in line.strip("|").split("|")]
         if len(cells) != 8:
             continue
-        clause_id, _element, _condition, applicability, outputs, *_ = cells
+        (
+            clause_id,
+            _element,
+            _condition,
+            applicability,
+            outputs,
+            target,
+            relation,
+            rationale,
+        ) = cells
         rows.append(
             {
                 "id": clause_id,
                 "applicability": applicability,
                 "outputs": outputs,
+                "target": target,
+                "relation": relation,
+                "rationale": rationale,
             }
         )
     return rows
@@ -1057,6 +1070,122 @@ def test_mdcg_missing_mdr_target_fails_with_source_and_target_key(tmp_path):
         match=rf"{source['crosswalks'][0]['sourceClause']}.*{target_key}#missing-mdr-clause",
     ):
         assert_crosswalk_targets_resolve(load_clause_sets(fixture / "manifest.yaml"))
+
+
+def _assert_ai_act_crosswalk_contract(clause_sets: list[dict]) -> None:
+    """Require AI Act crosswalks to be complete and claim-bounded."""
+    ai_set_keys = {
+        "eu/ai-act-2024-1689@2026-07-27",
+        "eu/ai-act-2024-1689-annex-iv@2026-07-27",
+    }
+    for clause_set in clause_sets:
+        source_key = clause_set_key(clause_set)
+        if source_key not in ai_set_keys:
+            continue
+        source_ids = {clause["id"] for clause in clause_set["clauses"]}
+        for crosswalk in clause_set.get("crosswalks", []):
+            source_clause = crosswalk.get("sourceClause", "")
+            assert source_clause in source_ids, (
+                f"{source_key}#{source_clause}.sourceClause must name a clause"
+            )
+            assert crosswalk.get("relation") in {"partial", "informative"}, (
+                f"{source_key}#{source_clause}.relation must be partial or informative"
+            )
+            assert isinstance(crosswalk.get("rationale"), str) and crosswalk[
+                "rationale"
+            ].strip(), f"{source_key}#{source_clause}.rationale must be nonempty"
+    assert_crosswalk_targets_resolve(clause_sets)
+
+
+@pytest.mark.trace("FR-021-AC-1", "FR-021-AC-2")
+def test_ai_act_crosswalks_match_the_annex_table_and_resolve_to_mdr():
+    """Check table-driven Annex IV mappings and the selected article mappings.
+
+    Assumptions: The exact AI Act and MDR sets are declared in the module.
+    Criteria: Each Annex IV row either has its table target or explicitly has
+    no counterpart; article mappings cover the ticket's named Article 9 and
+    Article 15 examples; all targets resolve with non-equivalent relations.
+    Trace: FR-021-AC-1, FR-021-AC-2
+    """
+    clause_sets = load_clause_sets()
+    high_risk = _ai_act_set()
+    annex = _ai_act_annex_set()
+    mdr_authority, mdr_id, mdr_version = _parsed_spec_sets()["mdr"]["identity"]
+    mdr_set = {
+        "authority": mdr_authority,
+        "id": mdr_id,
+        "version": mdr_version,
+    }
+
+    rows = _spec_ai_act_annex_rows()
+    expected_annex = [
+        {
+            "sourceClause": row["id"],
+            "target": {"set": mdr_set, "clause": row["target"]},
+            "relation": row["relation"],
+            "rationale": row["rationale"],
+        }
+        for row in rows
+        if row["target"] != "none"
+    ]
+    assert annex["crosswalks"] == expected_annex
+    no_counterpart = {row["id"] for row in rows if row["target"] == "none"}
+    assert no_counterpart.isdisjoint(
+        item["sourceClause"] for item in annex["crosswalks"]
+    )
+
+    expected_article_targets = {
+        "art-9": {"II-5", *(f"I-{index}" for index in range(1, 9))},
+        "art-15": {"I-17.2", "I-17.4", "I-18.8"},
+    }
+    actual_article_targets = {
+        source: {
+            item["target"]["clause"]
+            for item in high_risk["crosswalks"]
+            if item["sourceClause"] == source
+        }
+        for source in expected_article_targets
+    }
+    assert actual_article_targets == expected_article_targets
+    assert all(item["target"]["set"] == mdr_set for item in high_risk["crosswalks"])
+    _assert_ai_act_crosswalk_contract(clause_sets)
+
+
+@pytest.mark.trace("FR-021-AC-3")
+@pytest.mark.parametrize(
+    ("mutation", "expected_error"),
+    [
+        ("unknown_target", r"IV-1\(a\).*targets missing clause.*#II-99"),
+        ("equivalent", r"IV-1\(a\)\.relation"),
+        ("empty_rationale", r"IV-1\(a\)\.rationale"),
+    ],
+)
+def test_ai_act_invalid_crosswalk_fields_fail_with_source_and_field(
+    mutation: str, expected_error: str
+):
+    """Reject an unknown target, equivalent relation, or blank rationale.
+
+    Assumptions: The valid AI Act and MDR sets load from the module manifest.
+    Criteria: Each invalid crosswalk fails with the source clause and the
+    target, relation, or rationale field identified.
+    Trace: FR-021-AC-3
+    """
+    clause_sets = copy.deepcopy(load_clause_sets())
+    annex = next(
+        item
+        for item in clause_sets
+        if clause_set_key(item) == "eu/ai-act-2024-1689-annex-iv@2026-07-27"
+    )
+    crosswalk = annex["crosswalks"][0]
+    if mutation == "unknown_target":
+        crosswalk["target"]["clause"] = "II-99"
+    elif mutation == "equivalent":
+        crosswalk["relation"] = "equivalent"
+    else:
+        crosswalk["rationale"] = ""
+
+    with pytest.raises(AssertionError, match=expected_error):
+        _assert_ai_act_crosswalk_contract(clause_sets)
 
 
 def _assert_exact_crosswalk_source_rows(
