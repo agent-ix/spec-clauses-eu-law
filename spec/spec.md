@@ -9,27 +9,29 @@ tags:
   - clause-sets
   - mdr
   - medical-device-cybersecurity
+  - artificial-intelligence
 security_critical: false
 ---
 # Master Requirements Specification
 
 ## Purpose
 
-This specification defines the clause-only EU-law module and its sets for software-related requirements from Regulation (EU) 2017/745 (MDR), interpretive cybersecurity guidance from MDCG 2019-16 rev.1, and selected obligations in Regulation (EU) 2016/679 (GDPR). Clause summaries use original expression and link to official sources. The pack records evidence and produces an RMM; it does not determine legal compliance.
+This specification defines the clause-only EU-law module and its sets for software-related requirements from Regulation (EU) 2017/745 (MDR), interpretive cybersecurity guidance from MDCG 2019-16 rev.1, selected obligations in Regulation (EU) 2016/679 (GDPR), and selected high-risk AI obligations and technical-documentation elements in Regulation (EU) 2024/1689 (AI Act). Clause summaries use original expression and link to official sources. The pack records evidence and produces an RMM; it does not determine legal compliance.
 
 ## Scope
 
 ### In Scope
 
 - Repository `agent-ix/spec-clauses-eu-law`, Python package `spec_clauses_eu_law`, module `clause_sets`.
-- MDR set `eu/mdr-2017-745@2026-07-19`, MDCG set `eu-mdcg/mdcg-2019-16@rev1`, and GDPR set `eu/gdpr-2016-679@2016-05-04`.
+- MDR set `eu/mdr-2017-745@2026-07-19`, MDCG set `eu-mdcg/mdcg-2019-16@rev1`, GDPR set `eu/gdpr-2016-679@2016-05-04`, and AI Act sets `eu/ai-act-2024-1689@2026-07-27` and `eu/ai-act-2024-1689-annex-iv@2026-07-27`.
 - Set identities, sources, rights metadata, clause identifiers, applicability, expected outputs, MDCG-to-MDR and GDPR-to-NIST/HIPAA crosswalks, shared output catalog, customer-owned obligations, and synthetic reference corpus rules.
 - GDPR Articles 25, 30, 32 and 35; the person-supplied controller/processor, high-risk-processing, and Article 30(5) applicability values; human approval for DPIA residual-risk acceptance; and the security-analysis skill's coverage boundary for GDPR material.
+- AI Act high-risk provider obligations in Articles 9–20, 43, 47, 49, 72 and 73; deployer obligations in Article 26; Annex IV technical-documentation elements; person-supplied high-risk and operator-role values; and crosswalks to MDR Annex II.
 
 ### Out of Scope
 
 - Clause JSON/content, package manifest, corpus, implementation tests, CI, publish gate, output bindings, and scaffold beyond this specification (PLAT-1425, PLAT-1623, PLAT-1624, PLAT-1626).
-- GDPR Articles outside 25, 30, 32 and 35, including data-subject rights, international transfers, and breach notifications under Articles 33 and 34; AI Act sets; engine changes; legal advice or compliance determinations.
+- GDPR Articles outside 25, 30, 32 and 35, including data-subject rights, international transfers, and breach notifications under Articles 33 and 34; AI Act provisions outside the selected high-risk provider/deployer duties and Annex IV, including prohibited practices, general-purpose AI models and fundamental-rights impact assessments; engine changes; legal advice or compliance determinations.
 - Any source text or expression from harmonised or other paywalled standards.
 
 ## System Overview
@@ -114,6 +116,73 @@ The table is normative for clause IDs, force, applicability, and expected output
 
 Articles 25(3) and 32(3) are not clauses because they describe optional ways to demonstrate compliance. Article 30(5)'s exemption decision is represented by the person-supplied `article_30_records_applicability` value; a medical-product context or assumed health-data use is not enough to resolve it. Article 30(3) and (4) explicitly inherit this value because they concern records required under paragraphs 1 and 2. Article 35(3) and (4) are triggers rather than separate clauses; paragraphs (5) and (6) are supervisory-authority duties; paragraph (8) is conditional on a code-of-conduct circumstance not represented by the selected dimensions; paragraph (10) is an exception dependent on external legal-basis and prior-assessment facts. Those Article 35 paragraphs are identified as coverage limits and are not evaluated by this set. Any residual-risk decision associated with a DPIA remains with a named person.
 
+## AI Act Set Design
+
+The AI Act sets use authority `eu`, IDs `ai-act-2024-1689` and `ai-act-2024-1689-annex-iv`, and version `2026-07-27`, the EUR-Lex consolidated-text date consulted. Their official source is `https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng`; a later consolidated text is a new set version. Rights are `structure: citation_only`, `text: original`, and `clearance_ref: null`. Licence metadata states that EUR-Lex legal documents may be reused for commercial or non-commercial purposes unless otherwise specified and that the consolidated text is under CC BY 4.0 with source attribution and indication of changes. Attribution identifies the European Union, cites the exact official source, states that changes were made, and references `https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en`. No Commission reuse terms for standards are inferred from this law-text licence.
+
+AI Act clause IDs use `art-<article>` and Annex IV IDs use `IV-<section>(<letter>)` for lettered points or `IV-<section>` for unlettered points. The person supplies `ai_high_risk` (`yes` or `no`) and `ai_role` (`provider` or `deployer`); the tool never infers classification or role from the product. Provider clauses use `all[eq ai_high_risk yes, eq ai_role provider]`; Article 26 clauses use `all[eq ai_high_risk yes, eq ai_role deployer]`. Missing required values leave dependent clauses unresolved. A known role-incompatible clause is not binding. Annex IV clauses are provider obligations and use the provider expression. The Article 6(1) high-risk classification is made by a person outside this module; these dimensions record that decision rather than decide it.
+
+For the consolidated text dated 2026-07-27, Article 113 applies Chapter III Sections 1–3 to Article 6(1) high-risk AI systems related to Annex I products from 2 August 2028. The AI Act set records that date for its Annex I scope. It is reference metadata, not an evaluated applicability dimension; a later amendment or consolidation requires a new set version.
+
+## AI Act High-Risk Obligations Table
+
+This table is normative for IDs, force, applicability, and expected outputs. The provider set includes only the listed provider-facing obligations. Article 26 contains the selected deployer obligations. Other actors, provisions and unlisted articles are outside this set. Each clause summary uses original wording and does not reproduce source text.
+
+| Clause ID | Coverage | Applicability | Force | Expected outputs |
+|---|---|---|---|---|
+| `art-9` | Risk-management process and review | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `risk-management-records` |
+| `art-10` | Training, validation and testing data governance | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `data-lineage`, `verification-records` |
+| `art-11` | Technical documentation prepared and maintained | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `model-description`, `software-architecture`, `verification-records` |
+| `art-12` | Automatic event logging and traceability | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `event-logging-design` |
+| `art-13` | Information and instructions enabling deployer use | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `model-description`, `written-procedure` |
+| `art-14` | Human-oversight design and measures | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `human-oversight-design` |
+| `art-15` | Accuracy, robustness and cybersecurity | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `verification-records`, `security-risk-records` |
+| `art-16` | Provider duties for conformity, documentation, corrective action and cooperation | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `model-description`, `release-record`, `written-procedure` |
+| `art-17` | Quality-management system | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `written-procedure`, `audit-trail` |
+| `art-18` | Retention of documentation and logs | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `model-description`, `event-logging-design` |
+| `art-19` | Automatically generated logs under provider control | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `event-logging-design` |
+| `art-20` | Corrective action and authority notification | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `written-procedure`, `release-record` |
+| `art-26` | Deployer use, oversight, monitoring and incident duties | `all[eq ai_high_risk yes, eq ai_role deployer]` | mandatory | `human-oversight-design`, `written-procedure`, `event-logging-design` |
+| `art-43` | Conformity-assessment route | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `conformity-declaration`, `verification-records` |
+| `art-47` | EU declaration of conformity | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `conformity-declaration` |
+| `art-49` | Provider registration information | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `model-description` |
+| `art-72` | Post-market monitoring system and plan | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `post-market-monitoring-plan`, `event-logging-design` |
+| `art-73` | Serious-incident reporting | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `written-procedure`, `anomaly-list` |
+
+With `ai_high_risk=no`, every listed clause is `not_binding`; with `yes` and provider, provider clauses bind and Article 26 is `not_binding`; with `yes` and deployer, Article 26 binds and provider clauses are `not_binding`. A missing required dimension leaves dependent clauses unresolved. The set does not make a legal classification or conformity decision.
+
+## AI Act Annex IV Table
+
+This table is normative for every Annex IV point included. Each point is a mandatory provider documentation obligation, uses `all[eq ai_high_risk yes, eq ai_role provider]`, and declares at least one output from the catalog. A point's crosswalk target is an MDR Annex II clause; `none` records that no direct Annex II counterpart is asserted. Crosswalk rationales are original statements of scope, and relations are `partial` or `informative`, never `equivalent`.
+
+| Clause ID | Documentation element | Expected outputs | MDR Annex II target | Relation | Rationale |
+|---|---|---|---|---|---|
+| `IV-1(a)` | Intended purpose, provider identity and version lineage | `model-description` | `II-1.1` | partial | MDR device description includes intended purpose and identity, but not the complete AI system/version lineage. |
+| `IV-1(b)` | Interactions with hardware, software and other systems | `software-architecture` | `II-1.1` | partial | MDR device description can identify the device context and related components, while this point documents AI-system interactions. |
+| `IV-1(c)` | Relevant software or firmware versions and update requirements | `model-description` | `II-1.1` | partial | MDR device description covers device/software identification but not all AI software version-update information. |
+| `IV-1(d)` | Forms in which the system is placed on the market or put into service | `model-description` | `none` | `none` | The selected MDR software clauses contain no direct counterpart for all AI distribution forms. |
+| `IV-1(e)` | Hardware on which the system is intended to run | `software-architecture` | `II-1.1` | partial | The MDR device description can capture hardware context but does not enumerate all AI deployment hardware. |
+| `IV-1(f)` | Product component illustrations, external features, markings and layout | `software-architecture` | `II-1.1` | partial | MDR device description includes device illustrations, while the AI point identifies the AI component and its product placement. |
+| `IV-1(g)` | Basic description of the deployer-facing interface | `model-description` | `none` | `none` | The selected MDR software clauses do not directly cover the AI deployer interface description. |
+| `IV-1(h)` | Instructions for use and applicable interface description | `model-description`, `written-procedure` | `none` | `none` | The selected MDR software clauses do not directly cover these AI-specific deployer instructions. |
+| `IV-2(a)` | Development methods and steps | `software-architecture`, `verification-records` | `none` | `none` | The selected MDR software clauses do not directly cover the AI development-process record. |
+| `IV-2(b)` | Design specifications, logic, assumptions and classification choices | `model-description`, `software-architecture` | `II-1.1` | informative | MDR device description provides context for the AI design record without covering its internal logic or classification choices. |
+| `IV-2(c)` | Architecture, component integration and computational resources | `software-architecture` | `II-1.1` | partial | The MDR device description informs system architecture while the AI point adds model and computational-resource detail. |
+| `IV-2(d)` | Data requirements, provenance, selection and preparation | `data-lineage` | `none` | `none` | No selected MDR Annex II software clause directly specifies AI training-data governance documentation. |
+| `IV-2(e)` | Human-oversight assessment and output-interpretation measures | `human-oversight-design` | `none` | `none` | The selected MDR software clauses do not directly impose the AI Act human-oversight documentation element. |
+| `IV-2(f)` | Predetermined system changes and continuous-conformity measures | `release-record`, `verification-records` | `none` | `none` | The selected MDR software clauses do not directly cover this AI-specific change-control description. |
+| `IV-2(g)` | Validation and test procedures, data, metrics, logs and reports | `verification-records` | `II-6.1(b)` | partial | MDR software validation evidence overlaps, but does not cover the full AI validation and reporting detail. |
+| `IV-2(h)` | Cybersecurity measures | `security-risk-records`, `verification-records` | `II-4` | partial | MDR general safety and performance requirements include security concerns; this AI point adds system-specific measures. |
+| `IV-3` | Capabilities, limitations, risks, oversight and input specifications | `model-description`, `human-oversight-design`, `security-risk-records` | `II-1.1` | partial | Device description provides context, but does not cover all AI performance, oversight and input details. |
+| `IV-4` | Suitability of performance metrics for the system | `verification-records` | `II-6.1(b)` | partial | MDR software validation metrics overlap, but the AI point adds metric suitability for the AI system. |
+| `IV-5` | Risk-management system | `risk-management-records` | `II-5` | partial | MDR benefit-risk and risk-management evidence overlaps with the AI risk system without establishing equivalence. |
+| `IV-6` | Relevant lifecycle changes | `release-record` | `none` | `none` | The selected MDR software clauses do not directly cover the complete AI lifecycle-change description. |
+| `IV-7` | Applied standards or other solutions used to meet requirements | `model-description`, `verification-records` | `II-4` | informative | The MDR requirements-compliance record may contextualize solutions, but no particular standards are named or treated as equivalent. |
+| `IV-8` | EU declaration of conformity | `conformity-declaration` | `none` | `none` | The declaration is a separate AI Act deliverable and has no direct selected MDR Annex II clause. |
+| `IV-9` | Post-market performance evaluation system and monitoring plan | `post-market-monitoring-plan` | `II-4` | informative | MDR general requirements provide product-safety context, not an equivalent AI post-market performance plan. |
+
+For `IV-7`, the set records the documentation category without naming, numbering, quoting, or paraphrasing any harmonised standard, standardisation-request deliverable, or other paywalled standard. `IV-8` has no direct Annex II counterpart because the MDR declaration is defined separately from its Annex II technical-documentation contents.
+
 ## Security-Analysis Skill Disposition
 
 For PLAT-1628, retain `skills/spec-security-analysis/references/gdpr/ChII-Principles.md`, `ChIII-DataSubjectRights.md`, and `ChV-DataTransfers.md` as clearly labeled untyped context until future clause sets cover those chapters. Do not delete their summaries or treat them as evaluated clauses. Modify `skills/spec-security-analysis/references/gdpr/ChIV-ControllerProcessor.md` to replace the covered Article 25, 30, 32, and 35 summaries with links to `eu/gdpr-2016-679@2016-05-04`. Modify `skills/spec-security-analysis/references/gdpr/index.md`, `skills/spec-security-analysis/SKILL.md`, and `skills/spec-security-analysis/references/standards-index.md` to link the set and state the uncovered-topic boundary. These are the complete affected Quoin files; no other GDPR reference files are to be deleted or modified for this set.
@@ -193,14 +262,20 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | records-of-processing | record | Controller or processor record of processing activities derived from the declared data-flow model. |
 | dpia | document | Product-specific data protection impact assessment authored by people, with any residual-risk acceptance recorded by a named approver. |
 | privacy-by-default-settings | record | Declared default processing settings and data-minimisation choices. |
+| data-lineage | record | Provenance, selection, preparation and transformations for data used by the AI system. |
+| model-description | document | Original description of AI system purpose, version, behavior, limits and use. |
+| event-logging-design | record | Declared events, retention and access controls for AI system logs. |
+| human-oversight-design | record | Human oversight roles, measures, competence and output-interpretation controls. |
+| post-market-monitoring-plan | document | Provider plan and evidence for post-market performance monitoring. |
+| conformity-declaration | document | EU declaration of conformity and its controlled reference. |
 
 A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with rationale and customer approval reference, never a direct fact. `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
 
 ## Requirements Architecture
 
-FR-001 through FR-015 define module home, rights, MDR, MDCG and GDPR clauses and applicability, crosswalks, catalog, customer-owned obligations, skill mapping, and corpus. NFR-001 defines the licensing and standards boundary; NFR-002 defines the GDPR-specific source and original-expression boundary. StR-001 records the manufacturer's need for reviewable evidence; US-001 describes the human review outcome. FR-001 through FR-015 trace to US-001, and both NFRs constrain the applicable functional requirements.
+FR-001 through FR-015 define module home, rights, MDR, MDCG and GDPR clauses and applicability, crosswalks, catalog, customer-owned obligations, skill mapping, and corpus. FR-016 through FR-022 define the AI Act sets, provider/deployer obligations, Annex IV table, human decision evidence, MDR crosswalks and application date. NFR-001 defines the general licensing and standards boundary; NFR-002 defines the GDPR-specific source and original-expression boundary; NFR-003 defines the AI Act source and standards boundary. StR-001 records the manufacturer's need for reviewable evidence; US-001 describes the human review outcome. All functional requirements trace to US-001.
 
-Dependency graph (an edge A → B means A depends on B): FR-003 → FR-001, FR-002, FR-006; FR-004 → FR-003; FR-005 → FR-001, FR-002, FR-003, FR-006; FR-006 → FR-001; FR-007 → FR-006; FR-008 → FR-001, FR-003, FR-004, FR-005, FR-006, FR-007; FR-009 → FR-001, FR-002, FR-006; FR-010 → FR-009; FR-011 → FR-010; FR-012 → FR-010, FR-011; FR-013 → FR-010, FR-011; FR-014 → FR-010; FR-015 → FR-009, FR-010. NFR-001 constrains FR-001 through FR-015; NFR-002 constrains FR-009 through FR-015.
+Dependency graph (an edge A → B means A depends on B): FR-003 → FR-001, FR-002, FR-006; FR-004 → FR-003; FR-005 → FR-001, FR-002, FR-003, FR-006; FR-006 → FR-001; FR-007 → FR-006; FR-008 → FR-001, FR-003, FR-004, FR-005, FR-006, FR-007; FR-009 → FR-001, FR-002, FR-006; FR-010 → FR-009; FR-011 → FR-010; FR-012 → FR-010, FR-011; FR-013 → FR-010, FR-011; FR-014 → FR-010; FR-015 → FR-009, FR-010; FR-016 → FR-001, FR-002; FR-017 → FR-016, FR-006; FR-018 → FR-016, FR-006; FR-019 → FR-017, FR-018; FR-020 → FR-017; FR-021 → FR-018, FR-003; FR-022 → FR-016. NFR-001 constrains FR-001 through FR-022; NFR-002 constrains FR-009 through FR-015; NFR-003 constrains FR-016 through FR-022.
 
 ## Upstream Contracts
 
@@ -213,4 +288,6 @@ The module uses existing `clause-set-v1`, `clause_sets`, `quire clauses evaluate
 - MDCG 2019-16 rev.1 official PDF: `https://health.ec.europa.eu/document/download/b23b362f-8a56-434c-922a-5b3ca4d0a7a1_en?filename=md_cybersecurity_en.pdf`.
 - Commission MDCG listing: `https://health.ec.europa.eu/medical-devices-sector/new-regulations/guidance-mdcg-endorsed-documents-and-other-guidance_en`.
 - EUR-Lex current consolidated GDPR text consulted: `https://eur-lex.europa.eu/eli/reg/2016/679/2016-05-04/eng`.
+- EUR-Lex legal notice on reuse and attribution: `https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en`.
+- EUR-Lex consolidated AI Act text consulted: `https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng`.
 - EUR-Lex legal notice on reuse and attribution: `https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en`.
