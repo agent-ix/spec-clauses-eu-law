@@ -238,7 +238,7 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
                 "EUR-Lex legal documents may be reused for commercial or "
                 "non-commercial purposes unless otherwise specified and that "
                 "the consolidated text is under CC BY 4.0 with source attribution "
-                "and indication of changes"
+                "and indication of changes."
             ),
             "attribution": (
                 f"© European Union. Source: {ai_act['officialUrl']} | This set "
