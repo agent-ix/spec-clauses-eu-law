@@ -259,6 +259,8 @@ def test_mdr_clause_ids_and_required_fields_match_the_spec():
     clause_set = _mdr_set()
     clauses = clause_set["clauses"]
     assert [clause["id"] for clause in clauses] == MDR_IDS
+    evaluation = evaluate_clause_set(PACKAGE_ROOT, MDR_KEY)
+    assert [item["clauseId"] for item in evaluation["clauses"]] == MDR_IDS
     assert all(clause["force"] == "mandatory" for clause in clauses)
     assert all(clause["text"].strip() for clause in clauses)
     assert all(clause["expectedOutputs"] for clause in clauses)
