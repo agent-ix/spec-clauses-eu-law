@@ -1,5 +1,5 @@
 ---
-id: example.invalid/evidence_store
+id: evidence_store
 title: "EvidenceStore"
 type: part
 object: part
@@ -10,4 +10,4 @@ object: part
 
 | Owner | Declared Type | Multiplicity |
 |---|---|---|
-| example.invalid/review_service | example.invalid/evidence_store_type | 1..1 |
+| review_service | EvidenceStoreType | 1..1 |
