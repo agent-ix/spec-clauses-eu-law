@@ -637,5 +637,136 @@
       }
     }
   ],
-  "crosswalks": []
+  "crosswalks": [
+    {
+      "sourceClause": "art-15",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.2"
+      },
+      "relation": "partial",
+      "rationale": "This MDR clause covers cybersecurity risk controls for device software, one part of the AI Act obligation."
+    },
+    {
+      "sourceClause": "art-15",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "This MDR clause covers software verification and validation evidence, which supports but does not exhaust AI accuracy and robustness work."
+    },
+    {
+      "sourceClause": "art-15",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-18.8"
+      },
+      "relation": "partial",
+      "rationale": "This MDR clause covers release controls relevant to software integrity, not the full AI Act cybersecurity obligation."
+    },
+    {
+      "sourceClause": "art-9",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-5"
+      },
+      "relation": "partial",
+      "rationale": "MDR risk-management requirements overlap with the AI Act risk process, while each regime keeps its own scope and decisions."
+    },
+    {
+      "sourceClause": "art-9",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-1"
+      },
+      "relation": "partial",
+      "rationale": "MDR risk-management requirements overlap with the AI Act risk process, while each regime keeps its own scope and decisions."
+    },
+    {
+      "sourceClause": "art-9",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-2"
+      },
+      "relation": "partial",
+      "rationale": "MDR risk-management requirements overlap with the AI Act risk process, while each regime keeps its own scope and decisions."
+    },
+    {
+      "sourceClause": "art-9",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-3"
+      },
+      "relation": "partial",
+      "rationale": "MDR risk-management requirements overlap with the AI Act risk process, while each regime keeps its own scope and decisions."
+    },
+    {
+      "sourceClause": "art-9",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-4"
+      },
+      "relation": "partial",
+      "rationale": "MDR risk-management requirements overlap with the AI Act risk process, while each regime keeps its own scope and decisions."
+    },
+    {
+      "sourceClause": "art-9",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-5"
+      },
+      "relation": "partial",
+      "rationale": "MDR risk-management requirements overlap with the AI Act risk process, while each regime keeps its own scope and decisions."
+    },
+    {
+      "sourceClause": "art-9",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-8"
+      },
+      "relation": "partial",
+      "rationale": "MDR risk-management requirements overlap with the AI Act risk process, while each regime keeps its own scope and decisions."
+    }
+  ]
 }

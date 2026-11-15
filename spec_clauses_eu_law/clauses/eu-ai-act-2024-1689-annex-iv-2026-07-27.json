@@ -1052,5 +1052,188 @@
       }
     }
   ],
-  "crosswalks": []
+  "crosswalks": [
+    {
+      "sourceClause": "IV-1(a)",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-1.1"
+      },
+      "relation": "partial",
+      "rationale": "MDR device description includes intended purpose and identity, but not the complete AI system/version lineage."
+    },
+    {
+      "sourceClause": "IV-1(b)",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-1.1"
+      },
+      "relation": "partial",
+      "rationale": "MDR device description can identify the device context and related components, while this point documents AI-system interactions."
+    },
+    {
+      "sourceClause": "IV-1(c)",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-1.1"
+      },
+      "relation": "partial",
+      "rationale": "MDR device description covers device/software identification but not all AI software version-update information."
+    },
+    {
+      "sourceClause": "IV-1(e)",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-1.1"
+      },
+      "relation": "partial",
+      "rationale": "The MDR device description can capture hardware context but does not enumerate all AI deployment hardware."
+    },
+    {
+      "sourceClause": "IV-1(f)",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-1.1"
+      },
+      "relation": "partial",
+      "rationale": "MDR device description includes device illustrations, while this point identifies the AI component and its product placement."
+    },
+    {
+      "sourceClause": "IV-2(b)",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-1.1"
+      },
+      "relation": "informative",
+      "rationale": "MDR device description provides context for the AI design record without covering its internal logic or classification choices."
+    },
+    {
+      "sourceClause": "IV-2(c)",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-1.1"
+      },
+      "relation": "partial",
+      "rationale": "The MDR device description informs system architecture while the AI point adds model and computational-resource detail."
+    },
+    {
+      "sourceClause": "IV-2(g)",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-6.1(b)"
+      },
+      "relation": "partial",
+      "rationale": "MDR software validation evidence overlaps, but does not cover the full AI validation and reporting detail."
+    },
+    {
+      "sourceClause": "IV-2(h)",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-4"
+      },
+      "relation": "partial",
+      "rationale": "MDR general safety and performance requirements include security concerns; this AI point adds system-specific measures."
+    },
+    {
+      "sourceClause": "IV-3",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-1.1"
+      },
+      "relation": "partial",
+      "rationale": "Device description provides context, but does not cover all AI performance, oversight and input details."
+    },
+    {
+      "sourceClause": "IV-4",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-6.1(b)"
+      },
+      "relation": "partial",
+      "rationale": "MDR software validation metrics overlap, but the AI point adds metric suitability for the AI system."
+    },
+    {
+      "sourceClause": "IV-5",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-5"
+      },
+      "relation": "partial",
+      "rationale": "MDR benefit-risk and risk-management evidence overlaps with the AI risk system without establishing equivalence."
+    },
+    {
+      "sourceClause": "IV-7",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-4"
+      },
+      "relation": "informative",
+      "rationale": "The MDR requirements-compliance record may contextualize solutions, but no particular standards are named or treated as equivalent."
+    },
+    {
+      "sourceClause": "IV-9",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "II-4"
+      },
+      "relation": "informative",
+      "rationale": "MDR general requirements provide product-safety context, not an equivalent AI post-market performance plan."
+    }
+  ]
 }
