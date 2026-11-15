@@ -1,0 +1,8 @@
+{
+  "recordType": "synthetic-ai-model-description",
+  "systemName": "Example Triage Assistant",
+  "purpose": "Sort synthetic device-service requests for human review.",
+  "version": "1.0.0",
+  "limits": ["Does not make clinical or release decisions."],
+  "owner": "person://example.invalid/people/ai-product-owner"
+}

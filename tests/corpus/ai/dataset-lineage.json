@@ -1,0 +1,7 @@
+{
+  "recordType": "synthetic-dataset-lineage",
+  "dataset": "example-service-events-v1",
+  "source": "synthetic generated records",
+  "transformations": ["remove direct identifiers", "normalize event fields"],
+  "selectionOwner": "person://example.invalid/people/data-steward"
+}

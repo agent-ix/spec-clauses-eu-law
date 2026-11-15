@@ -1,0 +1,6 @@
+{
+  "recordType": "synthetic-ai-logging-design",
+  "events": ["request-received", "recommendation-produced", "human-review-completed"],
+  "retentionDays": 90,
+  "accessRole": "synthetic-audit-reviewer"
+}

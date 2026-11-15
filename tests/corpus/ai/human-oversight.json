@@ -1,0 +1,7 @@
+{
+  "recordType": "synthetic-human-oversight-design",
+  "reviewRole": "synthetic-clinical-operator",
+  "measures": ["review recommendation before action", "record override reason"],
+  "competenceRecord": "synthetic-training-complete",
+  "approvalRef": "person://example.invalid/people/ai-safety-reviewer"
+}
