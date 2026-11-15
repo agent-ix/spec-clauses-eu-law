@@ -1,12 +1,12 @@
 ---
-id: example.invalid/RISK-001
+id: example-invalid-RISK-001
 title: "EvidenceReviewDelay"
 type: risk
 object: risk
 likelihood: possible
 impact: minor
 ---
-# RISK-001: EvidenceReviewDelay
+# example-invalid-RISK-001: EvidenceReviewDelay
 
 ## Properties
 

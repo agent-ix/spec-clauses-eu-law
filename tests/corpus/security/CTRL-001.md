@@ -1,10 +1,10 @@
 ---
-id: example.invalid/CTRL-001
+id: example-invalid-CTRL-001
 title: "EvidenceDigestCheck"
 type: control
 object: control
 ---
-# CTRL-001: EvidenceDigestCheck
+# example-invalid-CTRL-001: EvidenceDigestCheck
 
 ## Effectiveness
 

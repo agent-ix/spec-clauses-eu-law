@@ -1,12 +1,12 @@
 ---
-id: example.invalid/THREAT-001
+id: example-invalid-THREAT-001
 title: "EvidenceReferenceSubstitution"
 type: threat
 object: threat
 stride_category: Tampering
 vector: "An attacker replaces a stored evidence reference with another record."
 ---
-# THREAT-001: EvidenceReferenceSubstitution
+# example-invalid-THREAT-001: EvidenceReferenceSubstitution
 
 ## Properties
 

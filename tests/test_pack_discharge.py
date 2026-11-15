@@ -11,6 +11,7 @@ import subprocess
 from urllib.parse import urlparse
 
 import pytest
+import yaml
 from conftest import PACKAGE_ROOT, REPO_ROOT, engine_tool, load_clause_sets, run
 
 CORPUS_ROOT = REPO_ROOT / "tests" / "corpus"
@@ -103,21 +104,32 @@ def _assert_customer_owned_facts(clause_set: dict, facts: list[dict]) -> None:
         assert fact.get(
             "approvalRef", ""
         ).strip(), f"customer-owned clause {fact['clauseId']} requires approvalRef"
+        _assert_reserved_uri_authority(fact["approvalRef"])
 
 
 def _resolve_evidence_ref(corpus: pathlib.Path, reference: str) -> pathlib.Path:
     """Resolve one synthetic evidence URL to a file under the corpus root."""
     parsed = urlparse(reference)
     assert parsed.scheme == "evidence", f"unsupported evidence scheme in {reference}"
-    assert (
-        parsed.netloc == "example.invalid"
-    ), f"evidence reference must use example.invalid: {reference}"
+    _assert_reserved_uri_authority(reference)
     path = (corpus / parsed.path.lstrip("/")).resolve()
     assert path.is_relative_to(
         corpus.resolve()
     ), f"evidence reference escapes corpus: {reference}"
     assert path.is_file(), f"evidence reference for clause is unresolved: {reference}"
     return path
+
+
+def _assert_reserved_uri_authority(reference: str) -> None:
+    """Require a synthetic URI to use the exact reserved example.invalid host."""
+    parsed = urlparse(reference)
+    assert parsed.scheme in {
+        "evidence",
+        "person",
+    }, f"unsupported synthetic reference scheme in {reference}"
+    assert (
+        parsed.netloc == "example.invalid"
+    ), f"synthetic reference authority must be exactly example.invalid: {reference}"
 
 
 def _assert_fact_refs_resolve(corpus: pathlib.Path, facts: list[dict]) -> None:
@@ -298,6 +310,7 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         "-----BEGIN RSA PRIVATE KEY-----",
         "-----BEGIN PRIVATE KEY-----",
     )
+    identifiers = []
     for path in CORPUS_ROOT.rglob("*"):
         if not path.is_file():
             continue
@@ -305,6 +318,37 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         assert not any(
             marker in content for marker in private_key_markers
         ), f"private key material found in {path.relative_to(REPO_ROOT)}"
+        frontmatter = re.match(r"\A---\s*\n(.*?)\n---(?:\s|$)", content, re.DOTALL)
+        assert (
+            frontmatter is not None
+        ), f"corpus document has no frontmatter: {path.relative_to(REPO_ROOT)}"
+        metadata = yaml.safe_load(frontmatter.group(1))
+        assert isinstance(
+            metadata, dict
+        ), f"corpus frontmatter is not a mapping: {path.relative_to(REPO_ROOT)}"
+        identifier = metadata.get("id")
+        assert (
+            isinstance(identifier, str) and identifier
+        ), f"corpus document has no string id: {path.relative_to(REPO_ROOT)}"
+        artifact_type = metadata.get("type")
+        fixed_patterns = {
+            "FR": r"FR-[0-9]+",
+            "NFR": r"NFR-[0-9]+",
+            "TestMatrix": r"TM-[0-9]+",
+        }
+        if artifact_type in fixed_patterns:
+            assert re.fullmatch(
+                fixed_patterns[artifact_type], identifier
+            ), f"corpus id {identifier!r} does not match the {artifact_type} grammar"
+        else:
+            assert identifier.startswith("example-invalid-"), (
+                f"free-form corpus id must use example-invalid-: "
+                f"{path.relative_to(REPO_ROOT)}: {identifier!r}"
+            )
+        identifiers.append(identifier)
+    assert len(identifiers) == len(
+        set(identifiers)
+    ), f"corpus frontmatter IDs must be unique: {identifiers}"
     refs = re.findall(
         r"(?:evidence|person)://[^\s)]+",
         "\n".join(
@@ -314,7 +358,32 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         ),
     )
     assert refs, "corpus must include synthetic evidence references"
-    assert all("example.invalid" in reference for reference in refs), refs
+    for reference in refs:
+        _assert_reserved_uri_authority(reference)
+
+
+@pytest.mark.trace("FR-008-AC-1")
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "evidence://attacker-example.invalid.evil.test/file.json",
+        "evidence://example.invalid.evil/file.json",
+        "evidence://notexample.invalid/file.json",
+        "evidence://user@example.invalid/file.json",
+        "evidence://example.invalid:443/file.json",
+    ],
+)
+def test_synthetic_reference_rejects_unreserved_authority(reference: str):
+    """Reject lookalike, suffixed, credentialed and port-qualified authorities.
+
+    Assumptions: Synthetic references use the exact reserved example.invalid
+    authority.
+    Criteria: An authority that only contains or resembles the reserved host
+    fails validation.
+    Trace: FR-008-AC-1
+    """
+    with pytest.raises(AssertionError, match="authority must be exactly"):
+        _assert_reserved_uri_authority(reference)
 
 
 @pytest.mark.trace("FR-007-AC-2")

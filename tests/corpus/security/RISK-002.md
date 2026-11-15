@@ -1,12 +1,12 @@
 ---
-id: example.invalid/RISK-002
+id: example-invalid-RISK-002
 title: "EvidenceIntegrityLoss"
 type: risk
 object: risk
 likelihood: unlikely
 impact: moderate
 ---
-# RISK-002: EvidenceIntegrityLoss
+# example-invalid-RISK-002: EvidenceIntegrityLoss
 
 ## Properties
 

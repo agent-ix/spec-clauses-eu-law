@@ -1,11 +1,11 @@
 ---
-id: example.invalid/SOUP-001
+id: example-invalid-SOUP-001
 title: "ExampleDigestLibrary"
 type: soup_record
 object: soup_record
 purl: "pkg:cargo/example-digest-library@1.0.0"
 ---
-# SOUP-001: ExampleDigestLibrary
+# example-invalid-SOUP-001: ExampleDigestLibrary
 
 ## Properties
 

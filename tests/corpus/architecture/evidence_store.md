@@ -1,10 +1,10 @@
 ---
-id: evidence_store
+id: example-invalid-evidence_store
 title: "EvidenceStore"
 type: part
 object: part
 ---
-# evidence_store: EvidenceStore
+# example-invalid-evidence_store: EvidenceStore
 
 ## Part
 
