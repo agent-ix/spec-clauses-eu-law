@@ -127,12 +127,12 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | release-record | record | Engineering-assurance release decision. |
 | it-requirements-statement | document | Minimum hardware, network and IT-security requirements for instructions for use. |
 | written-procedure | procedure | Customer-owned written procedure. |
-| signed-record | record | Signed commit or tag verified by `git verify-commit` or `git verify-tag`. |
-| audit-trail | record | Git history of the record. |
-| signer-registry | record | Allowed-signers mapping from signing key to named person. |
-| signature-meaning | record | The `Signed-off-meaning:` trailer. |
+| signed-record | record | Signed commits and tags verified by the `signature-verify` capability. |
+| audit-trail | record | Git history and signed-approval history produced by the `approval-trail` capability for the record. |
+| signer-registry | record | Allowed-signers mapping from signing key to named person, read by the `approval-trail` capability. |
+| signature-meaning | record | The `Signed-off-meaning:` trailer verified by the `approval-verify` capability. |
 | fda-certification-record | record | Evidence that the electronic-signature certification was submitted to FDA. |
-| approval-trail | record | Engineering-assurance approval-trail output. |
+| approval-trail | record | Signed approval history for a record produced by the `approval-trail` capability. |
 | access-control | record | Repository permission and branch-rule settings. |
 | system-validation | record | Validation evidence for the toolchain's intended use. |
 | training-record | procedure | Customer-owned training record. |
