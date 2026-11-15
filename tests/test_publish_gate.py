@@ -128,6 +128,11 @@ def test_scan_archive_runs_content_rights_over_wheel_and_npm_tree(tmp_path):
     (wheel_tree / "spec_clauses_eu_law-0.1.0.dist-info" / "METADATA").write_text(
         "Metadata-Version: 2.1\nName: spec-clauses-eu-law\nVersion: 0.1.0\n"
     )
+    license_dir = wheel_tree / "spec_clauses_eu_law-0.1.0.dist-info" / "licenses"
+    license_dir.mkdir()
+    (license_dir / "LICENSE").write_text(
+        "GNU Affero General Public License: https://www.gnu.org/licenses/agpl-3.0.html\n"
+    )
     wheel = tmp_path / "fixture.whl"
     zipped = pathlib.Path(
         shutil.make_archive(str(wheel.with_suffix("")), "zip", wheel_tree)
@@ -146,3 +151,25 @@ def test_scan_archive_runs_content_rights_over_wheel_and_npm_tree(tmp_path):
 
     assert scan_archive(tmp_path / "fixture.whl", _rights_tool()) == (True, [])
     assert scan_archive(npm, _rights_tool()) == (True, [])
+
+
+def test_scan_archive_checks_nonlicense_wheel_contents(tmp_path):
+    wheel_tree = tmp_path / "wheel-tree"
+    package = wheel_tree / "spec_clauses_eu_law"
+    package.mkdir(parents=True)
+    (package / "manifest.yaml").write_text("clause_sets: []\n")
+    (package / "bad.json").write_text(
+        '{"source":"Synthetic fixture cites ISO 999999999"}\n'
+    )
+    wheel = tmp_path / "fixture.whl"
+    zipped = pathlib.Path(
+        shutil.make_archive(str(wheel.with_suffix("")), "zip", wheel_tree)
+    )
+    zipped.rename(wheel)
+
+    accepted, findings = scan_archive(wheel, _rights_tool())
+
+    assert not accepted
+    assert findings == [
+        "spec_clauses_eu_law/bad.json:1: external-publication-identifier"
+    ]

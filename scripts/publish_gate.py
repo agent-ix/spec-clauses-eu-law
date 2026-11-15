@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -43,6 +44,30 @@ def _extract_archive(archive: pathlib.Path, destination: pathlib.Path) -> None:
         source.extractall(destination, filter="data")
 
 
+def _normalize_wheel_license_path(archive: pathlib.Path, root: pathlib.Path) -> None:
+    """Present the wheel's standard license copy under the shared LICENSE path.
+
+    Wheel metadata stores the declared license at ``*.dist-info/licenses/LICENSE``.
+    The shared scanner intentionally grants its license-file rules to the exact
+    path ``LICENSE``. Move the package-manager copy to that canonical path so
+    the unchanged scanner policy applies to the full license text.
+    """
+    if archive.suffix != ".whl":
+        return
+    license_copies = sorted(root.glob("*.dist-info/licenses/LICENSE"))
+    if not license_copies:
+        return
+    canonical = root / "LICENSE"
+    for source in license_copies:
+        if canonical.exists():
+            if source.read_bytes() != canonical.read_bytes():
+                raise ValueError("wheel contains differing license copies")
+            source.unlink()
+        else:
+            canonical.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(source), str(canonical))
+
+
 def scan_archive(
     archive: pathlib.Path,
     engineering_assurance: str,
@@ -51,6 +76,7 @@ def scan_archive(
     with tempfile.TemporaryDirectory(prefix="eu-publish-scan-") as temporary:
         root = pathlib.Path(temporary).resolve()
         _extract_archive(archive, root)
+        _normalize_wheel_license_path(archive, root)
         initialized = _run(["git", "init", "--quiet", "-b", "main"], cwd=root)
         if initialized.returncode != 0:
             return False, ["could not initialize the extracted package scan tree"]
@@ -92,6 +118,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--engineering-assurance", default="engineering-assurance")
     parser.add_argument("--quire", default="quire")
     arguments = parser.parse_args(argv)
+    if pathlib.Path(arguments.engineering_assurance).parent != pathlib.Path("."):
+        arguments.engineering_assurance = str(
+            pathlib.Path(arguments.engineering_assurance).resolve()
+        )
 
     wheel_files = sorted(arguments.wheel_dir.glob("*.whl"))
     npm_files = sorted(arguments.npm_dir.glob("*.tgz"))
