@@ -434,20 +434,18 @@ def test_each_clause_set_rights_and_source_match_the_spec():
     for clause_set in clause_sets:
         _assert_set_metadata_matches_spec(clause_set)
 
-    # Prove a changed value is reported with the affected set and field.
-    broken = json.loads(json.dumps(_mdr_set()))
-    broken["rights"]["licence"] = "changed"
-    with pytest.raises(
-        AssertionError, match=r"eu/mdr-2017-745@2026-07-19\.rights\.licence"
-    ):
-        _assert_set_metadata_matches_spec(broken)
+    # Prove changed values name the affected set and field for every set.
+    for clause_set in clause_sets:
+        key = re.escape(clause_set_key(clause_set))
+        broken = json.loads(json.dumps(clause_set))
+        broken["rights"]["licence"] = "changed"
+        with pytest.raises(AssertionError, match=rf"{key}\.rights\.licence"):
+            _assert_set_metadata_matches_spec(broken)
 
-    broken = json.loads(json.dumps(_mdr_set()))
-    broken["source"]["officialUrl"] = "https://example.invalid/changed"
-    with pytest.raises(
-        AssertionError, match=r"eu/mdr-2017-745@2026-07-19\.source\.officialUrl"
-    ):
-        _assert_set_metadata_matches_spec(broken)
+        broken = json.loads(json.dumps(clause_set))
+        broken["source"]["officialUrl"] = "https://example.invalid/changed"
+        with pytest.raises(AssertionError, match=rf"{key}\.source\.officialUrl"):
+            _assert_set_metadata_matches_spec(broken)
 
 
 @pytest.mark.trace("FR-002-AC-2")
