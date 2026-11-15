@@ -16,7 +16,7 @@ Each set SHALL declare `structure: citation_only`, `text: original`, `clearance_
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-002-AC-1 | A metadata test checks both sets' required rights fields and source-specific licence and attribution values; an injected mismatch names the affected set and field. | Test |
+| FR-002-AC-1 | A metadata test checks all declared sets' required rights fields and source-specific licence and attribution values; an injected mismatch names the affected set and field. | Test |
 | FR-002-AC-2 | `quire publish-check --module <pkg>` exits 0; a fixture with `text: licensed` exits 2 and identifies its set key. | Test |
 | FR-002-AC-3 | The source URL in each set equals its official source URL in `spec.md`; a changed URL fails and identifies the set. | Test |
 

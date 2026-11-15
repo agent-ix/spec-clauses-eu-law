@@ -15,20 +15,21 @@ security_critical: false
 
 ## Purpose
 
-This specification defines the clause-only EU-law module and its first two sets: software-related requirements from Regulation (EU) 2017/745 (MDR), and interpretive cybersecurity guidance from MDCG 2019-16 rev.1. Clause summaries will be original expression and linked to official sources. The pack records evidence and produces an RMM; it does not determine legal compliance.
+This specification defines the clause-only EU-law module and its sets for software-related requirements from Regulation (EU) 2017/745 (MDR), interpretive cybersecurity guidance from MDCG 2019-16 rev.1, and selected obligations in Regulation (EU) 2016/679 (GDPR). Clause summaries use original expression and link to official sources. The pack records evidence and produces an RMM; it does not determine legal compliance.
 
 ## Scope
 
 ### In Scope
 
 - Repository `agent-ix/spec-clauses-eu-law`, Python package `spec_clauses_eu_law`, module `clause_sets`.
-- MDR set `eu/mdr-2017-745@2026-07-19` and MDCG set `eu-mdcg/mdcg-2019-16@rev1`.
-- Set identities, sources, rights metadata, clause identifiers, applicability, expected outputs, MDCG-to-MDR crosswalks, shared output catalog, customer-owned obligations, and synthetic reference corpus rules.
+- MDR set `eu/mdr-2017-745@2026-07-19`, MDCG set `eu-mdcg/mdcg-2019-16@rev1`, and GDPR set `eu/gdpr-2016-679@2016-05-04`.
+- Set identities, sources, rights metadata, clause identifiers, applicability, expected outputs, MDCG-to-MDR and GDPR-to-NIST/HIPAA crosswalks, shared output catalog, customer-owned obligations, and synthetic reference corpus rules.
+- GDPR Articles 25, 30, 32 and 35; the modeled controller/processor and high-risk-processing values; human approval for DPIA residual-risk acceptance; and the security-analysis skill's coverage boundary for GDPR material.
 
 ### Out of Scope
 
 - Clause JSON/content, package manifest, corpus, implementation tests, CI, publish gate, output bindings, and scaffold beyond this specification (PLAT-1425, PLAT-1623, PLAT-1624, PLAT-1626).
-- GDPR and AI Act sets; engine changes; legal advice or compliance determinations.
+- GDPR Articles outside 25, 30, 32 and 35, including data-subject rights, international transfers, and breach notifications under Articles 33 and 34; AI Act sets; engine changes; legal advice or compliance determinations.
 - Any source text or expression from harmonised or other paywalled standards.
 
 ## System Overview
@@ -41,9 +42,13 @@ Verification requires `quire validate` with clause-set and crosswalk support, `q
 
 MDR identity is authority `eu`, ID `mdr-2017-745`, and version `2026-07-19`, the EUR-Lex consolidated-text date consulted. A later consolidation is a new version. Its official URL is `https://eur-lex.europa.eu/eli/reg/2017/745/2026-07-19/eng` (EUR-Lex ELI). Set rights are `structure: citation_only`, `text: original`, `clearance_ref: null`. Licence metadata shall say: `EUR-Lex legal documents may be reused for commercial or non-commercial purposes unless otherwise specified. Consolidated texts are CC BY 4.0; acknowledge the source and indicate changes.` Attribution metadata shall say `© European Union. Source: <official URL>. Changes made.` Source: EUR-Lex legal notice `https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en`.
 
+GDPR identity is authority `eu`, ID `gdpr-2016-679`, and version `2016-05-04`, the current consolidated-text date shown by EUR-Lex when this specification was authored. A later consolidation is a new version. Its official URL is `https://eur-lex.europa.eu/eli/reg/2016/679/2016-05-04/eng`. Rights are `structure: citation_only`, `text: original`, and `clearance_ref: null`. Licence metadata shall state that EUR-Lex legal documents may be reused for commercial or non-commercial purposes unless otherwise specified, and that EUR-Lex's consolidated text is under CC BY 4.0 with source attribution and indication of changes. Attribution shall identify the European Union, link the official EUR-Lex source and state that the module contains original summaries and changes. The legal notice is `https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en`. The set contains only Articles 25, 30, 32 and 35; it does not claim coverage of other GDPR articles.
+
 MDCG identity is authority `eu-mdcg`, ID `mdcg-2019-16`, version `rev1`, with source `https://health.ec.europa.eu/document/download/b23b362f-8a56-434c-922a-5b3ca4d0a7a1_en?filename=md_cybersecurity_en.pdf` and listing `https://health.ec.europa.eu/medical-devices-sector/new-regulations/guidance-mdcg-endorsed-documents-and-other-guidance_en`. The PDF identifies the document as endorsed by the Medical Device Coordination Group, states that it is not a European Commission document, and says its views are non-binding. Rights are `structure: citation_only`, `text: original`, and `clearance_ref: null`. Licence metadata SHALL state that no reuse licence is asserted for this source and that the module contains only citations and original summaries, not reproduced PDF text. Attribution SHALL identify the Medical Device Coordination Group (MDCG), *MDCG 2019-16 rev.1*, July 2020, and the official PDF URL; it SHALL identify the module's summaries as original Agent-IX text and SHALL NOT attribute the source to the European Commission or apply Decision 2011/833/EU to it. The guidance is non-binding; clauses are `recommended`. MDR clauses are `mandatory`.
 
 Clause IDs are `<annex roman>-<section>` with subparagraphs in parentheses, e.g. `I-17.3`, `I-23.4(ab)`, `II-6.1(b)`. MDCG IDs are section identifiers without a prefix, e.g. `3.2`. IDs contain no slash. `mobile_platform` has values `yes` and `no`; only `I-17.3` uses it (`eq mobile_platform yes`). Other MDR clauses always bind. Device class is not a dimension because no in-scope clause depends on it.
+
+GDPR clause IDs use the article and paragraph designators, retaining subparagraph letters in parentheses, e.g. `art-30(1)(a)`. `gdpr_role` has values `controller` and `processor`; `high_risk_processing` has values `yes` and `no`. Both are supplied by a person and are never inferred from product or data-flow content. Health data may inform a person's assessment, but it does not determine the high-risk value. Articles 25, 30(1) and 35 apply to controllers; Article 30(2) applies to processors; Article 30(3), 30(4), and 32 apply to both roles. Article 35 applies only when a person sets `high_risk_processing` to `yes` for a controller. Articles 25(3) and 32(3) are not clauses because they describe optional ways to demonstrate compliance. Article 30(5)'s small-organization exemption is not modeled; its exceptions require facts outside the selected dimensions, including whether special-category data are processed. These exclusions do not make another GDPR clause non-binding. Article 35(3) and (4) are triggers used to inform the person's high-risk classification, not separate clauses. Articles 35(5) and (6) assign duties to supervisory authorities, Article 35(8) is conditional on adherence to an approved code, and Article 35(10) is an exception tied to an existing legal basis and prior impact assessment; these are explicit coverage limits because their actors or triggers are outside the selected dimensions. No tool decides the high-risk classification or accepts a DPIA's residual risk.
 
 ## MDR Clause Table
 
@@ -68,6 +73,48 @@ The table is normative for IDs, applicability and outputs. All outputs resolve i
 | II-4 | always | software-requirements, software-architecture, verification-records |
 | II-5 | always | software-requirements, verification-records, security-risk-records |
 | II-6.1(b) | always | software-architecture, verification-records |
+
+## GDPR Clause Table
+
+The table is normative for clause IDs, force, applicability, and expected outputs. All listed clauses are mandatory. `all[...]` denotes the engine's `all` expression and each `eq` is an equality condition. For Article 32, no applicability expression means the clause applies to both roles.
+
+| Clause ID | Applicability | Expected outputs |
+|---|---|---|
+| `art-25(1)` | `eq gdpr_role controller` | `privacy-by-default-settings`, `data-flow-model`, `software-architecture`, `security-risk-records` |
+| `art-25(2)` | `eq gdpr_role controller` | `privacy-by-default-settings`, `data-flow-model` |
+| `art-30(1)(a)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(b)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(c)` | `eq gdpr_role controller` | `records-of-processing` |
+| `art-30(1)(d)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(e)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(f)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
+| `art-30(1)(g)` | `eq gdpr_role controller` | `records-of-processing`, `data-flow-model` |
+| `art-30(2)(a)` | `eq gdpr_role processor` | `records-of-processing`, `data-flow-model` |
+| `art-30(2)(b)` | `eq gdpr_role processor` | `records-of-processing`, `data-flow-model` |
+| `art-30(2)(c)` | `eq gdpr_role processor` | `records-of-processing`, `data-flow-model` |
+| `art-30(2)(d)` | `eq gdpr_role processor` | `records-of-processing`, `data-flow-model` |
+| `art-30(3)` | always | `records-of-processing` |
+| `art-30(4)` | always | `records-of-processing` |
+| `art-32(1)(a)` | always | `security-risk-records`, `verification-records` |
+| `art-32(1)(b)` | always | `security-risk-records`, `verification-records` |
+| `art-32(1)(c)` | always | `security-risk-records`, `verification-records` |
+| `art-32(1)(d)` | always | `security-risk-records`, `verification-records` |
+| `art-32(2)` | always | `security-risk-records` |
+| `art-32(4)` | always | `access-control`, `written-procedure`, `training-record` |
+| `art-35(1)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model`, `security-risk-records` |
+| `art-35(2)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model` |
+| `art-35(7)(a)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model` |
+| `art-35(7)(b)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `security-risk-records` |
+| `art-35(7)(c)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model`, `privacy-by-default-settings` |
+| `art-35(7)(d)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `security-risk-records` |
+| `art-35(9)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia` |
+| `art-35(11)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model`, `security-risk-records` |
+
+Articles 25(3) and 32(3) are not clauses because they describe optional ways to demonstrate compliance. Article 30(5) is not modeled as an exemption: processing special-category data is one of its explicit exceptions, so the medical-product context does not justify assuming the exemption. Article 35(3) and (4) are triggers rather than separate clauses; paragraphs (5) and (6) are supervisory-authority duties; paragraph (8) is conditional on a code-of-conduct circumstance not represented by the selected dimensions; paragraph (10) is an exception dependent on external legal-basis and prior-assessment facts. Those paragraphs are identified as coverage limits and are not evaluated by this set. Any residual-risk decision associated with a DPIA remains with a named person.
+
+## Article 32 Crosswalk Policy
+
+Crosswalks originate from `art-32(1)(a)` through `(d)` and `art-32(2)`. They may point to `nist/sp800-53@5.2.0` in `spec-objects-security` and `us-hhs/45-cfr-164-subpart-c@2026-11-12` in `spec-clauses-us-health`. The target modules are test-time dependencies and are never copied into this module. Each source clause has at least one target in each module. Relations are `partial` or `informative`; they never assert equivalence. Every target set and clause identifier must resolve in the installed target module. The rationale is an original explanation of scope, not a restatement of target text.
 
 ## MDCG Companion Table
 
@@ -136,14 +183,18 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | access-control | record | Repository permission and branch-rule settings. |
 | system-validation | record | Validation evidence for the toolchain's intended use. |
 | training-record | procedure | Customer-owned training record. |
+| data-flow-model | record | Architecture connections with their declared data flows and classifications. |
+| records-of-processing | record | Controller or processor record of processing activities derived from the declared data-flow model. |
+| dpia | document | Product-specific data protection impact assessment authored by people, with any residual-risk acceptance recorded by a named approver. |
+| privacy-by-default-settings | record | Declared default processing settings and data-minimisation choices. |
 
 A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with rationale and customer approval reference, never a direct fact. `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
 
 ## Requirements Architecture
 
-FR-001 through FR-008 define module home, rights, MDR clauses and applicability, MDCG crosswalks, catalog, customer-owned obligations and corpus. NFR-001 defines the licensing and standards boundary. StR-001 records the manufacturer's need for reviewable evidence; US-001 describes the human review outcome. FR-001 through FR-008 trace to US-001, and NFR-001 constrains every FR.
+FR-001 through FR-015 define module home, rights, MDR, MDCG and GDPR clauses and applicability, crosswalks, catalog, customer-owned obligations, skill mapping, and corpus. NFR-001 defines the licensing and standards boundary; NFR-002 defines the GDPR-specific source and original-expression boundary. StR-001 records the manufacturer's need for reviewable evidence; US-001 describes the human review outcome. FR-001 through FR-015 trace to US-001, and both NFRs constrain the applicable functional requirements.
 
-Dependency graph (an edge A → B means A depends on B): FR-003 → FR-001, FR-002, FR-006; FR-004 → FR-003; FR-005 → FR-001, FR-002, FR-003, FR-006; FR-006 → FR-001; FR-007 → FR-006; FR-008 → FR-001, FR-003, FR-004, FR-005, FR-006, FR-007. NFR-001 constrains FR-001 through FR-008.
+Dependency graph (an edge A → B means A depends on B): FR-003 → FR-001, FR-002, FR-006; FR-004 → FR-003; FR-005 → FR-001, FR-002, FR-003, FR-006; FR-006 → FR-001; FR-007 → FR-006; FR-008 → FR-001, FR-003, FR-004, FR-005, FR-006, FR-007; FR-009 → FR-001, FR-002, FR-006; FR-010 → FR-009; FR-011 → FR-010; FR-012 → FR-010, FR-011; FR-013 → FR-010, FR-011; FR-014 → FR-010; FR-015 → FR-009, FR-010. NFR-001 constrains FR-001 through FR-015; NFR-002 constrains FR-009 through FR-015.
 
 ## Upstream Contracts
 
@@ -155,3 +206,5 @@ The module uses existing `clause-set-v1`, `clause_sets`, `quire clauses evaluate
 - EUR-Lex legal notice: `https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en`.
 - MDCG 2019-16 rev.1 official PDF: `https://health.ec.europa.eu/document/download/b23b362f-8a56-434c-922a-5b3ca4d0a7a1_en?filename=md_cybersecurity_en.pdf`.
 - Commission MDCG listing: `https://health.ec.europa.eu/medical-devices-sector/new-regulations/guidance-mdcg-endorsed-documents-and-other-guidance_en`.
+- EUR-Lex current consolidated GDPR text consulted: `https://eur-lex.europa.eu/eli/reg/2016/679/2016-05-04/eng`.
+- EUR-Lex legal notice on reuse and attribution: `https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en`.
