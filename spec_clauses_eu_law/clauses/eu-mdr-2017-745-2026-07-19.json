@@ -1,0 +1,256 @@
+{
+  "schemaVersion": "clause-set-v1",
+  "authority": "eu",
+  "id": "mdr-2017-745",
+  "title": "MDR software-related safety, performance, and documentation requirements",
+  "version": "2026-07-19",
+  "rights": {
+    "structure": "citation_only",
+    "text": "original",
+    "clearance_ref": null,
+    "licence": "EUR-Lex legal documents may be reused for commercial or non-commercial purposes unless otherwise specified. Consolidated texts are CC BY 4.0; acknowledge the source and indicate changes.",
+    "attribution": "© European Union. Source: https://eur-lex.europa.eu/eli/reg/2017/745/2026-07-19/eng. Changes made."
+  },
+  "source": {
+    "title": "Regulation (EU) 2017/745 on medical devices",
+    "identifier": "Regulation (EU) 2017/745, Annexes I and II",
+    "officialUrl": "https://eur-lex.europa.eu/eli/reg/2017/745/2026-07-19/eng"
+  },
+  "classificationDimensions": {
+    "mobile_platform": {
+      "values": ["yes", "no"]
+    }
+  },
+  "outputCatalog": {
+    "risk-management-records": {
+      "kind": "record",
+      "description": "`spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records."
+    },
+    "it-requirements-statement": {
+      "kind": "document",
+      "description": "Minimum hardware, network and IT-security requirements for instructions for use."
+    },
+    "software-requirements": {
+      "kind": "record",
+      "description": "Functional and non-functional requirements (FR/NFR)."
+    },
+    "software-architecture": {
+      "kind": "record",
+      "description": "`spec-objects-architecture` parts and connections."
+    },
+    "verification-records": {
+      "kind": "record",
+      "description": "Test matrix and retained evidence."
+    },
+    "security-risk-records": {
+      "kind": "record",
+      "description": "`spec-objects-security` threat, risk, and control records."
+    },
+    "soup-list": {
+      "kind": "record",
+      "description": "Software of unknown provenance (SOUP) report."
+    },
+    "anomaly-list": {
+      "kind": "record",
+      "description": "Unresolved-anomaly report."
+    },
+    "release-record": {
+      "kind": "record",
+      "description": "Engineering-assurance release decision."
+    }
+  },
+  "clauses": [
+    {
+      "id": "I-1",
+      "force": "mandatory",
+      "title": "Intended performance and safety",
+      "text": "The device is designed for its stated use and intended performance while protecting patients and users, with remaining risk proportionate to the expected patient benefit.",
+      "subjects": ["risk", "device-performance"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["risk-management-records"]
+    },
+    {
+      "id": "I-2",
+      "force": "mandatory",
+      "title": "Meaning of risk reduction",
+      "text": "Risk reduction under this Annex is carried out as far as practicable without worsening the balance between device benefits and risks.",
+      "subjects": ["risk"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["risk-management-records"]
+    },
+    {
+      "id": "I-3",
+      "force": "mandatory",
+      "title": "Ongoing risk process",
+      "text": "The manufacturer maintains a documented risk-management process for each device across its lifecycle and updates it using relevant production and post-market information.",
+      "subjects": ["risk", "device-lifecycle"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["risk-management-records"]
+    },
+    {
+      "id": "I-4",
+      "force": "mandatory",
+      "title": "Risk-control selection",
+      "text": "The manufacturer addresses risks first through safer design, then protective measures, then safety information and, where appropriate, user training, and informs users about residual risks.",
+      "subjects": ["risk", "risk-control"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["risk-management-records"]
+    },
+    {
+      "id": "I-5",
+      "force": "mandatory",
+      "title": "Use-error prevention",
+      "text": "Design measures address use-error risks through device ergonomics and the intended use environment, taking account of the capabilities and conditions of intended users.",
+      "subjects": ["risk", "usability"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["risk-management-records"]
+    },
+    {
+      "id": "I-8",
+      "force": "mandatory",
+      "title": "Risks and side effects",
+      "text": "Known or foreseeable risks and unwanted side effects are minimized and remain acceptable in relation to the benefits provided by the device under normal use.",
+      "subjects": ["risk", "device-performance"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["risk-management-records"]
+    },
+    {
+      "id": "I-14.2(d)",
+      "force": "mandatory",
+      "title": "Software-environment interaction",
+      "text": "The device design reduces risks arising from adverse interactions between its software and the IT environment in which it operates.",
+      "subjects": ["software-lifecycle", "it-security"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["it-requirements-statement"]
+    },
+    {
+      "id": "I-17.1",
+      "force": "mandatory",
+      "title": "Reliable programmable systems",
+      "text": "Programmable systems and software devices provide repeatable and reliable performance for their intended use, with suitable measures for risks or performance loss caused by a single fault.",
+      "subjects": ["software-lifecycle", "device-performance"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["software-requirements", "software-architecture", "verification-records"]
+    },
+    {
+      "id": "I-17.2",
+      "force": "mandatory",
+      "title": "Software lifecycle controls",
+      "text": "Software development and production account for lifecycle activities, risk management including information security, and verification and validation, consistent with current practice.",
+      "subjects": ["software-lifecycle", "it-security", "risk"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["software-requirements", "software-architecture", "security-risk-records"]
+    },
+    {
+      "id": "I-17.3",
+      "force": "mandatory",
+      "title": "Mobile-platform conditions",
+      "text": "When software is intended to operate with mobile computing platforms, its design accounts for platform characteristics and the conditions in which it will be used.",
+      "subjects": ["software-lifecycle", "usability"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["software-requirements", "software-architecture", "verification-records"],
+      "applicability": {
+        "op": "eq",
+        "dimension": "mobile_platform",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "I-17.4",
+      "force": "mandatory",
+      "title": "Software operating prerequisites",
+      "text": "The manufacturer specifies the minimum hardware, network characteristics, and security measures required to operate the software as intended.",
+      "subjects": ["software-lifecycle", "it-security", "technical-documentation"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["soup-list", "anomaly-list", "risk-management-records"]
+    },
+    {
+      "id": "I-18.8",
+      "force": "mandatory",
+      "title": "Protection from unauthorized access",
+      "text": "Device design includes protection against access that could prevent the device from operating as intended.",
+      "subjects": ["it-security", "device-performance"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["release-record", "verification-records", "anomaly-list"]
+    },
+    {
+      "id": "I-23.4(ab)",
+      "force": "mandatory",
+      "title": "IT requirements in user instructions",
+      "text": "Instructions for use state the minimum hardware, network, and security conditions needed to run software safely as intended.",
+      "subjects": ["technical-documentation", "it-security"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["it-requirements-statement"]
+    },
+    {
+      "id": "II-1.1",
+      "force": "mandatory",
+      "title": "Device description and specifications",
+      "text": "Technical documentation identifies the device and its intended purpose, users, operating principles, software components, variants, and relevant specifications.",
+      "subjects": ["technical-documentation", "software-architecture"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["software-requirements", "software-architecture"]
+    },
+    {
+      "id": "II-4",
+      "force": "mandatory",
+      "title": "Safety and performance evidence",
+      "text": "Technical documentation explains which applicable safety and performance requirements apply, how they are addressed, and the validation, verification, and evidence locations supporting the chosen solutions.",
+      "subjects": ["technical-documentation", "verification"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["software-requirements", "software-architecture", "verification-records"]
+    },
+    {
+      "id": "II-5",
+      "force": "mandatory",
+      "title": "Benefit-risk and risk records",
+      "text": "Technical documentation records the benefit-risk analysis and the selected risk controls together with their results.",
+      "subjects": ["technical-documentation", "risk"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["software-requirements", "verification-records", "security-risk-records"]
+    },
+    {
+      "id": "II-6.1(b)",
+      "force": "mandatory",
+      "title": "Test methods and conclusions",
+      "text": "Technical documentation includes relevant test and study designs, protocols, analysis methods, summaries, and conclusions supporting device safety and performance.",
+      "subjects": ["technical-documentation", "verification"],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": ["software-architecture", "verification-records"]
+    }
+  ]
+}
