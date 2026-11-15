@@ -90,7 +90,6 @@ Each guidance section is recommended and has at least one informative or partial
 | 4.2 | I-23.4(ab) | it-requirements-statement |
 | 5.1 | I-17.4, I-18.8 | anomaly-list, release-record |
 | 5.2 | I-17.4, I-18.8 | anomaly-list, release-record |
-| 5.3 | I-17.4, I-18.8 | anomaly-list, release-record |
 
 ## EU Pack Output Catalog
 
