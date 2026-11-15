@@ -12,7 +12,6 @@ from urllib.parse import urlparse
 
 import pytest
 import yaml
-
 from conftest import PACKAGE_ROOT, REPO_ROOT, engine_tool, load_clause_sets, run
 
 CORPUS_ROOT = REPO_ROOT / "tests" / "corpus"
@@ -20,7 +19,9 @@ AS_OF = "2026-11-15T00:00:00Z"
 OPEN_CLAUSES = {"eu/mdr-2017-745@2026-07-19": "I-18.8"}
 
 
-def _checked(*args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
+def _checked(
+    *args: str, env: dict[str, str] | None = None
+) -> subprocess.CompletedProcess:
     """Run a required tool and include the command in assertion failures."""
     result = run(*args, env=env)
     assert result.returncode == 0, (
@@ -50,17 +51,15 @@ def _preflight() -> tuple[str, str, str]:
             f"exit {result.returncode}: {result.stderr}{result.stdout}"
         )
         if command[-1] in {"--rmm", "--pack"}:
-            assert command[-1] in result.stdout, (
-                f"required capability {command[-1]!r} missing from {command[0]}"
-            )
+            assert (
+                command[-1] in result.stdout
+            ), f"required capability {command[-1]!r} missing from {command[0]}"
     return quire, quoin, assurance
 
 
 def _clause_set_key(clause_set: dict) -> str:
     """Return the canonical identity used by evaluation and the evidence store."""
-    return (
-        f"{clause_set['authority']}/{clause_set['id']}@{clause_set['version']}"
-    )
+    return f"{clause_set['authority']}/{clause_set['id']}@{clause_set['version']}"
 
 
 def _clause_set_args(key: str) -> tuple[str, str, str]:
@@ -93,31 +92,31 @@ def _assert_customer_owned_facts(clause_set: dict, facts: list[dict]) -> None:
     for fact in facts:
         if fact.get("clauseId") not in owned:
             continue
-        assert fact.get("kind") == "disposition", (
-            f"customer-owned clause {fact['clauseId']} cannot have a direct fact"
-        )
-        assert fact.get("decision") == "delegated", (
-            f"customer-owned clause {fact['clauseId']} requires delegated disposition"
-        )
-        assert fact.get("rationale", "").strip(), (
-            f"customer-owned clause {fact['clauseId']} requires rationale"
-        )
-        assert fact.get("approvalRef", "").strip(), (
-            f"customer-owned clause {fact['clauseId']} requires approvalRef"
-        )
+        assert (
+            fact.get("kind") == "disposition"
+        ), f"customer-owned clause {fact['clauseId']} cannot have a direct fact"
+        assert (
+            fact.get("decision") == "delegated"
+        ), f"customer-owned clause {fact['clauseId']} requires delegated disposition"
+        assert fact.get(
+            "rationale", ""
+        ).strip(), f"customer-owned clause {fact['clauseId']} requires rationale"
+        assert fact.get(
+            "approvalRef", ""
+        ).strip(), f"customer-owned clause {fact['clauseId']} requires approvalRef"
 
 
 def _resolve_evidence_ref(corpus: pathlib.Path, reference: str) -> pathlib.Path:
     """Resolve one synthetic evidence URL to a file under the corpus root."""
     parsed = urlparse(reference)
     assert parsed.scheme == "evidence", f"unsupported evidence scheme in {reference}"
-    assert parsed.netloc == "example.invalid", (
-        f"evidence reference must use example.invalid: {reference}"
-    )
+    assert (
+        parsed.netloc == "example.invalid"
+    ), f"evidence reference must use example.invalid: {reference}"
     path = (corpus / parsed.path.lstrip("/")).resolve()
-    assert path.is_relative_to(corpus.resolve()), (
-        f"evidence reference escapes corpus: {reference}"
-    )
+    assert path.is_relative_to(
+        corpus.resolve()
+    ), f"evidence reference escapes corpus: {reference}"
     assert path.is_file(), f"evidence reference for clause is unresolved: {reference}"
     return path
 
@@ -193,7 +192,12 @@ def _signed_corpus(tmp_path: pathlib.Path, assurance: str) -> pathlib.Path:
     _checked("git", "-C", str(corpus), "config", "gpg.format", "ssh")
     _checked("git", "-C", str(corpus), "config", "user.signingkey", str(key))
     _checked(
-        "git", "-C", str(corpus), "config", "gpg.ssh.allowedSignersFile", str(allowed_signers)
+        "git",
+        "-C",
+        str(corpus),
+        "config",
+        "gpg.ssh.allowedSignersFile",
+        str(allowed_signers),
     )
     _checked("git", "-C", str(corpus), "config", "commit.gpgsign", "true")
     _checked("git", "-C", str(corpus), "config", "tag.gpgSign", "true")
@@ -223,9 +227,9 @@ def _signed_corpus(tmp_path: pathlib.Path, assurance: str) -> pathlib.Path:
         output_path = evidence / f"signature-{kind}.json"
         output_path.write_text(result.stdout)
         verified = json.loads(result.stdout)
-        assert verified.get("status") == "signed_valid", (
-            f"signature verification for {kind} returned {verified}"
-        )
+        assert (
+            verified.get("status") == "signed_valid"
+        ), f"signature verification for {kind} returned {verified}"
     return corpus
 
 
@@ -251,7 +255,9 @@ def _facts_for_binding(
                     "kind": "disposition",
                     "clauseId": clause_id,
                     "decision": "delegated",
-                    "rationale": "Customer procedure is maintained in the synthetic project.",
+                    "rationale": (
+                        "Customer procedure is maintained in the synthetic project."
+                    ),
                     "approvalRef": "person://example.invalid/approvals/customer-owner",
                     "attestation": attestation,
                 }
@@ -300,14 +306,17 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         if not path.is_file():
             continue
         content = path.read_text(errors="replace")
-        assert not any(marker in content for marker in private_key_markers), (
-            f"private key material found in {path.relative_to(REPO_ROOT)}"
-        )
-    refs = re.findall(r"(?:evidence|person)://[^\s)]+", "\n".join(
-        path.read_text(errors="replace")
-        for path in CORPUS_ROOT.rglob("*")
-        if path.is_file()
-    ))
+        assert not any(
+            marker in content for marker in private_key_markers
+        ), f"private key material found in {path.relative_to(REPO_ROOT)}"
+    refs = re.findall(
+        r"(?:evidence|person)://[^\s)]+",
+        "\n".join(
+            path.read_text(errors="replace")
+            for path in CORPUS_ROOT.rglob("*")
+            if path.is_file()
+        ),
+    )
     assert refs, "corpus must include synthetic evidence references"
     assert all("example.invalid" in reference for reference in refs), refs
 
@@ -361,7 +370,13 @@ def test_dangling_evidence_fixture_fails_with_clause_id(tmp_path: pathlib.Path):
         )
 
 
-@pytest.mark.trace("FR-008-AC-2", "FR-008-AC-3", "FR-008-AC-5", "FR-008-AC-6", "FR-008-AC-7")
+@pytest.mark.trace(
+    "FR-008-AC-2",
+    "FR-008-AC-3",
+    "FR-008-AC-5",
+    "FR-008-AC-6",
+    "FR-008-AC-7",
+)
 def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     """Record facts from signed corpus evidence and render the pack RMM.
 
@@ -428,7 +443,9 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         )
         assert recorded.stdout.strip(), "record-discharge must report stored evidence"
         binding_clauses = [
-            clause for clause in binding["clauses"] if clause.get("outcome") == "binding"
+            clause
+            for clause in binding["clauses"]
+            if clause.get("outcome") == "binding"
         ]
         assert len(facts) == len(binding_clauses) - (
             1 if OPEN_CLAUSES.get(key) else 0
@@ -475,9 +492,9 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     assert "Compliant" in rendered and "signature-commit.json" in rendered
     for clause_set in (keys[key] for key in expected_keys):
         for clause in clause_set["clauses"]:
-            assert clause["title"] not in rendered, (
-                f"clause title leaked into report: {clause['id']}"
-            )
-            assert clause["text"] not in rendered, (
-                f"clause text leaked into report: {clause['id']}"
-            )
+            assert (
+                clause["title"] not in rendered
+            ), f"clause title leaked into report: {clause['id']}"
+            assert (
+                clause["text"] not in rendered
+            ), f"clause text leaked into report: {clause['id']}"
