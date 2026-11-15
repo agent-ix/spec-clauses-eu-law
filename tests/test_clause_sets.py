@@ -29,6 +29,7 @@ from conftest import (
 )
 
 MDR_KEY = "eu/mdr-2017-745@2026-07-19"
+MDCG_KEY = "eu-mdcg/mdcg-2019-16@rev1"
 
 
 def _spec_mdr_ids() -> list[str]:
@@ -61,7 +62,7 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
     ), "spec.md must declare the MDR identity, source, licence, and attribution"
     mdcg = re.search(
         r"MDCG identity is authority `([^`]+)`, ID `([^`]+)`, "
-        r"version `([^`]+)`, with source `([^`]+)`.*?"
+        r"version `([^`]+)`, with source `([^`]+)` and listing `([^`]+)`.*?"
         r"Licence metadata SHALL state that (.+?)\. "
         r"Attribution SHALL identify the (.+?), and the official PDF URL",
         design,
@@ -83,8 +84,10 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
         },
         f"{mdcg.group(1)}/{mdcg.group(2)}@{mdcg.group(3)}": {
             "officialUrl": mdcg.group(4),
-            "licence": mdcg.group(5),
-            "attribution_terms": mdcg.group(6).replace("*", ""),
+            "listingUrl": mdcg.group(5),
+            "licence": mdcg.group(6),
+            "licence_exact": False,
+            "attribution_terms": mdcg.group(7).replace("*", ""),
             "rights": {
                 "structure": "citation_only",
                 "text": "original",
@@ -104,9 +107,14 @@ def _assert_set_metadata_matches_spec(clause_set: dict) -> None:
     assert rights["licence"].strip(), f"{key}.rights.licence must be nonblank"
     assert rights["attribution"].strip(), f"{key}.rights.attribution must be nonblank"
     if "licence" in expected:
-        assert (
-            rights["licence"] == expected["licence"]
-        ), f"{key}.rights.licence differs from spec.md"
+        if expected.get("licence_exact", True):
+            assert (
+                rights["licence"] == expected["licence"]
+            ), f"{key}.rights.licence differs from spec.md"
+        else:
+            assert (
+                expected["licence"].casefold() in rights["licence"].casefold()
+            ), f"{key}.rights.licence omits its source-specific spec statement"
     else:
         assert (
             expected["licence"].casefold() in rights["licence"].casefold()
@@ -127,6 +135,10 @@ def _assert_set_metadata_matches_spec(clause_set: dict) -> None:
     assert (
         clause_set["source"]["officialUrl"] == expected["officialUrl"]
     ), f"{key}.source.officialUrl differs from spec.md"
+    if "listingUrl" in expected:
+        assert (
+            expected["listingUrl"] in rights["attribution"]
+        ), f"{key}.rights.attribution omits the source listing URL"
 
 
 def _mdr_set() -> dict:
@@ -136,6 +148,43 @@ def _mdr_set() -> dict:
         for clause_set in load_clause_sets()
         if clause_set_key(clause_set) == MDR_KEY
     )
+
+
+def _mdcg_set() -> dict:
+    """Return the declared MDCG companion set."""
+    return next(
+        clause_set
+        for clause_set in load_clause_sets()
+        if clause_set_key(clause_set) == MDCG_KEY
+    )
+
+
+def _spec_mdcg_crosswalks() -> list[dict[str, str]]:
+    """Read the normative MDCG-to-MDR crosswalk table from spec.md."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("## MDCG Companion Table", 1)[1].split("\n## ", 1)[0]
+    rows = []
+    for line in section.splitlines():
+        if (
+            not line.startswith("|")
+            or line.startswith("| MDCG ID")
+            or line.startswith("|---")
+        ):
+            continue
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        if len(cells) != 5:
+            continue
+        mdcg_id, mdr_id, relation, rationale, outputs = cells
+        rows.append(
+            {
+                "sourceClause": mdcg_id,
+                "targetClause": mdr_id,
+                "relation": relation,
+                "rationale": rationale,
+                "outputs": outputs,
+            }
+        )
+    return rows
 
 
 def _spec_output_catalog() -> dict[str, dict[str, str]]:
@@ -205,15 +254,19 @@ def _installed_clause_sets(module_name: str) -> list[dict]:
     return load_clause_sets(manifest_path)
 
 
-def test_manifest_is_clause_only_and_declares_the_mdr_set():
-    """Verify the module declares the first EU clause set.
+@pytest.mark.trace("FR-005-AC-1")
+def test_manifest_is_clause_only_and_declares_both_m1_sets():
+    """Verify the module declares both first-wave EU clause sets.
 
     Assumptions: The scaffold is extended with MDR content.
-    Criteria: The manifest declares the MDR file and no non-clause module
-    contributions.
+    Criteria: The manifest declares the MDR and MDCG files and no non-clause
+    module contributions.
     """
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
-    assert manifest["clause_sets"] == ["clauses/eu-mdr-2017-745-2026-07-19.json"]
+    assert manifest["clause_sets"] == [
+        "clauses/eu-mdr-2017-745-2026-07-19.json",
+        "clauses/eu-mdcg-mdcg-2019-16-rev1.json",
+    ]
     assert not {"object_types", "archetypes", "edges"}.intersection(manifest)
     assert manifest["name"] == "spec_clauses_eu_law"
 
@@ -308,6 +361,7 @@ def test_quoin_detects_a_licensed_set_in_a_temporary_module(tmp_path):
         shutil.rmtree(source_root)
 
 
+@pytest.mark.trace("FR-006-AC-3")
 def test_all_declared_sets_share_one_output_catalog():
     """Reject output kind or description drift across installed sets.
 
@@ -479,9 +533,118 @@ def test_mdr_declares_the_spec_catalog_subset_used_by_its_clauses():
     Assumptions: The EU catalog table in spec.md is canonical.
     Criteria: Each referenced output is declared with the exact catalog
     definition, and the set has no unused output entry.
-    Trace: FR-006-AC-1
     """
     clause_set = _mdr_set()
+    used = {
+        output
+        for clause in clause_set["clauses"]
+        for output in clause["expectedOutputs"]
+    }
+    catalog = _spec_output_catalog()
+    assert clause_set["outputCatalog"] == {name: catalog[name] for name in sorted(used)}
+
+
+@pytest.mark.trace("FR-003-AC-1", "FR-003-AC-2", "FR-005-AC-1")
+def test_mdcg_clause_ids_outputs_and_evaluation_match_the_spec():
+    """Check the MDCG IDs, outputs, recommendation force, and evaluation.
+
+    Assumptions: The companion table in spec.md is normative for IDs and
+    crosswalk outputs; the source guidance remains non-binding.
+    Criteria: Every table ID appears once, every output equals the table union,
+    and the empty context binds every recommended clause.
+    """
+    clause_set = _mdcg_set()
+    rows = _spec_mdcg_crosswalks()
+    spec_ids = list(dict.fromkeys(row["sourceClause"] for row in rows))
+    clauses = clause_set["clauses"]
+    assert [clause["id"] for clause in clauses] == spec_ids
+    assert all(clause["force"] == "recommended" for clause in clauses)
+    assert all("applicability" not in clause for clause in clauses)
+    assert all(clause["text"].strip() for clause in clauses)
+    assert all(clause["expectedOutputs"] for clause in clauses)
+    assert all(
+        set(clause["expectedOutputs"]) <= set(clause_set["outputCatalog"])
+        for clause in clauses
+    )
+    for clause in clauses:
+        expected_outputs = sorted(
+            {
+                output.strip()
+                for row in rows
+                if row["sourceClause"] == clause["id"]
+                for output in row["outputs"].split(",")
+            }
+        )
+        assert clause["expectedOutputs"] == expected_outputs
+
+    evaluation = evaluate_clause_set(PACKAGE_ROOT, MDCG_KEY)
+    assert [item["clauseId"] for item in evaluation["clauses"]] == spec_ids
+    assert {item["outcome"] for item in evaluation["clauses"]} == {"binding"}
+
+
+@pytest.mark.trace("FR-005-AC-1", "FR-005-AC-3")
+def test_mdcg_crosswalks_match_spec_and_resolve_to_mdr():
+    """Check every MDCG mapping against the table and loaded MDR set.
+
+    Assumptions: Each crosswalk rationale is original prose from spec.md.
+    Criteria: Source IDs, targets, relations, rationales, and target resolution
+    match the normative table exactly.
+    """
+    clause_sets = load_clause_sets()
+    clause_set = next(item for item in clause_sets if clause_set_key(item) == MDCG_KEY)
+    expected_rows = _spec_mdcg_crosswalks()
+    expected = [
+        {
+            "sourceClause": row["sourceClause"],
+            "target": {
+                "set": {
+                    "authority": "eu",
+                    "id": "mdr-2017-745",
+                    "version": "2026-07-19",
+                },
+                "clause": row["targetClause"],
+            },
+            "relation": row["relation"],
+            "rationale": row["rationale"],
+        }
+        for row in expected_rows
+    ]
+    assert clause_set["crosswalks"] == expected
+    assert all(
+        item["relation"] in {"informative", "partial"}
+        for item in clause_set["crosswalks"]
+    )
+    assert all(item["rationale"].strip() for item in clause_set["crosswalks"])
+    assert_crosswalk_targets_resolve(clause_sets)
+
+
+@pytest.mark.trace("FR-005-AC-2")
+def test_mdcg_missing_mdr_target_fails_with_source_and_target_key(tmp_path):
+    """Reject an MDCG crosswalk whose target is absent from the MDR set.
+
+    Assumptions: The fixture otherwise contains the real MDCG and MDR sets.
+    Criteria: The failure names the source clause and exact target set key.
+    """
+    source = json.loads(json.dumps(_mdcg_set()))
+    source["crosswalks"][0]["target"]["clause"] = "missing-mdr-clause"
+    target = _mdr_set()
+    fixture = stage_clause_sets(tmp_path, source, target)
+    with pytest.raises(
+        AssertionError,
+        match=rf"{source['crosswalks'][0]['sourceClause']}.*{re.escape(MDR_KEY)}#missing-mdr-clause",
+    ):
+        assert_crosswalk_targets_resolve(load_clause_sets(fixture / "manifest.yaml"))
+
+
+@pytest.mark.trace("FR-006-AC-1")
+def test_mdcg_declares_the_spec_catalog_subset_used_by_its_clauses():
+    """Check that the MDCG set uses its exact canonical output subset.
+
+    Assumptions: The EU catalog table in spec.md is canonical.
+    Criteria: Every referenced output has the exact catalog definition and no
+    unused output entry is present.
+    """
+    clause_set = _mdcg_set()
     used = {
         output
         for clause in clause_set["clauses"]
@@ -513,7 +676,6 @@ def test_catalog_mismatch_error_names_both_sets():
 
     Assumptions: Two synthetic sets declare the same output key.
     Criteria: A kind mismatch raises an assertion naming both set keys.
-    Trace: FR-006-AC-2
     """
     sets = [
         _synthetic_set(
@@ -545,7 +707,6 @@ def test_crosswalk_error_names_source_clause_and_missing_target_key(tmp_path):
     Assumptions: The synthetic source references a loaded target set whose
     clause list does not contain the requested clause.
     Criteria: The consistency check fails with both identifiers in its error.
-    Trace: FR-005-AC-2
     """
     target = _synthetic_set(
         "example.invalid",
