@@ -22,6 +22,20 @@ relationships:
     type: "constrains"
   - target: "ix://agent-ix/spec-clauses-eu-law/FR-008"
     type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-009"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-010"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-011"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-012"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-013"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-014"
+    type: "constrains"
+  - target: "ix://agent-ix/spec-clauses-eu-law/FR-015"
+    type: "constrains"
 ---
 # NFR-001: Published content respects reuse and standards boundaries
 
@@ -41,7 +55,7 @@ EUR-Lex states reuse terms for its legal texts. The cited MDCG PDF says it is no
 
 | Metric | Target | Threshold | Method |
 |---|---|---|---|
-| Rights metadata | The two set records meet NFR-001-AC-1 | Not quantitative; binary acceptance is defined by AC-1 | Test and inspection |
+| Rights metadata | Every declared set record meets NFR-001-AC-1 | Not quantitative; binary acceptance is defined by AC-1 | Test and inspection |
 | Standard designator scan | The package meets NFR-001-AC-2 | Not quantitative; binary acceptance is defined by AC-2 | Test |
 | Original expression | Authored summaries meet NFR-001-AC-3 | Not quantitative; binary acceptance is defined by AC-3 | Analysis |
 
@@ -63,6 +77,6 @@ Review source notices and rights fields; scan package files for known designator
 
 ## Dependencies
 
-Constrains FR-001 through FR-008. The source-specific rights boundaries are
+Constrains FR-001 through FR-015. The source-specific rights boundaries are
 defined in `spec.md`; each FR specifies the tests and review methods that
 enforce them.
