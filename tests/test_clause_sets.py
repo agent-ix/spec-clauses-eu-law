@@ -19,10 +19,65 @@ from conftest import (
     assert_crosswalk_targets_resolve,
     assert_output_catalog_consistent,
     engine_tool,
+    evaluate_clause_set,
     load_clause_sets,
+    record_and_render_matrix,
     run,
     stage_clause_sets,
 )
+
+MDR_KEY = "eu/mdr-2017-745@2026-07-19"
+MDR_IDS = [
+    "I-1",
+    "I-2",
+    "I-3",
+    "I-4",
+    "I-5",
+    "I-8",
+    "I-14.2(d)",
+    "I-17.1",
+    "I-17.2",
+    "I-17.3",
+    "I-17.4",
+    "I-18.8",
+    "I-23.4(ab)",
+    "II-1.1",
+    "II-4",
+    "II-5",
+    "II-6.1(b)",
+]
+MDR_SOURCE_URL = "https://eur-lex.europa.eu/eli/reg/2017/745/2026-07-19/eng"
+MDR_LICENCE = (
+    "EUR-Lex legal documents may be reused for commercial or non-commercial "
+    "purposes unless otherwise specified. Consolidated texts are CC BY 4.0; "
+    "acknowledge the source and indicate changes."
+)
+MDR_ATTRIBUTION = f"© European Union. Source: {MDR_SOURCE_URL}. Changes made."
+
+
+def _mdr_set() -> dict:
+    """Return the declared MDR set."""
+    return next(clause_set for clause_set in load_clause_sets() if clause_set_key(clause_set) == MDR_KEY)
+
+
+def _spec_output_catalog() -> dict[str, dict[str, str]]:
+    """Read the canonical output definitions from the master specification."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("## EU Pack Output Catalog", 1)[1].split("\n## ", 1)[0]
+    catalog = {}
+    for line in section.splitlines():
+        if not line.startswith("|"):
+            continue
+        name, kind, description = [cell.strip() for cell in line.strip("|").split("|")]
+        if name == "Name" or name.startswith("---"):
+            continue
+        catalog[name] = {"kind": kind, "description": description}
+    return catalog
+
+
+def _outcomes(binding: dict) -> dict[str, str]:
+    """Return clause outcomes indexed by their stable IDs."""
+    return {item["clauseId"]: item["outcome"] for item in binding["clauses"]}
 
 
 def _synthetic_set(
@@ -70,15 +125,15 @@ def _installed_clause_sets(module_name: str) -> list[dict]:
     return load_clause_sets(manifest_path)
 
 
-def test_manifest_is_clause_only_and_starts_without_sets():
-    """Verify the scaffold declares only its future clause set resources.
+def test_manifest_is_clause_only_and_declares_the_mdr_set():
+    """Verify the module declares the first EU clause set.
 
-    Assumptions: MDR and MDCG content lands in later tickets.
-    Criteria: The manifest has an empty clause set list and no other module
+    Assumptions: The scaffold is extended with MDR content.
+    Criteria: The manifest declares the MDR file and no non-clause module
     contributions.
     """
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
-    assert manifest["clause_sets"] == []
+    assert manifest["clause_sets"] == ["clauses/eu-mdr-2017-745-2026-07-19.json"]
     assert not {"object_types", "archetypes", "edges"}.intersection(manifest)
     assert manifest["name"] == "spec_clauses_eu_law"
 
@@ -183,6 +238,186 @@ def test_all_declared_sets_share_one_output_catalog():
     clause_sets = load_clause_sets()
     clause_sets.extend(_installed_clause_sets("spec_clauses_us_health"))
     assert_output_catalog_consistent(clause_sets)
+
+
+@pytest.mark.trace("FR-003-AC-1", "FR-003-AC-2")
+def test_mdr_clause_ids_and_required_fields_match_the_spec():
+    """Check the MDR clause table and required clause fields.
+
+    Assumptions: The master specification is the source for the clause IDs.
+    Criteria: IDs match exactly; every clause is mandatory, has original text,
+    and names at least one catalog output.
+    Trace: FR-003-AC-1, FR-003-AC-2
+    """
+    clause_set = _mdr_set()
+    clauses = clause_set["clauses"]
+    assert [clause["id"] for clause in clauses] == MDR_IDS
+    assert all(clause["force"] == "mandatory" for clause in clauses)
+    assert all(clause["text"].strip() for clause in clauses)
+    assert all(clause["expectedOutputs"] for clause in clauses)
+    assert all(
+        set(clause["expectedOutputs"]) <= set(clause_set["outputCatalog"])
+        for clause in clauses
+    )
+
+
+@pytest.mark.trace("FR-003-AC-3")
+def test_unknown_clause_output_fails_with_the_clause_id(tmp_path):
+    """Reject an MDR fixture that references an undeclared output.
+
+    Assumptions: The temporary set otherwise follows the valid clause shape.
+    Criteria: Quire rejects the unknown output and identifies its clause.
+    Trace: FR-003-AC-3
+    """
+    fixture = _synthetic_set(
+        "example.invalid",
+        "unknown-output",
+        "1.0.0",
+        clauses=[
+            {
+                "id": "I-17.2",
+                "force": "mandatory",
+                "title": "Synthetic clause",
+                "text": "Original synthetic summary.",
+                "expectedOutputs": ["missing-output"],
+            }
+        ],
+    )
+    module_root = stage_clause_sets(tmp_path, fixture)
+    result = run(
+        engine_tool("quire"),
+        "clauses",
+        "evaluate",
+        "--module",
+        str(module_root),
+        "--authority",
+        "example.invalid",
+        "--set",
+        "unknown-output",
+        "--version",
+        "1.0.0",
+        "--json",
+    )
+    assert result.returncode != 0
+    assert "I-17.2" in result.stderr + result.stdout
+
+
+@pytest.mark.trace("FR-004-AC-1", "FR-004-AC-2", "FR-004-AC-3")
+def test_mdr_mobile_platform_applicability():
+    """Check mobile applicability for the one conditional MDR clause.
+
+    Assumptions: Context values are supplied by a human product reviewer.
+    Criteria: Only I-17.3 depends on mobile_platform and its three outcomes
+    match the specification.
+    Trace: FR-004-AC-1, FR-004-AC-2, FR-004-AC-3
+    """
+    clause_set = _mdr_set()
+    assert clause_set["classificationDimensions"] == {
+        "mobile_platform": {"values": ["yes", "no"]}
+    }
+    conditional = [
+        clause["id"] for clause in clause_set["clauses"] if "applicability" in clause
+    ]
+    assert conditional == ["I-17.3"]
+
+    no_context = _outcomes(evaluate_clause_set(PACKAGE_ROOT, MDR_KEY))
+    mobile_no = _outcomes(
+        evaluate_clause_set(PACKAGE_ROOT, MDR_KEY, "mobile_platform=no")
+    )
+    mobile_yes = _outcomes(
+        evaluate_clause_set(PACKAGE_ROOT, MDR_KEY, "mobile_platform=yes")
+    )
+    assert no_context["I-17.3"] == "unresolved"
+    assert set(no_context.values()) - {"binding"} == {"unresolved"}
+    assert mobile_no["I-17.3"] == "not_binding"
+    assert {clause_id for clause_id, value in mobile_no.items() if value != "binding"} == {
+        "I-17.3"
+    }
+    assert set(mobile_yes.values()) == {"binding"}
+
+
+@pytest.mark.trace("FR-002-AC-1", "FR-002-AC-3")
+def test_mdr_rights_and_official_source_metadata_match_the_spec():
+    """Check the MDR reuse metadata and its official source URL.
+
+    Assumptions: The canonical values are maintained in the master
+    specification.
+    Criteria: The set uses the required rights fields and exact source values.
+    Trace: FR-002-AC-1, FR-002-AC-3
+    """
+    clause_set = _mdr_set()
+    rights = clause_set["rights"]
+    assert rights == {
+        "structure": "citation_only",
+        "text": "original",
+        "clearance_ref": None,
+        "licence": MDR_LICENCE,
+        "attribution": MDR_ATTRIBUTION,
+    }
+    assert clause_set["source"]["officialUrl"] == MDR_SOURCE_URL
+
+
+@pytest.mark.trace("FR-002-AC-2")
+def test_mdr_publish_check_accepts_the_set_and_rejects_licensed_text(tmp_path):
+    """Check that publish-check accepts the public set and rejects a licensed fixture.
+
+    Assumptions: The fixture is copied into a temporary module without changing
+    any other module metadata.
+    Criteria: The real module exits zero and a licensed-text set exits two with
+    its set key in the diagnostic.
+    Trace: FR-002-AC-2
+    """
+    accepted = run(
+        engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT)
+    )
+    assert accepted.returncode == 0, accepted.stderr + accepted.stdout
+
+    module_root = tmp_path / "licensed-module"
+    shutil.copytree(PACKAGE_ROOT, module_root)
+    clause_path = module_root / "clauses/eu-mdr-2017-745-2026-07-19.json"
+    licensed = json.loads(clause_path.read_text())
+    licensed["rights"]["text"] = "licensed"
+    clause_path.write_text(json.dumps(licensed))
+    refused = run(
+        engine_tool("quire"), "publish-check", "--module", str(module_root)
+    )
+    assert refused.returncode == 2
+    assert MDR_KEY in refused.stderr + refused.stdout
+
+
+@pytest.mark.trace("FR-006-AC-1")
+def test_mdr_declares_the_spec_catalog_subset_used_by_its_clauses():
+    """Check that the MDR set uses only its exact catalog subset.
+
+    Assumptions: The EU catalog table in spec.md is canonical.
+    Criteria: Each referenced output is declared with the exact catalog
+    definition, and the set has no unused output entry.
+    Trace: FR-006-AC-1
+    """
+    clause_set = _mdr_set()
+    used = {
+        output
+        for clause in clause_set["clauses"]
+        for output in clause["expectedOutputs"]
+    }
+    catalog = _spec_output_catalog()
+    assert clause_set["outputCatalog"] == {
+        name: catalog[name] for name in sorted(used)
+    }
+
+
+def test_mdr_single_set_discharge_renders_expected_rows(tmp_path):
+    """Render a matrix with one discharged and one open MDR clause.
+
+    Assumptions: The temporary evidence store starts empty.
+    Criteria: I-17.2 is compliant and I-18.8 remains undischarged.
+    """
+    rendered = record_and_render_matrix(
+        tmp_path, PACKAGE_ROOT, MDR_KEY, clause_id="I-17.2"
+    )
+    assert rendered.returncode == 0, rendered.stderr + rendered.stdout
+    assert "| I-17.2 | Applicable | Compliant |" in rendered.stdout
+    assert "| I-18.8 | Applicable | Not compliant - undischarged |" in rendered.stdout
 
 
 @pytest.mark.trace("FR-006-AC-2")
