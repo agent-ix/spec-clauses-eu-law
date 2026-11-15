@@ -51,7 +51,8 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
     mdr = re.search(
         r"MDR identity is authority `([^`]+)`, ID `([^`]+)`, and version `([^`]+)`.*?"
         r"official URL is `(https://[^`]+)`.*?"
-        r"Licence metadata shall say: `([^`]+)` Attribution metadata shall say `([^`]+)`",
+        r"Licence metadata shall say: `([^`]+)` "
+        r"Attribution metadata shall say `([^`]+)`",
         design,
         re.DOTALL,
     )
@@ -59,8 +60,10 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
         "spec.md must declare the MDR identity, source, licence, and attribution"
     )
     mdcg = re.search(
-        r"MDCG identity is authority `([^`]+)`, ID `([^`]+)`, version `([^`]+)`, with source `([^`]+)`.*?"
-        r"Licence metadata SHALL state that (.+?)\. Attribution SHALL identify the (.+?), and the official PDF URL",
+        r"MDCG identity is authority `([^`]+)`, ID `([^`]+)`, "
+        r"version `([^`]+)`, with source `([^`]+)`.*?"
+        r"Licence metadata SHALL state that (.+?)\. "
+        r"Attribution SHALL identify the (.+?), and the official PDF URL",
         design,
         re.DOTALL,
     )
