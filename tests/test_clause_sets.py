@@ -56,9 +56,9 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
         design,
         re.DOTALL,
     )
-    assert mdr, (
-        "spec.md must declare the MDR identity, source, licence, and attribution"
-    )
+    assert (
+        mdr
+    ), "spec.md must declare the MDR identity, source, licence, and attribution"
     mdcg = re.search(
         r"MDCG identity is authority `([^`]+)`, ID `([^`]+)`, "
         r"version `([^`]+)`, with source `([^`]+)`.*?"
@@ -67,9 +67,9 @@ def _spec_set_metadata() -> dict[str, dict[str, object]]:
         design,
         re.DOTALL,
     )
-    assert mdcg, (
-        "spec.md must declare the MDCG identity, source, licence, and attribution"
-    )
+    assert (
+        mdcg
+    ), "spec.md must declare the MDCG identity, source, licence, and attribution"
     return {
         f"{mdr.group(1)}/{mdr.group(2)}@{mdr.group(3)}": {
             "officialUrl": mdr.group(4),
@@ -104,29 +104,29 @@ def _assert_set_metadata_matches_spec(clause_set: dict) -> None:
     assert rights["licence"].strip(), f"{key}.rights.licence must be nonblank"
     assert rights["attribution"].strip(), f"{key}.rights.attribution must be nonblank"
     if "licence" in expected:
-        assert rights["licence"] == expected["licence"], (
-            f"{key}.rights.licence differs from spec.md"
-        )
+        assert (
+            rights["licence"] == expected["licence"]
+        ), f"{key}.rights.licence differs from spec.md"
     else:
-        assert expected["licence"] in rights["licence"], (
-            f"{key}.rights.licence omits its source-specific spec statement"
-        )
+        assert (
+            expected["licence"] in rights["licence"]
+        ), f"{key}.rights.licence omits its source-specific spec statement"
     if "attribution" in expected:
-        assert rights["attribution"] == expected["attribution"], (
-            f"{key}.rights.attribution differs from spec.md"
-        )
+        assert (
+            rights["attribution"] == expected["attribution"]
+        ), f"{key}.rights.attribution differs from spec.md"
     else:
         for term in (
             *expected["attribution_terms"].split(", "),
             expected["officialUrl"],
             "Agent-IX",
         ):
-            assert term in rights["attribution"], (
-                f"{key}.rights.attribution omits {term!r} from spec.md"
-            )
-    assert clause_set["source"]["officialUrl"] == expected["officialUrl"], (
-        f"{key}.source.officialUrl differs from spec.md"
-    )
+            assert (
+                term in rights["attribution"]
+            ), f"{key}.rights.attribution omits {term!r} from spec.md"
+    assert (
+        clause_set["source"]["officialUrl"] == expected["officialUrl"]
+    ), f"{key}.source.officialUrl differs from spec.md"
 
 
 def _mdr_set() -> dict:
