@@ -110,15 +110,25 @@ def _resolve_evidence_ref(corpus: pathlib.Path, reference: str) -> pathlib.Path:
     """Resolve one synthetic evidence URL to a file under the corpus root."""
     parsed = urlparse(reference)
     assert parsed.scheme == "evidence", f"unsupported evidence scheme in {reference}"
-    assert (
-        parsed.netloc == "example.invalid"
-    ), f"evidence reference must use example.invalid: {reference}"
+    _assert_reserved_uri_authority(reference)
     path = (corpus / parsed.path.lstrip("/")).resolve()
     assert path.is_relative_to(
         corpus.resolve()
     ), f"evidence reference escapes corpus: {reference}"
     assert path.is_file(), f"evidence reference for clause is unresolved: {reference}"
     return path
+
+
+def _assert_reserved_uri_authority(reference: str) -> None:
+    """Require a synthetic URI to use the exact reserved example.invalid host."""
+    parsed = urlparse(reference)
+    assert parsed.scheme in {
+        "evidence",
+        "person",
+    }, f"unsupported synthetic reference scheme in {reference}"
+    assert (
+        parsed.netloc == "example.invalid"
+    ), f"synthetic reference authority must be exactly example.invalid: {reference}"
 
 
 def _assert_fact_refs_resolve(corpus: pathlib.Path, facts: list[dict]) -> None:
@@ -146,27 +156,6 @@ def _report_clause_rows(value: object, clause_id: str) -> list[dict]:
     if isinstance(value, list):
         return [row for child in value for row in _report_clause_rows(child, clause_id)]
     return []
-
-
-def _stage_mdr_mdcg_module(tmp_path: pathlib.Path) -> pathlib.Path:
-    """Stage only the two sets this ticket requires in the pack index."""
-    module = tmp_path / "module"
-    clauses = module / "clauses"
-    clauses.mkdir(parents=True)
-    manifest = yaml.safe_load((PACKAGE_ROOT / "manifest.yaml").read_text())
-    selected = []
-    for relative in manifest["clause_sets"]:
-        clause_set = json.loads((PACKAGE_ROOT / relative).read_text())
-        key = _clause_set_key(clause_set)
-        if key in {
-            "eu/mdr-2017-745@2026-07-19",
-            "eu-mdcg/mdcg-2019-16@rev1",
-        }:
-            shutil.copy2(PACKAGE_ROOT / relative, module / relative)
-            selected.append(relative)
-    manifest["clause_sets"] = selected
-    (module / "manifest.yaml").write_text(yaml.safe_dump(manifest, sort_keys=False))
-    return module
 
 
 def _signed_corpus(tmp_path: pathlib.Path, assurance: str) -> pathlib.Path:
@@ -327,6 +316,18 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         assert not any(
             marker in content for marker in private_key_markers
         ), f"private key material found in {path.relative_to(REPO_ROOT)}"
+        frontmatter = re.match(r"\A---\s*\n(.*?)\n---(?:\s|$)", content, re.DOTALL)
+        assert (
+            frontmatter is not None
+        ), f"corpus document has no frontmatter: {path.relative_to(REPO_ROOT)}"
+        metadata = yaml.safe_load(frontmatter.group(1))
+        identifier = metadata.get("id") if isinstance(metadata, dict) else None
+        assert isinstance(identifier, str) and identifier.startswith(
+            "example.invalid/"
+        ), (
+            f"corpus identifier must use example.invalid: {path.relative_to(REPO_ROOT)}: "
+            f"{identifier!r}"
+        )
     refs = re.findall(
         r"(?:evidence|person)://[^\s)]+",
         "\n".join(
@@ -336,7 +337,32 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         ),
     )
     assert refs, "corpus must include synthetic evidence references"
-    assert all("example.invalid" in reference for reference in refs), refs
+    for reference in refs:
+        _assert_reserved_uri_authority(reference)
+
+
+@pytest.mark.trace("FR-008-AC-1")
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "evidence://attacker-example.invalid.evil.test/file.json",
+        "evidence://example.invalid.evil/file.json",
+        "evidence://notexample.invalid/file.json",
+        "evidence://user@example.invalid/file.json",
+        "evidence://example.invalid:443/file.json",
+    ],
+)
+def test_synthetic_reference_rejects_unreserved_authority(reference: str):
+    """Reject lookalike, suffixed, credentialed and port-qualified authorities.
+
+    Assumptions: Synthetic references use the exact reserved example.invalid
+    authority.
+    Criteria: An authority that only contains or resembles the reserved host
+    fails validation.
+    Trace: FR-008-AC-1
+    """
+    with pytest.raises(AssertionError, match="authority must be exactly"):
+        _assert_reserved_uri_authority(reference)
 
 
 @pytest.mark.trace("FR-007-AC-2")
@@ -406,7 +432,6 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     config_root.mkdir()
     env = {**os.environ, "IX_CONFIG_ROOT": str(config_root)}
     store = tmp_path / "evidence-store"
-    module = _stage_mdr_mdcg_module(tmp_path)
     sets = load_clause_sets()
     assert len(sets) >= 2, "MDR and MDCG clause sets must be present"
     keys = {_clause_set_key(clause_set): clause_set for clause_set in sets}
@@ -414,6 +439,9 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         "eu/mdr-2017-745@2026-07-19",
         "eu-mdcg/mdcg-2019-16@rev1",
     }
+    assert expected_keys.issubset(
+        keys
+    ), "MDR and MDCG sets must be in the current module"
     for key in expected_keys:
         clause_set = keys[key]
         authority, set_id, version = _clause_set_args(key)
@@ -422,7 +450,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             "clauses",
             "evaluate",
             "--module",
-            str(module),
+            str(PACKAGE_ROOT),
             "--authority",
             authority,
             "--set",
@@ -468,7 +496,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         quoin,
         "module",
         "install",
-        f"path:{module}",
+        f"path:{PACKAGE_ROOT}",
         env=env,
     )
     assert installed.returncode == 0
@@ -501,8 +529,10 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         if isinstance(entry.get("clauseSet"), dict)
     ]
     assert len(set_keys) == len(index), "every index entry must identify its clause set"
-    assert set_keys == sorted(expected_keys, key=lambda value: value.encode()), set_keys
-    assert len(index) == 2
+    expected_module_keys = set(keys)
+    assert set_keys == sorted(
+        expected_module_keys, key=lambda value: value.encode()
+    ), set_keys
     rendered = json.dumps(report)
     assert "I-17.3" in rendered and "Not applicable" in rendered
     mdr_rows = _report_clause_rows(report, "I-18.8")
@@ -535,7 +565,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     assert "Not compliant - undischarged" in markdown
     assert "I-17.2" in markdown and "Compliant" in markdown
     assert "I-17.3" in markdown and "Not applicable" in markdown
-    for clause_set in (keys[key] for key in expected_keys):
+    for clause_set in sets:
         for clause in clause_set["clauses"]:
             assert (
                 clause["title"] not in rendered
@@ -543,3 +573,9 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             assert (
                 clause["text"] not in rendered
             ), f"clause text leaked into report: {clause['id']}"
+            assert (
+                clause["title"] not in markdown
+            ), f"clause title leaked into Markdown RMM: {clause['id']}"
+            assert (
+                clause["text"] not in markdown
+            ), f"clause text leaked into Markdown RMM: {clause['id']}"
