@@ -160,8 +160,28 @@ def assert_output_catalog_consistent(clause_sets: list[dict]) -> None:
             definitions[output] = (clause_set, definition)
 
 
-def assert_crosswalk_targets_resolve(clause_sets: list[dict]) -> None:
-    """Require every cross-set crosswalk target to exist in loaded sets."""
+def _installed_clause_set(target_key: str, env: dict | None = None) -> dict | None:
+    """Find a clause set by key in any Quoin-installed dependency module."""
+    listed = run(engine_tool("quoin"), "module", "list", env=env)
+    assert listed.returncode == 0, listed.stderr + listed.stdout
+    for module in json.loads(listed.stdout)["plugins"]:
+        manifest_path = pathlib.Path(module["targetPath"]) / "manifest.yaml"
+        if not manifest_path.is_file():
+            continue
+        manifest = yaml.safe_load(manifest_path.read_text())
+        module_root = manifest_path.parent
+        for relative_path in manifest.get("clause_sets", []):
+            path = module_root / relative_path
+            clause_set = json.loads(path.read_text())
+            if clause_set_key(clause_set) == target_key:
+                return clause_set
+    return None
+
+
+def assert_crosswalk_targets_resolve(
+    clause_sets: list[dict], env: dict | None = None
+) -> None:
+    """Require crosswalk targets in the module or installed dependencies."""
     by_key = {clause_set_key(clause_set): clause_set for clause_set in clause_sets}
     for clause_set in clause_sets:
         source_key = clause_set_key(clause_set)
@@ -175,6 +195,8 @@ def assert_crosswalk_targets_resolve(clause_sets: list[dict]) -> None:
                 target_clauses = clause_set.get("clauses", [])
             else:
                 target_clause_set = by_key.get(target_key)
+                if target_clause_set is None:
+                    target_clause_set = _installed_clause_set(target_key, env)
                 target_clauses = (
                     target_clause_set.get("clauses", []) if target_clause_set else []
                 )

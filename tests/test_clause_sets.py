@@ -70,14 +70,12 @@ def _installed_clause_sets(module_name: str) -> list[dict]:
     return load_clause_sets(manifest_path)
 
 
-@pytest.mark.trace("TC-001", "FR-001-AC-1")
 def test_manifest_is_clause_only_and_starts_without_sets():
     """Verify the scaffold declares only its future clause set resources.
 
     Assumptions: MDR and MDCG content lands in later tickets.
     Criteria: The manifest has an empty clause set list and no other module
     contributions.
-    Trace: FR-001-AC-1
     """
     manifest = yaml.safe_load(MANIFEST_PATH.read_text())
     assert manifest["clause_sets"] == []
@@ -85,14 +83,12 @@ def test_manifest_is_clause_only_and_starts_without_sets():
     assert manifest["name"] == "spec_clauses_eu_law"
 
 
-@pytest.mark.trace("TC-002", "FR-001-AC-1")
 def test_quire_validates_the_module_and_spec_bundle():
     """Validate the empty module and its specification documents.
 
     Assumptions: The installed ISO artifacts module supplies validation
     schemas.
     Criteria: Quire exits successfully for the EU module and spec documents.
-    Trace: FR-001-AC-1
     """
     iso_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-iso"
     process_module = pathlib.Path.home() / ".ix/filament/modules/spec-artifacts-process"
@@ -132,15 +128,24 @@ def test_path_install_reports_a_non_pack_clause_module(tmp_path):
     plugins = json.loads(listed.stdout)["plugins"]
     module = next(item for item in plugins if item["name"] == "spec_clauses_eu_law")
     assert module["pack"] is False
+    manifest = yaml.safe_load(MANIFEST_PATH.read_text())
+    assert not {"object_types", "archetypes", "edges"}.intersection(manifest)
+    catalog = run(engine_tool("quoin"), "catalog", "list", "--json", env=env)
+    assert catalog.returncode == 0, catalog.stderr + catalog.stdout
+    catalog_module = next(
+        item
+        for item in json.loads(catalog.stdout)["modules"]
+        if item["name"] == "spec_clauses_eu_law"
+    )
+    assert catalog_module["objectTypes"] == []
+    assert catalog_module["artifactTypes"] == []
 
 
-@pytest.mark.trace("TC-004", "FR-001-AC-3")
 def test_quoin_detects_a_licensed_set_in_a_temporary_module(tmp_path):
     """Verify pack detection with an isolated licensed set fixture.
 
     Assumptions: The synthetic fixture uses the clause-set rights shape.
     Criteria: Quoin installs it and reports pack true.
-    Trace: FR-001-AC-3
     """
     licensed_set = _synthetic_set("example.invalid", "licensed", "1.0.0")
     licensed_set["rights"]["text"] = "licensed"
@@ -168,14 +173,12 @@ def test_quoin_detects_a_licensed_set_in_a_temporary_module(tmp_path):
         shutil.rmtree(source_root)
 
 
-@pytest.mark.trace("TC-005", "FR-006-AC-1")
 def test_all_declared_sets_share_one_output_catalog():
     """Reject output kind or description drift across installed sets.
 
     Assumptions: A US pack module may be installed in the test environment.
     Criteria: This module's sets and any installed US sets share exact output
     definitions.
-    Trace: FR-006-AC-1
     """
     clause_sets = load_clause_sets()
     clause_sets.extend(_installed_clause_sets("spec_clauses_us_health"))
@@ -214,7 +217,7 @@ def test_catalog_mismatch_error_names_both_sets():
 
 
 @pytest.mark.trace("TC-007", "FR-005-AC-2")
-def test_crosswalk_error_names_source_clause_and_missing_target_key():
+def test_crosswalk_error_names_source_clause_and_missing_target_key(tmp_path):
     """Name the source clause and target set when a crosswalk target is absent.
 
     Assumptions: The synthetic source references a loaded target set whose
@@ -226,8 +229,18 @@ def test_crosswalk_error_names_source_clause_and_missing_target_key():
         "example.invalid",
         "target",
         "1.0.0",
-        clauses=[{"id": "present"}],
+        clauses=[{"id": "present", "force": "mandatory", "title": "Present"}],
     )
+    dependency = stage_clause_sets(tmp_path, target)
+    home = tmp_path / "dependency-home"
+    config_root = tmp_path / "dependency-config"
+    home.mkdir()
+    config_root.mkdir()
+    env = {**os.environ, "HOME": str(home), "IX_CONFIG_ROOT": str(config_root)}
+    installed = run(
+        engine_tool("quoin"), "module", "install", f"path:{dependency}", env=env
+    )
+    assert installed.returncode == 0, installed.stderr + installed.stdout
     source = _synthetic_set(
         "example.invalid",
         "source",
@@ -253,23 +266,31 @@ def test_crosswalk_error_names_source_clause_and_missing_target_key():
         AssertionError,
         match=r"source-clause.*example.invalid/target@1.0.0#missing",
     ):
-        assert_crosswalk_targets_resolve([source, target])
+        assert_crosswalk_targets_resolve([source], env=env)
 
 
-@pytest.mark.trace("TC-008", "FR-005-AC-1")
-def test_crosswalk_to_a_loaded_clause_resolves():
+def test_crosswalk_to_a_loaded_clause_resolves(tmp_path):
     """Accept a crosswalk whose external target clause is loaded.
 
     Assumptions: The target set and clause are included in the loaded module.
     Criteria: The crosswalk resolver returns without an error.
-    Trace: FR-005-AC-1
     """
     target = _synthetic_set(
         "example.invalid",
         "target",
         "1.0.0",
-        clauses=[{"id": "present"}],
+        clauses=[{"id": "present", "force": "mandatory", "title": "Present"}],
     )
+    dependency = stage_clause_sets(tmp_path, target)
+    home = tmp_path / "dependency-home"
+    config_root = tmp_path / "dependency-config"
+    home.mkdir()
+    config_root.mkdir()
+    env = {**os.environ, "HOME": str(home), "IX_CONFIG_ROOT": str(config_root)}
+    installed = run(
+        engine_tool("quoin"), "module", "install", f"path:{dependency}", env=env
+    )
+    assert installed.returncode == 0, installed.stderr + installed.stdout
     source = _synthetic_set(
         "example.invalid",
         "source",
@@ -291,10 +312,9 @@ def test_crosswalk_to_a_loaded_clause_resolves():
             }
         ],
     )
-    assert_crosswalk_targets_resolve([source, target])
+    assert_crosswalk_targets_resolve([source], env=env)
 
 
-@pytest.mark.trace("TC-009", "FR-001-AC-6")
 def test_clause_files_ship_in_wheel_and_npm_tarball(tmp_path):
     """Build both distributions and inspect their declared clause resources.
 
@@ -302,7 +322,6 @@ def test_clause_files_ship_in_wheel_and_npm_tarball(tmp_path):
     this packaging test cannot pass with an empty manifest.
     Criteria: The manifest and every declared clause file are present in both
     the wheel and npm tarball.
-    Trace: FR-001-AC-6
     """
     project = tmp_path / "project"
     shutil.copytree(
