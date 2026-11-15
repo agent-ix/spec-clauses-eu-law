@@ -207,7 +207,7 @@ def _signed_corpus(tmp_path: pathlib.Path, assurance: str) -> pathlib.Path:
     _checked("git", "-C", str(corpus), "tag", "-s", "v1.0", "-m", "Synthetic corpus")
 
     evidence = corpus / "evidence"
-    evidence.mkdir()
+    evidence.mkdir(exist_ok=True)
     for kind, revision in (("commit", commit), ("tag", "v1.0")):
         request = {
             "protocol": "engineering-assurance.signature-verify-request/v1",
