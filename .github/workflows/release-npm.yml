@@ -41,10 +41,10 @@ jobs:
         run: |
           poetry install --no-interaction --no-root
           npm ci --userconfig /dev/null --registry https://registry.npmjs.org/ --@agent-ix:registry=https://registry.npmjs.org/
-      - name: Install default Quire modules
-        run: quoin module ensure-defaults
       - name: Add Quire and Quoin to PATH
         run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: Install default Quire modules
+        run: quoin module ensure-defaults
       - name: Build engineering-assurance content rights checker
         run: cargo build --locked --features full --manifest-path .deps/engineering-assurance/Cargo.toml
       - name: Build wheel and npm archive
