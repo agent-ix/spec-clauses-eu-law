@@ -92,18 +92,8 @@ def _corpus_validation_modules() -> list[str]:
 
 
 def _records_of_processing_modules() -> list[str]:
-    """Return the released modules that own the generator's input records."""
-    modules_root = pathlib.Path.home() / ".ix" / "filament" / "modules"
-    return [
-        os.environ.get(
-            "SPEC_OBJECTS_SECURITY_MODULE",
-            str(modules_root / "spec-objects-security"),
-        ),
-        os.environ.get(
-            "SPEC_OBJECTS_ARCHITECTURE_MODULE",
-            str(modules_root / "spec-objects-architecture"),
-        ),
-    ]
+    """Return the corpus module roots needed to resolve producer records."""
+    return _corpus_validation_modules()
 
 
 def _checked(

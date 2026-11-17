@@ -5,7 +5,7 @@ type: data_sink
 object: data_sink
 kind: datastore
 processor_agreement: not_applicable
-processor: Example Medical Software Cooperative
+processor: Example-Medical-Software-Cooperative
 region:
   - eu
 purpose:
