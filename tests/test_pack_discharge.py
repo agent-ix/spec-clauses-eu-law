@@ -698,6 +698,11 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     gdpr_binding = None
     data_flow = json.loads((CORPUS_ROOT / "gdpr/data-flow-model.json").read_text())
     records = json.loads((CORPUS_ROOT / "gdpr/records-of-processing.json").read_text())
+    dpia = json.loads((CORPUS_ROOT / "gdpr/dpia.json").read_text())
+    dpia_approval_ref = dpia["residualRiskDecision"]["approvalRef"]
+    assert (
+        dpia["residualRiskDecision"]["approver"] == dpia_approval_ref
+    ), "DPIA residual-risk approval must name the approver"
     assert _generate_records_of_processing(data_flow) == records
     for key in expected_keys:
         clause_set = keys[key]
@@ -743,9 +748,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         if key == GDPR_KEY:
             for fact in facts:
                 if fact.get("clauseId") in GDPR_APPROVAL_CLAUSES:
-                    fact["approvalRef"] = (
-                        "person://example.invalid/people/privacy-officer"
-                    )
+                    fact["approvalRef"] = dpia_approval_ref
         _assert_customer_owned_facts(clause_set, facts)
         if key == "eu/ai-act-2024-1689@2026-07-27":
             _assert_named_person_approvals(facts)
