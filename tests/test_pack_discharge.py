@@ -392,9 +392,10 @@ def _generate_records_of_processing(data_flow: dict) -> dict:
             "id": connection.get("processingActivityId", connection["id"]),
             "connection": connection["id"],
         }
-        for activity_field, (model_field, source_name) in (
-            GDPR_ACTIVITY_SOURCE_FIELDS.items()
-        ):
+        for activity_field, (
+            model_field,
+            source_name,
+        ) in GDPR_ACTIVITY_SOURCE_FIELDS.items():
             source = field_sources.get(source_name)
             if source is None or model_field not in connection:
                 continue
@@ -657,7 +658,14 @@ def test_gdpr_dpia_discharge_requires_named_person_approval(fact: dict):
         )
 
 
-@pytest.mark.trace("FR-008-AC-2", "FR-008-AC-3", "FR-007-AC-2")
+@pytest.mark.trace(
+    "FR-008-AC-2",
+    "FR-008-AC-3",
+    "FR-007-AC-2",
+    "FR-012-AC-1",
+    "FR-012-AC-2",
+    "FR-013-AC-2",
+)
 def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     """Record EU law facts and render the pack RMM across all authored sets.
 
@@ -689,9 +697,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     ), "MDR and MDCG sets must be in the current module"
     gdpr_binding = None
     data_flow = json.loads((CORPUS_ROOT / "gdpr/data-flow-model.json").read_text())
-    records = json.loads(
-        (CORPUS_ROOT / "gdpr/records-of-processing.json").read_text()
-    )
+    records = json.loads((CORPUS_ROOT / "gdpr/records-of-processing.json").read_text())
     assert _generate_records_of_processing(data_flow) == records
     for key in expected_keys:
         clause_set = keys[key]
@@ -909,9 +915,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         "art-30(1)(g)",
         records_of_processing=source_missing_records,
     )
-    assert "art-30(1)(b)" not in {
-        fact["clauseId"] for fact in source_missing_facts
-    }
+    assert "art-30(1)(b)" not in {fact["clauseId"] for fact in source_missing_facts}
     missing_store = tmp_path / "missing-purpose-store"
     missing_facts_path = tmp_path / "missing-purpose-facts.json"
     missing_facts_path.write_text(json.dumps(source_missing_facts))
