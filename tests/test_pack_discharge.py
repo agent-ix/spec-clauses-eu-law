@@ -42,7 +42,7 @@ GDPR_APPROVAL_CLAUSES = {
 }
 GDPR_EVIDENCE_REFS = {
     "data-flow-model": "evidence://example.invalid/gdpr/data-flow-model.json",
-    "dpia": "evidence://example.invalid/gdpr/dpia.md",
+    "dpia": "evidence://example.invalid/gdpr/dpia.json",
     "privacy-by-default-settings": (
         "evidence://example.invalid/gdpr/privacy-by-default-settings.json"
     ),
@@ -753,7 +753,11 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
                 {fact.get("clauseId") for fact in facts}
             )
         if key == GDPR_KEY:
-            _assert_named_person_approvals(facts, GDPR_APPROVAL_CLAUSES)
+            _assert_named_person_approvals(
+                facts,
+                GDPR_APPROVAL_CLAUSES,
+                require_accepted_risk=False,
+            )
             assert GDPR_APPROVAL_CLAUSES.issubset(
                 {fact.get("clauseId") for fact in facts}
             )

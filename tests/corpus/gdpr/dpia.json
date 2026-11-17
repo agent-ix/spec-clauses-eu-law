@@ -1,0 +1,19 @@
+{
+  "recordType": "synthetic-data-protection-impact-assessment",
+  "processingDescription": "The synthetic service routes device-support requests to a human review team. Requests may contain health data when needed to explain a device issue.",
+  "necessityAndProportionality": "The service collects request details needed for review, restricts access to assigned reviewers, and removes records after the declared retention period.",
+  "risks": [
+    "Disclosure of health data to an unintended recipient.",
+    "Use beyond the support purpose."
+  ],
+  "safeguards": [
+    "Encryption at rest.",
+    "Role-based access.",
+    "Purpose-limited defaults."
+  ],
+  "residualRiskDecision": {
+    "decision": "accepted by named reviewer",
+    "approver": "person://example.invalid/people/privacy-officer",
+    "approvalRef": "person://example.invalid/people/privacy-officer"
+  }
+}
