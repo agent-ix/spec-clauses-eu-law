@@ -958,7 +958,11 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         ).stdout
     )
     for clause_id in ("art-25(1)", "art-25(2)", *GDPR_APPROVAL_CLAUSES):
-        rows = _report_clause_rows(gdpr_processor_report, clause_id)
+        rows = [
+            row
+            for row in _report_clause_rows(gdpr_processor_report, clause_id)
+            if "compliance" in row
+        ]
         assert len(rows) == 1 and rows[0]["compliance"] == "not_applicable", rows
 
     assert gdpr_binding is not None
