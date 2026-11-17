@@ -1,11 +1,14 @@
 {
   "recordType": "synthetic-generated-records-of-processing",
   "generatedFrom": "evidence://example.invalid/gdpr/data-flow-model.json",
-  "controller": "Example Medical Software Cooperative",
   "activities": [
     {
       "id": "example-invalid-processing-triage",
       "connection": "example-invalid-connection-triage",
+      "identity": {
+        "value": "Example Medical Software Cooperative",
+        "sourceField": "fieldSources.identity"
+      },
       "purposes": {
         "value": "Route a device-support request for human review.",
         "sourceField": "fieldSources.purposes"
@@ -21,6 +24,10 @@
       "recipients": {
         "value": ["synthetic-clinical-review-team"],
         "sourceField": "fieldSources.recipients"
+      },
+      "transfers": {
+        "value": [],
+        "sourceField": "fieldSources.transfers"
       },
       "retention": {
         "value": "90 days",

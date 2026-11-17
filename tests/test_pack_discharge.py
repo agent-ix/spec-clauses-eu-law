@@ -52,6 +52,25 @@ GDPR_EVIDENCE_REFS = {
     "training-record": "evidence://example.invalid/requirements/NFR-001.md",
     "verification-records": "evidence://example.invalid/tests/TM-001.md",
 }
+GDPR_ART30_ACTIVITY_FIELDS = {
+    "art-30(1)(a)": "identity",
+    "art-30(1)(b)": "purposes",
+    "art-30(1)(c)": "dataSubjectCategories",
+    "art-30(1)(d)": "recipients",
+    "art-30(1)(e)": "transfers",
+    "art-30(1)(f)": "retention",
+    "art-30(1)(g)": "securityMeasures",
+}
+GDPR_ACTIVITY_SOURCE_FIELDS = {
+    "identity": ("controller", "identity"),
+    "purposes": ("purpose", "purposes"),
+    "dataSubjectCategories": ("dataSubjectCategories", "data-subject-categories"),
+    "dataCategories": ("dataCategories", "data-categories"),
+    "recipients": ("recipient", "recipients"),
+    "transfers": ("transfers", "transfers"),
+    "retention": ("retention", "retention"),
+    "securityMeasures": ("securityMeasures", "security-measures"),
+}
 
 
 def _provider_pack_context() -> list[str]:
@@ -278,7 +297,11 @@ def _signed_corpus(tmp_path: pathlib.Path, assurance: str) -> pathlib.Path:
 
 
 def _facts_for_binding(
-    clause_set: dict, binding: dict, open_clause: str | None
+    clause_set: dict,
+    binding: dict,
+    open_clause: str | None,
+    *,
+    records_of_processing: dict | None = None,
 ) -> list[dict]:
     """Build explicit synthetic facts for binding clauses except open work."""
     owned = _customer_owned_clauses(clause_set)
@@ -287,6 +310,11 @@ def _facts_for_binding(
         if clause.get("outcome") != "binding" or clause["clauseId"] == open_clause:
             continue
         clause_id = clause["clauseId"]
+        if clause_set.get("id") == "gdpr-2016-679" and clause_id in GDPR_ART30_ACTIVITY_FIELDS:
+            field = GDPR_ART30_ACTIVITY_FIELDS[clause_id]
+            activities = (records_of_processing or {}).get("activities", [])
+            if not any(field in activity for activity in activities):
+                continue
         attestation = {
             "attestedBy": "reviewer@example.invalid",
             "authority": "quality-lead@example.invalid",
@@ -347,6 +375,33 @@ def _facts_for_binding(
                 }
             )
     return facts
+
+
+def _generate_records_of_processing(data_flow: dict) -> dict:
+    """Project synthetic activity fields from sourced data-flow model fields."""
+    activities = []
+    for connection in data_flow.get("connections", []):
+        field_sources = connection.get("fieldSources", {})
+        activity = {
+            "id": connection["id"],
+            "connection": connection["id"],
+        }
+        for activity_field, (model_field, source_name) in (
+            GDPR_ACTIVITY_SOURCE_FIELDS.items()
+        ):
+            source = field_sources.get(source_name)
+            if source is None or model_field not in connection:
+                continue
+            activity[activity_field] = {
+                "value": connection[model_field],
+                "sourceField": f"fieldSources.{source_name}",
+            }
+        activities.append(activity)
+    return {
+        "recordType": "synthetic-generated-records-of-processing",
+        "generatedFrom": GDPR_EVIDENCE_REFS["data-flow-model"],
+        "activities": activities,
+    }
 
 
 def _assert_named_person_approvals(
@@ -627,7 +682,11 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         keys
     ), "MDR and MDCG sets must be in the current module"
     gdpr_binding = None
-    gdpr_facts = None
+    data_flow = json.loads((CORPUS_ROOT / "gdpr/data-flow-model.json").read_text())
+    records = json.loads(
+        (CORPUS_ROOT / "gdpr/records-of-processing.json").read_text()
+    )
+    assert _generate_records_of_processing(data_flow) == records
     for key in expected_keys:
         clause_set = keys[key]
         authority, set_id, version = _clause_set_args(key)
@@ -663,7 +722,12 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         open_clause = OPEN_CLAUSES.get(key)
         if key == GDPR_KEY:
             open_clause = "art-30(1)(g)"
-        facts = _facts_for_binding(clause_set, binding, open_clause)
+        facts = _facts_for_binding(
+            clause_set,
+            binding,
+            open_clause,
+            records_of_processing=records if key == GDPR_KEY else None,
+        )
         if key == GDPR_KEY:
             for fact in facts:
                 if fact.get("clauseId") in GDPR_APPROVAL_CLAUSES:
@@ -682,7 +746,6 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
                 {fact.get("clauseId") for fact in facts}
             )
             gdpr_binding = binding
-            gdpr_facts = facts
         binding_path = tmp_path / f"{set_id}-binding.json"
         facts_path = tmp_path / f"{set_id}-facts.json"
         binding_path.write_text(json.dumps(binding))
@@ -827,21 +890,22 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         rows = _report_clause_rows(gdpr_processor_report, clause_id)
         assert len(rows) == 1 and rows[0]["compliance"] == "not_applicable", rows
 
-    assert gdpr_binding is not None and gdpr_facts is not None
-    data_flow_path = CORPUS_ROOT / "gdpr" / "data-flow-model.json"
-    records_path = CORPUS_ROOT / "gdpr" / "records-of-processing.json"
-    data_flow = json.loads(data_flow_path.read_text())
-    records = json.loads(records_path.read_text())
+    assert gdpr_binding is not None
     activity = records["activities"][0]
     assert activity["purposes"]["sourceField"] == "fieldSources.purposes"
     assert "purposes" in data_flow["connections"][0]["fieldSources"]
     data_flow["connections"][0]["fieldSources"].pop("purposes")
-    activity.pop("purposes")
-    assert "purposes" not in data_flow["connections"][0]["fieldSources"]
-    assert "purposes" not in activity
-    source_missing_facts = [
-        fact for fact in gdpr_facts if fact["clauseId"] != "art-30(1)(b)"
-    ]
+    source_missing_records = _generate_records_of_processing(data_flow)
+    assert "purposes" not in source_missing_records["activities"][0]
+    source_missing_facts = _facts_for_binding(
+        keys[GDPR_KEY],
+        gdpr_binding,
+        "art-30(1)(g)",
+        records_of_processing=source_missing_records,
+    )
+    assert "art-30(1)(b)" not in {
+        fact["clauseId"] for fact in source_missing_facts
+    }
     missing_store = tmp_path / "missing-purpose-store"
     missing_facts_path = tmp_path / "missing-purpose-facts.json"
     missing_facts_path.write_text(json.dumps(source_missing_facts))
