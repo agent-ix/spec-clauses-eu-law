@@ -93,7 +93,11 @@ def _corpus_validation_modules() -> list[str]:
 
 def _records_of_processing_modules() -> list[str]:
     """Return the corpus module roots needed to resolve producer records."""
-    return _corpus_validation_modules()
+    modules = _corpus_validation_modules()
+    producer_security = os.environ.get("SPEC_OBJECTS_SECURITY_PRODUCER_MODULE")
+    if producer_security is not None:
+        modules[-1] = producer_security
+    return modules
 
 
 def _checked(

@@ -26,6 +26,11 @@ jobs:
           repository: agent-ix/spec-clauses-us-health
           ref: ca78ac063186e5ff8d8e074382a3527b6b84d0b8
           path: .deps/spec-clauses-us-health
+      - uses: actions/checkout@v4
+        with:
+          repository: agent-ix/spec-objects-security
+          ref: v0.18.0
+          path: .deps/spec-objects-security
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.98.1
@@ -39,14 +44,14 @@ jobs:
         run: echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
       - name: Install default Quire modules
         run: quoin module ensure-defaults
+      - name: Restore the approved security module for corpus validation
+        run: quoin module install github:agent-ix/spec-objects-security//spec_objects_security@v0.14.0
+      - name: Install the current architecture module for the records-of-processing producer
+        run: quoin module install github:agent-ix/spec-objects-architecture//spec_objects_architecture@v0.14.0
       - name: Validate specification documents
         run: quire validate 'spec/**/*.md' --module "$GITHUB_WORKSPACE/spec_clauses_eu_law" --module "$HOME/.ix/filament/modules/spec-artifacts-iso" --module "$HOME/.ix/filament/modules/spec-artifacts-process"
       - name: Check clause-set publication rights
         run: quire publish-check --module "$GITHUB_WORKSPACE/spec_clauses_eu_law"
-      - name: Install the current architecture module for the records-of-processing producer
-        run: quoin module install github:agent-ix/spec-objects-architecture//spec_objects_architecture@v0.14.0
-      - name: Install the current security module for GDPR and crosswalk tests
-        run: quoin module install github:agent-ix/spec-objects-security//spec_objects_security@v0.18.0
       - name: Install the pinned HIPAA module for crosswalk tests
         run: quoin module install path:$GITHUB_WORKSPACE/.deps/spec-clauses-us-health/spec_clauses_us_health
       - name: Build engineering-assurance content rights checker
@@ -54,6 +59,8 @@ jobs:
       - name: Add engineering-assurance to PATH
         run: echo "$GITHUB_WORKSPACE/.deps/engineering-assurance/target/debug" >> "$GITHUB_PATH"
       - name: Verify module, rights, catalog, and distributions
+        env:
+          SPEC_OBJECTS_SECURITY_PRODUCER_MODULE: ${{ github.workspace }}/.deps/spec-objects-security/spec_objects_security
         run: pytest
       - name: Check Python style
         run: make lint
