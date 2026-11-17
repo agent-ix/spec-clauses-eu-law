@@ -383,7 +383,7 @@ def _generate_records_of_processing(data_flow: dict) -> dict:
     for connection in data_flow.get("connections", []):
         field_sources = connection.get("fieldSources", {})
         activity = {
-            "id": connection["id"],
+            "id": connection.get("processingActivityId", connection["id"]),
             "connection": connection["id"],
         }
         for activity_field, (model_field, source_name) in (
