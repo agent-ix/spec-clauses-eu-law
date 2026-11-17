@@ -1,4 +1,4 @@
-"""End-to-end discharge checks for the MDR and MDCG reference corpus."""
+"""End-to-end discharge checks for the EU reference corpus."""
 
 from __future__ import annotations
 
@@ -29,6 +29,29 @@ AI_EVIDENCE_REFS = {
     "post-market-monitoring-plan": "evidence://example.invalid/ai/post-market-monitoring.json",
 }
 AI_ANNEX_KEY = "eu/ai-act-2024-1689-annex-iv@2026-07-27"
+GDPR_KEY = "eu/gdpr-2016-679@2016-05-04"
+GDPR_APPROVAL_CLAUSES = {
+    "art-35(1)",
+    "art-35(2)",
+    "art-35(7)(a)",
+    "art-35(7)(b)",
+    "art-35(7)(c)",
+    "art-35(7)(d)",
+    "art-35(9)",
+    "art-35(11)",
+}
+GDPR_EVIDENCE_REFS = {
+    "data-flow-model": "evidence://example.invalid/gdpr/data-flow-model.json",
+    "dpia": "evidence://example.invalid/gdpr/dpia.md",
+    "privacy-by-default-settings": "evidence://example.invalid/gdpr/privacy-by-default-settings.json",
+    "records-of-processing": "evidence://example.invalid/gdpr/records-of-processing.json",
+    "security-risk-records": "evidence://example.invalid/security/RISK-002.md",
+    "software-architecture": "evidence://example.invalid/architecture/evidence_store.md",
+    "access-control": "evidence://example.invalid/security/CTRL-001.md",
+    "written-procedure": "evidence://example.invalid/requirements/FR-001.md",
+    "training-record": "evidence://example.invalid/requirements/NFR-001.md",
+    "verification-records": "evidence://example.invalid/tests/TM-001.md",
+}
 
 
 def _provider_pack_context() -> list[str]:
@@ -301,9 +324,15 @@ def _facts_for_binding(
                 item for item in clause_set["clauses"] if item["id"] == clause_id
             )
             output_refs = [
-                AI_EVIDENCE_REFS[output]
+                (GDPR_EVIDENCE_REFS if clause_set.get("id") == "gdpr-2016-679" else AI_EVIDENCE_REFS)[output]
                 for output in clause.get("expectedOutputs", [])
-                if output in AI_EVIDENCE_REFS and output in outputs
+                if output
+                in (
+                    GDPR_EVIDENCE_REFS
+                    if clause_set.get("id") == "gdpr-2016-679"
+                    else AI_EVIDENCE_REFS
+                )
+                and output in outputs
             ]
             facts.append(
                 {
@@ -320,17 +349,23 @@ def _facts_for_binding(
     return facts
 
 
-def _assert_named_person_approvals(facts: list[dict]) -> None:
-    """Require explicit person-owned approval for risk and oversight clauses."""
+def _assert_named_person_approvals(
+    facts: list[dict],
+    clause_ids: set[str] = AI_APPROVAL_CLAUSES,
+    *,
+    require_accepted_risk: bool = True,
+) -> None:
+    """Require a named-person approval for risk and DPIA clauses."""
     by_clause = {item.get("clauseId"): item for item in facts}
-    for clause_id in AI_APPROVAL_CLAUSES.intersection(by_clause):
+    for clause_id in clause_ids.intersection(by_clause):
         fact = by_clause[clause_id]
-        assert (
-            fact.get("kind") == "disposition"
-        ), f"{clause_id} requires an approved disposition"
-        assert (
-            fact.get("decision") == "accepted_risk"
-        ), f"{clause_id} requires an accepted-risk decision"
+        if require_accepted_risk:
+            assert (
+                fact.get("kind") == "disposition"
+            ), f"{clause_id} requires an approved disposition"
+            assert (
+                fact.get("decision") == "accepted_risk"
+            ), f"{clause_id} requires an accepted-risk decision"
         approval_ref = fact.get("approvalRef", "")
         parsed = urlparse(approval_ref)
         assert (
@@ -535,13 +570,39 @@ def test_ai_act_human_oversight_requires_named_person_approval():
         _assert_named_person_approvals(missing_approval)
 
 
+@pytest.mark.trace("FR-012-AC-1", "FR-012-AC-2")
+@pytest.mark.parametrize(
+    "fact",
+    [
+        {
+            "kind": "direct",
+            "clauseId": "art-35(1)",
+            "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
+        },
+        {
+            "kind": "disposition",
+            "clauseId": "art-35(1)",
+            "decision": "accepted_risk",
+        },
+    ],
+)
+def test_gdpr_dpia_discharge_requires_named_person_approval(fact: dict):
+    """Reject Art 35 facts without an approval reference naming a person."""
+    with pytest.raises(
+        AssertionError, match=r"art-35\(1\).*approvalRef must name a person"
+    ):
+        _assert_named_person_approvals(
+            [fact], GDPR_APPROVAL_CLAUSES, require_accepted_risk=False
+        )
+
+
 @pytest.mark.trace("FR-008-AC-2", "FR-008-AC-3", "FR-007-AC-2")
 def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     """Record EU law facts and render the pack RMM across all authored sets.
 
     Assumptions: Quire, Quoin, and Engineering Assurance expose the required
     validation, signature-verification, evidence-store, and pack-RMM commands.
-    Criteria: Every binding MDR, MDCG, and AI Act clause except the two open
+    Criteria: Every binding MDR, MDCG, GDPR, and AI Act clause except open
     examples has one fact; references resolve; the report index and statuses
     match the acceptance contract; report output excludes clause titles and text.
     Trace: FR-008-AC-2, FR-008-AC-3, FR-007-AC-2
@@ -560,15 +621,26 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         "eu-mdcg/mdcg-2019-16@rev1",
         "eu/ai-act-2024-1689@2026-07-27",
         AI_ANNEX_KEY,
+        GDPR_KEY,
     }
     assert expected_keys.issubset(
         keys
     ), "MDR and MDCG sets must be in the current module"
+    gdpr_binding = None
+    gdpr_facts = None
     for key in expected_keys:
         clause_set = keys[key]
         authority, set_id, version = _clause_set_args(key)
         context = ["mobile_platform=no"]
-        if key == "eu/ai-act-2024-1689@2026-07-27":
+        if key == GDPR_KEY:
+            context.extend(
+                [
+                    "gdpr_role=controller",
+                    "high_risk_processing=yes",
+                    "article_30_records_applicability=applies",
+                ]
+            )
+        elif key == "eu/ai-act-2024-1689@2026-07-27":
             context.extend(["ai_high_risk=yes", "ai_role=provider"])
         elif key == AI_ANNEX_KEY:
             context.extend(_ai_annex_context())
@@ -588,13 +660,29 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             "--json",
         )
         binding = json.loads(evaluated.stdout)
-        facts = _facts_for_binding(clause_set, binding, OPEN_CLAUSES.get(key))
+        open_clause = OPEN_CLAUSES.get(key)
+        if key == GDPR_KEY:
+            open_clause = "art-30(1)(g)"
+        facts = _facts_for_binding(clause_set, binding, open_clause)
+        if key == GDPR_KEY:
+            for fact in facts:
+                if fact.get("clauseId") in GDPR_APPROVAL_CLAUSES:
+                    fact["approvalRef"] = (
+                        "person://example.invalid/people/privacy-officer"
+                    )
         _assert_customer_owned_facts(clause_set, facts)
         if key == "eu/ai-act-2024-1689@2026-07-27":
             _assert_named_person_approvals(facts)
             assert AI_APPROVAL_CLAUSES.issubset(
                 {fact.get("clauseId") for fact in facts}
             )
+        if key == GDPR_KEY:
+            _assert_named_person_approvals(facts, GDPR_APPROVAL_CLAUSES)
+            assert GDPR_APPROVAL_CLAUSES.issubset(
+                {fact.get("clauseId") for fact in facts}
+            )
+            gdpr_binding = binding
+            gdpr_facts = facts
         binding_path = tmp_path / f"{set_id}-binding.json"
         facts_path = tmp_path / f"{set_id}-facts.json"
         binding_path.write_text(json.dumps(binding))
@@ -620,7 +708,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             if clause.get("outcome") == "binding"
         ]
         assert len(facts) == len(binding_clauses) - (
-            1 if OPEN_CLAUSES.get(key) else 0
+            1 if open_clause else 0
         ), f"{key} did not receive one fact per binding clause except open work"
 
     installed = _checked(
@@ -707,6 +795,97 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     ai_act_row = _report_clause_rows(report, "art-10")
     assert len(ai_act_row) == 1 and ai_act_row[0]["compliance"] == "compliant"
     assert any("dataset-lineage.json" in ref for ref in ai_act_row[0]["evidenceRefs"])
+
+    gdpr_processor_report = json.loads(
+        _checked(
+            quoin,
+            "discharge",
+            "--rmm",
+            "--pack",
+            "spec_clauses_eu_law",
+            "--repo",
+            str(store),
+            "--as-of",
+            AS_OF,
+            "--context",
+            "mobile_platform=no",
+            "--context",
+            "gdpr_role=processor",
+            "--context",
+            "high_risk_processing=yes",
+            "--context",
+            "article_30_records_applicability=applies",
+            "--context",
+            "ai_high_risk=yes",
+            "--context",
+            "ai_role=provider",
+            "--json",
+            env=env,
+        ).stdout
+    )
+    for clause_id in ("art-25(1)", "art-25(2)", *GDPR_APPROVAL_CLAUSES):
+        rows = _report_clause_rows(gdpr_processor_report, clause_id)
+        assert len(rows) == 1 and rows[0]["compliance"] == "not_applicable", rows
+
+    assert gdpr_binding is not None and gdpr_facts is not None
+    data_flow_path = CORPUS_ROOT / "gdpr" / "data-flow-model.json"
+    records_path = CORPUS_ROOT / "gdpr" / "records-of-processing.json"
+    data_flow = json.loads(data_flow_path.read_text())
+    records = json.loads(records_path.read_text())
+    activity = records["activities"][0]
+    assert activity["purposes"]["sourceField"] == "fieldSources.purposes"
+    assert "purposes" in data_flow["connections"][0]["fieldSources"]
+    data_flow["connections"][0]["fieldSources"].pop("purposes")
+    activity.pop("purposes")
+    assert "purposes" not in data_flow["connections"][0]["fieldSources"]
+    assert "purposes" not in activity
+    source_missing_facts = [
+        fact for fact in gdpr_facts if fact["clauseId"] != "art-30(1)(b)"
+    ]
+    missing_store = tmp_path / "missing-purpose-store"
+    missing_facts_path = tmp_path / "missing-purpose-facts.json"
+    missing_facts_path.write_text(json.dumps(source_missing_facts))
+    binding_path = tmp_path / "gdpr-binding.json"
+    binding_path.write_text(json.dumps(gdpr_binding))
+    _checked(
+        quoin,
+        "evidence",
+        "record-discharge",
+        "--repo",
+        str(missing_store),
+        "--binding",
+        str(binding_path),
+        "--facts",
+        str(missing_facts_path),
+        "--json",
+        env=env,
+    )
+    missing_report = json.loads(
+        _checked(
+            quoin,
+            "discharge",
+            "--rmm",
+            "--pack",
+            "spec_clauses_eu_law",
+            "--repo",
+            str(missing_store),
+            "--as-of",
+            AS_OF,
+            "--context",
+            "mobile_platform=no",
+            "--context",
+            "gdpr_role=controller",
+            "--context",
+            "high_risk_processing=yes",
+            "--context",
+            "article_30_records_applicability=applies",
+            "--json",
+            env=env,
+        ).stdout
+    )
+    missing_purpose_rows = _report_clause_rows(missing_report, "art-30(1)(b)")
+    assert len(missing_purpose_rows) == 1
+    assert missing_purpose_rows[0]["compliance"] == "undischarged"
 
     deployer_report = json.loads(
         _checked(

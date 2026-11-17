@@ -1,0 +1,25 @@
+{
+  "recordType": "synthetic-data-flow-model",
+  "connections": [
+    {
+      "id": "example-invalid-connection-triage",
+      "source": "service://example.invalid/device-support/intake",
+      "sink": "service://example.invalid/device-support/review-store",
+      "purpose": "Route a device-support request for human review.",
+      "dataCategories": ["service-request", "health-data"],
+      "dataSubjectCategories": ["device-user"],
+      "recipient": "synthetic-clinical-review-team",
+      "region": "eu",
+      "securityMeasures": ["encryption-at-rest", "role-based-access"],
+      "fieldSources": {
+        "identity": "service configuration",
+        "purposes": "request routing rule",
+        "data-subject-categories": "intake schema",
+        "data-categories": "intake schema",
+        "recipients": "review-store access policy",
+        "retention": "retention setting",
+        "security-measures": "security control inventory"
+      }
+    }
+  ]
+}

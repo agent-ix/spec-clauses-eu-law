@@ -1,0 +1,11 @@
+{
+  "recordType": "synthetic-privacy-by-default-settings",
+  "defaults": {
+    "collection": "only fields required for device-support review",
+    "access": "assigned reviewers only",
+    "use": "the request's stated support purpose",
+    "retention": "90 days unless a documented hold applies",
+    "healthData": "not collected unless the request requires clinical context"
+  },
+  "owner": "person://example.invalid/people/privacy-officer"
+}
