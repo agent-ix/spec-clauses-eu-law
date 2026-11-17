@@ -455,6 +455,10 @@ def _assert_named_person_approvals(
             and parsed.netloc == "example.invalid"
             and re.fullmatch(r"/people/[a-z][a-z0-9-]*", parsed.path)
         ), f"{clause_id} approvalRef must name a person"
+        if fact.get("kind") == "direct":
+            assert (
+                fact.get("attestation", {}).get("attestedBy") == approval_ref
+            ), f"{clause_id} attestation must be bound to its named approver"
 
 
 def _ai_annex_context() -> list[str]:
@@ -692,6 +696,9 @@ def test_gdpr_dpia_direct_fact_passes_with_named_approval():
                 "clauseId": "art-35(1)",
                 "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
                 "approvalRef": "person://example.invalid/people/privacy-officer",
+                "attestation": {
+                    "attestedBy": "person://example.invalid/people/privacy-officer"
+                },
             }
         ],
         GDPR_APPROVAL_CLAUSES,
@@ -789,19 +796,8 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         if key == GDPR_KEY:
             for fact in facts:
                 if fact.get("clauseId") in GDPR_APPROVAL_CLAUSES:
-                    fact.update(
-                        {
-                            "kind": "disposition",
-                            "decision": "accepted_risk",
-                            "owner": dpia_approval_ref,
-                            "rationale": (
-                                "The named reviewer accepted the synthetic DPIA "
-                                "residual risk."
-                            ),
-                            "approvalRef": dpia_approval_ref,
-                        }
-                    )
-                    fact.pop("evidenceRefs", None)
+                    fact["approvalRef"] = dpia_approval_ref
+                    fact["attestation"]["attestedBy"] = dpia_approval_ref
         _assert_customer_owned_facts(clause_set, facts)
         if key == "eu/ai-act-2024-1689@2026-07-27":
             _assert_named_person_approvals(facts)
@@ -812,6 +808,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             _assert_named_person_approvals(
                 facts,
                 GDPR_APPROVAL_CLAUSES,
+                require_accepted_risk=False,
             )
             assert GDPR_APPROVAL_CLAUSES.issubset(
                 {fact.get("clauseId") for fact in facts}
