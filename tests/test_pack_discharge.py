@@ -82,6 +82,22 @@ def _provider_pack_context() -> list[str]:
     return ["mobile_platform=no", *_ai_annex_context()]
 
 
+def _corpus_validation_modules() -> list[str]:
+    """Select only corpus schemas, excluding unrelated ambient app modules."""
+    modules_root = pathlib.Path.home() / ".ix" / "filament" / "modules"
+    roots = [
+        "spec-artifacts-iso",
+        "spec-artifacts-process",
+        "spec-objects-architecture",
+        "spec-objects-business",
+        "spec-objects-safety",
+    ]
+    security_root = os.environ.get(
+        "SPEC_OBJECTS_SECURITY_MODULE", str(modules_root / "spec-objects-security")
+    )
+    return [*(str(modules_root / name) for name in roots), security_root]
+
+
 def _checked(
     *args: str, env: dict[str, str] | None = None
 ) -> subprocess.CompletedProcess:
@@ -428,6 +444,10 @@ def _assert_named_person_approvals(
             assert (
                 fact.get("decision") == "accepted_risk"
             ), f"{clause_id} requires an accepted-risk decision"
+        elif fact.get("kind") == "direct":
+            assert GDPR_EVIDENCE_REFS["dpia"] in fact.get(
+                "evidenceRefs", []
+            ), f"{clause_id} direct fact must cite the DPIA"
         approval_ref = fact.get("approvalRef", "")
         parsed = urlparse(approval_ref)
         assert (
@@ -469,6 +489,11 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
         quire,
         "validate",
         "tests/corpus/**/*.md",
+        *[
+            argument
+            for module in _corpus_validation_modules()
+            for argument in ("--module", module)
+        ],
         cwd=REPO_ROOT,
     )
     assert validated.returncode == 0, (
@@ -658,6 +683,22 @@ def test_gdpr_dpia_discharge_requires_named_person_approval(fact: dict):
         )
 
 
+def test_gdpr_dpia_direct_fact_passes_with_named_approval():
+    """Accept a direct Art 35 fact only when its DPIA approver is named."""
+    _assert_named_person_approvals(
+        [
+            {
+                "kind": "direct",
+                "clauseId": "art-35(1)",
+                "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
+                "approvalRef": "person://example.invalid/people/privacy-officer",
+            }
+        ],
+        GDPR_APPROVAL_CLAUSES,
+        require_accepted_risk=False,
+    )
+
+
 @pytest.mark.trace(
     "FR-008-AC-2",
     "FR-008-AC-3",
@@ -748,7 +789,19 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         if key == GDPR_KEY:
             for fact in facts:
                 if fact.get("clauseId") in GDPR_APPROVAL_CLAUSES:
-                    fact["approvalRef"] = dpia_approval_ref
+                    fact.update(
+                        {
+                            "kind": "disposition",
+                            "decision": "accepted_risk",
+                            "owner": dpia_approval_ref,
+                            "rationale": (
+                                "The named reviewer accepted the synthetic DPIA "
+                                "residual risk."
+                            ),
+                            "approvalRef": dpia_approval_ref,
+                        }
+                    )
+                    fact.pop("evidenceRefs", None)
         _assert_customer_owned_facts(clause_set, facts)
         if key == "eu/ai-act-2024-1689@2026-07-27":
             _assert_named_person_approvals(facts)
@@ -759,7 +812,6 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             _assert_named_person_approvals(
                 facts,
                 GDPR_APPROVAL_CLAUSES,
-                require_accepted_risk=False,
             )
             assert GDPR_APPROVAL_CLAUSES.issubset(
                 {fact.get("clauseId") for fact in facts}

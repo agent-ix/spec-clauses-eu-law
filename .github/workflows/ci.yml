@@ -44,7 +44,7 @@ jobs:
       - name: Check clause-set publication rights
         run: quire publish-check --module "$GITHUB_WORKSPACE/spec_clauses_eu_law"
       - name: Install the pinned NIST module for crosswalk tests
-        run: quoin module install github:agent-ix/spec-objects-security//spec_objects_security@v0.13.0
+        run: quoin module install github:agent-ix/spec-objects-security//spec_objects_security@v0.14.0
       - name: Install the pinned HIPAA module for crosswalk tests
         run: quoin module install path:$GITHUB_WORKSPACE/.deps/spec-clauses-us-health/spec_clauses_us_health
       - name: Build engineering-assurance content rights checker
