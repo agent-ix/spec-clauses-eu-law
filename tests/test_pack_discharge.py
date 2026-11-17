@@ -15,6 +15,9 @@ import yaml
 from conftest import PACKAGE_ROOT, REPO_ROOT, engine_tool, load_clause_sets, run
 
 CORPUS_ROOT = REPO_ROOT / "tests" / "corpus"
+GDPR_RECORDS_OF_PROCESSING_FIXTURE = (
+    REPO_ROOT / "tests" / "fixtures" / "gdpr_records_of_processing"
+)
 AS_OF = "2026-11-15T00:00:00Z"
 OPEN_CLAUSES = {
     "eu/mdr-2017-745@2026-07-19": "I-18.8",
@@ -59,21 +62,11 @@ GDPR_EVIDENCE_REFS = {
 GDPR_ART30_ACTIVITY_FIELDS = {
     "art-30(1)(a)": "identity",
     "art-30(1)(b)": "purposes",
-    "art-30(1)(c)": "dataSubjectCategories",
+    "art-30(1)(c)": "dataCategories",
     "art-30(1)(d)": "recipients",
     "art-30(1)(e)": "transfers",
     "art-30(1)(f)": "retention",
     "art-30(1)(g)": "securityMeasures",
-}
-GDPR_ACTIVITY_SOURCE_FIELDS = {
-    "identity": ("controller", "identity"),
-    "purposes": ("purpose", "purposes"),
-    "dataSubjectCategories": ("dataSubjectCategories", "data-subject-categories"),
-    "dataCategories": ("dataCategories", "data-categories"),
-    "recipients": ("recipient", "recipients"),
-    "transfers": ("transfers", "transfers"),
-    "retention": ("retention", "retention"),
-    "securityMeasures": ("securityMeasures", "security-measures"),
 }
 
 
@@ -96,6 +89,21 @@ def _corpus_validation_modules() -> list[str]:
         "SPEC_OBJECTS_SECURITY_MODULE", str(modules_root / "spec-objects-security")
     )
     return [*(str(modules_root / name) for name in roots), security_root]
+
+
+def _records_of_processing_modules() -> list[str]:
+    """Return the released modules that own the generator's input records."""
+    modules_root = pathlib.Path.home() / ".ix" / "filament" / "modules"
+    return [
+        os.environ.get(
+            "SPEC_OBJECTS_SECURITY_MODULE",
+            str(modules_root / "spec-objects-security"),
+        ),
+        os.environ.get(
+            "SPEC_OBJECTS_ARCHITECTURE_MODULE",
+            str(modules_root / "spec-objects-architecture"),
+        ),
+    ]
 
 
 def _checked(
@@ -322,6 +330,7 @@ def _facts_for_binding(
     open_clause: str | None,
     *,
     records_of_processing: dict | None = None,
+    generated_records_of_processing: tuple[dict, str] | None = None,
 ) -> list[dict]:
     """Build explicit synthetic facts for binding clauses except open work."""
     owned = _customer_owned_clauses(clause_set)
@@ -336,6 +345,19 @@ def _facts_for_binding(
         ):
             field = GDPR_ART30_ACTIVITY_FIELDS[clause_id]
             activities = (records_of_processing or {}).get("activities", [])
+            if clause_id == "art-30(1)(c)" and generated_records_of_processing:
+                report, markdown = generated_records_of_processing
+                gaps = [
+                    gap
+                    for document in report.get("documents", [])
+                    for gap in document.get("gaps", [])
+                ]
+                has_classification_gap = any(
+                    gap.get("gap_kind") == "personal_data_categories_unstated"
+                    for gap in gaps
+                )
+                if has_classification_gap or "CLASS-PHI (health)" not in markdown:
+                    continue
             if not any(field in activity for activity in activities):
                 continue
         attestation = {
@@ -399,32 +421,39 @@ def _facts_for_binding(
     return facts
 
 
-def _generate_records_of_processing(data_flow: dict) -> dict:
-    """Project synthetic activity fields from sourced data-flow model fields."""
-    activities = []
-    for connection in data_flow.get("connections", []):
-        field_sources = connection.get("fieldSources", {})
-        activity = {
-            "id": connection.get("processingActivityId", connection["id"]),
-            "connection": connection["id"],
-        }
-        for activity_field, (
-            model_field,
-            source_name,
-        ) in GDPR_ACTIVITY_SOURCE_FIELDS.items():
-            source = field_sources.get(source_name)
-            if source is None or model_field not in connection:
-                continue
-            activity[activity_field] = {
-                "value": connection[model_field],
-                "sourceField": f"fieldSources.{source_name}",
-            }
-        activities.append(activity)
-    return {
-        "recordType": "synthetic-generated-records-of-processing",
-        "generatedFrom": GDPR_EVIDENCE_REFS["data-flow-model"],
-        "activities": activities,
-    }
+def _generate_records_of_processing(
+    quoin: str, scope: pathlib.Path, env: dict[str, str]
+) -> tuple[dict, str]:
+    """Run PLAT-1658's producer and return its JSON report and generated file."""
+    module_args = [
+        argument
+        for module in _records_of_processing_modules()
+        for argument in ("--module", module)
+    ]
+    result = run(
+        quoin,
+        "dossier",
+        "generate",
+        "--doc",
+        "records-of-processing",
+        "--scope",
+        str(scope),
+        *module_args,
+        "--json",
+        cwd=scope,
+        env=env,
+    )
+    assert result.returncode in {0, 1}, (
+        f"{quoin} dossier generate --doc records-of-processing exited "
+        f"{result.returncode}: {result.stderr}{result.stdout}"
+    )
+    envelope = json.loads(result.stdout)
+    report = json.loads(envelope["rendered"])
+    assert len(report["documents"]) == 1
+    document = report["documents"][0]
+    assert document["id"] == "DOS-ROP"
+    markdown = (scope / document["path"]).read_text()
+    return report, markdown
 
 
 def _assert_named_person_approvals(
@@ -744,14 +773,12 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         keys
     ), "MDR and MDCG sets must be in the current module"
     gdpr_binding = None
-    data_flow = json.loads((CORPUS_ROOT / "gdpr/data-flow-model.json").read_text())
     records = json.loads((CORPUS_ROOT / "gdpr/records-of-processing.json").read_text())
     dpia = json.loads((CORPUS_ROOT / "gdpr/dpia.json").read_text())
     dpia_approval_ref = dpia["residualRiskDecision"]["approvalRef"]
     assert (
         dpia["residualRiskDecision"]["approver"] == dpia_approval_ref
     ), "DPIA residual-risk approval must name the approver"
-    assert _generate_records_of_processing(data_flow) == records
     for key in expected_keys:
         clause_set = keys[key]
         authority, set_id, version = _clause_set_args(key)
@@ -963,21 +990,38 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         assert len(rows) == 1 and rows[0]["compliance"] == "not_applicable", rows
 
     assert gdpr_binding is not None
-    activity = records["activities"][0]
-    assert activity["purposes"]["sourceField"] == "fieldSources.purposes"
-    assert "purposes" in data_flow["connections"][0]["fieldSources"]
-    data_flow["connections"][0]["fieldSources"].pop("purposes")
-    source_missing_records = _generate_records_of_processing(data_flow)
-    assert "purposes" not in source_missing_records["activities"][0]
+    source_scope = tmp_path / "records-of-processing-source"
+    shutil.copytree(GDPR_RECORDS_OF_PROCESSING_FIXTURE, source_scope)
+    generated_records = _generate_records_of_processing(quoin, source_scope, env)
+    assert "CLASS-PHI (health)" in generated_records[1]
+
+    source_missing_scope = (
+        tmp_path / "records-of-processing-source-missing-classification"
+    )
+    shutil.copytree(source_scope, source_missing_scope)
+    sink_path = source_missing_scope / "spec" / "SINK-001.md"
+    sink = sink_path.read_text()
+    carry_edge = "  - target: CLASS-PHI\n    type: carries\n"
+    assert carry_edge in sink
+    sink_path.write_text(sink.replace(carry_edge, "", 1))
+    source_missing_records = _generate_records_of_processing(
+        quoin, source_missing_scope, env
+    )
+    assert "CLASS-PHI (health)" not in source_missing_records[1]
+    assert (
+        "GAP: (c) categories of personal data — SINK-001 carries no classification"
+        in source_missing_records[1]
+    )
     source_missing_facts = _facts_for_binding(
         keys[GDPR_KEY],
         gdpr_binding,
         "art-30(1)(g)",
-        records_of_processing=source_missing_records,
+        records_of_processing=records,
+        generated_records_of_processing=source_missing_records,
     )
-    assert "art-30(1)(b)" not in {fact["clauseId"] for fact in source_missing_facts}
-    missing_store = tmp_path / "missing-purpose-store"
-    missing_facts_path = tmp_path / "missing-purpose-facts.json"
+    assert "art-30(1)(c)" not in {fact["clauseId"] for fact in source_missing_facts}
+    missing_store = tmp_path / "missing-category-store"
+    missing_facts_path = tmp_path / "missing-category-facts.json"
     missing_facts_path.write_text(json.dumps(source_missing_facts))
     binding_path = tmp_path / "gdpr-binding.json"
     binding_path.write_text(json.dumps(gdpr_binding))
@@ -994,7 +1038,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         "--json",
         env=env,
     )
-    missing_report = json.loads(
+    missing_discharge_report = json.loads(
         _checked(
             quoin,
             "discharge",
@@ -1017,9 +1061,33 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
             env=env,
         ).stdout
     )
-    missing_purpose_rows = _report_clause_rows(missing_report, "art-30(1)(b)")
-    assert len(missing_purpose_rows) == 1
-    assert missing_purpose_rows[0]["compliance"] == "undischarged"
+    missing_category_rows = _report_clause_rows(
+        missing_discharge_report, "art-30(1)(c)"
+    )
+    assert len(missing_category_rows) == 1
+    assert missing_category_rows[0]["compliance"] == "undischarged"
+    missing_discharge_markdown = _checked(
+        quoin,
+        "discharge",
+        "--rmm",
+        "--pack",
+        "spec_clauses_eu_law",
+        "--repo",
+        str(missing_store),
+        "--as-of",
+        AS_OF,
+        "--context",
+        "mobile_platform=no",
+        "--context",
+        "gdpr_role=controller",
+        "--context",
+        "high_risk_processing=yes",
+        "--context",
+        "article_30_records_applicability=applies",
+        env=env,
+    ).stdout
+    assert "art-30(1)(c)" in missing_discharge_markdown
+    assert "Not compliant - undischarged" in missing_discharge_markdown
 
     deployer_report = json.loads(
         _checked(
