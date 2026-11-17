@@ -43,8 +43,12 @@ GDPR_APPROVAL_CLAUSES = {
 GDPR_EVIDENCE_REFS = {
     "data-flow-model": "evidence://example.invalid/gdpr/data-flow-model.json",
     "dpia": "evidence://example.invalid/gdpr/dpia.md",
-    "privacy-by-default-settings": "evidence://example.invalid/gdpr/privacy-by-default-settings.json",
-    "records-of-processing": "evidence://example.invalid/gdpr/records-of-processing.json",
+    "privacy-by-default-settings": (
+        "evidence://example.invalid/gdpr/privacy-by-default-settings.json"
+    ),
+    "records-of-processing": (
+        "evidence://example.invalid/gdpr/records-of-processing.json"
+    ),
     "security-risk-records": "evidence://example.invalid/security/RISK-002.md",
     "software-architecture": "evidence://example.invalid/architecture/evidence_store.md",
     "access-control": "evidence://example.invalid/security/CTRL-001.md",
@@ -310,7 +314,10 @@ def _facts_for_binding(
         if clause.get("outcome") != "binding" or clause["clauseId"] == open_clause:
             continue
         clause_id = clause["clauseId"]
-        if clause_set.get("id") == "gdpr-2016-679" and clause_id in GDPR_ART30_ACTIVITY_FIELDS:
+        if (
+            clause_set.get("id") == "gdpr-2016-679"
+            and clause_id in GDPR_ART30_ACTIVITY_FIELDS
+        ):
             field = GDPR_ART30_ACTIVITY_FIELDS[clause_id]
             activities = (records_of_processing or {}).get("activities", [])
             if not any(field in activity for activity in activities):
@@ -351,16 +358,15 @@ def _facts_for_binding(
             clause = next(
                 item for item in clause_set["clauses"] if item["id"] == clause_id
             )
+            evidence_refs = (
+                GDPR_EVIDENCE_REFS
+                if clause_set.get("id") == "gdpr-2016-679"
+                else AI_EVIDENCE_REFS
+            )
             output_refs = [
-                (GDPR_EVIDENCE_REFS if clause_set.get("id") == "gdpr-2016-679" else AI_EVIDENCE_REFS)[output]
+                evidence_refs[output]
                 for output in clause.get("expectedOutputs", [])
-                if output
-                in (
-                    GDPR_EVIDENCE_REFS
-                    if clause_set.get("id") == "gdpr-2016-679"
-                    else AI_EVIDENCE_REFS
-                )
-                and output in outputs
+                if output in evidence_refs and output in outputs
             ]
             facts.append(
                 {
