@@ -630,7 +630,7 @@
         "data-protection"
       ],
       "obligatedActors": [],
-      "approvalRoles": [],
+      "approvalRoles": ["privacy-officer"],
       "styles": {},
       "expectedOutputs": [
         "dpia",
@@ -663,7 +663,7 @@
         "data-protection"
       ],
       "obligatedActors": [],
-      "approvalRoles": [],
+      "approvalRoles": ["privacy-officer"],
       "styles": {},
       "expectedOutputs": [
         "dpia",
@@ -695,7 +695,7 @@
         "data-protection"
       ],
       "obligatedActors": [],
-      "approvalRoles": [],
+      "approvalRoles": ["privacy-officer"],
       "styles": {},
       "expectedOutputs": [
         "dpia",
@@ -727,7 +727,7 @@
         "data-protection"
       ],
       "obligatedActors": [],
-      "approvalRoles": [],
+      "approvalRoles": ["privacy-officer"],
       "styles": {},
       "expectedOutputs": [
         "dpia",
@@ -759,7 +759,7 @@
         "data-protection"
       ],
       "obligatedActors": [],
-      "approvalRoles": [],
+      "approvalRoles": ["privacy-officer"],
       "styles": {},
       "expectedOutputs": [
         "dpia",
@@ -792,7 +792,7 @@
         "data-protection"
       ],
       "obligatedActors": [],
-      "approvalRoles": [],
+      "approvalRoles": ["privacy-officer"],
       "styles": {},
       "expectedOutputs": [
         "dpia",
@@ -824,7 +824,7 @@
         "data-protection"
       ],
       "obligatedActors": [],
-      "approvalRoles": [],
+      "approvalRoles": ["privacy-officer"],
       "styles": {},
       "expectedOutputs": [
         "dpia"
@@ -855,7 +855,7 @@
         "data-protection"
       ],
       "obligatedActors": [],
-      "approvalRoles": [],
+      "approvalRoles": ["privacy-officer"],
       "styles": {},
       "expectedOutputs": [
         "dpia",
