@@ -71,8 +71,14 @@ GDPR_ART30_ACTIVITY_FIELDS = {
 
 
 def _provider_pack_context() -> list[str]:
-    """Return explicit product and AI inputs for the combined EU pack run."""
-    return ["mobile_platform=no", *_ai_annex_context()]
+    """Return explicit product, GDPR-controller, and AI inputs for the EU pack run."""
+    return [
+        "mobile_platform=no",
+        "gdpr_role=controller",
+        "high_risk_processing=yes",
+        "article_30_records_applicability=applies",
+        *_ai_annex_context(),
+    ]
 
 
 def _corpus_validation_modules() -> list[str]:
