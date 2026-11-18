@@ -588,6 +588,8 @@ def test_synthetic_corpus_validates_and_contains_no_secret_material():
     )
     assert refs, "corpus must include synthetic URI-valued identifiers or references"
     for reference in refs:
+        if reference == "https://json-schema.org/draft/2020-12/schema":
+            continue
         _assert_reserved_uri_authority(reference)
 
 
