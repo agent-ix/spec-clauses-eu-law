@@ -734,6 +734,102 @@ def test_gdpr_dpia_direct_fact_passes_with_named_approval():
     )
 
 
+@pytest.mark.trace("FR-012-AC-1")
+def test_gdpr_dpia_direct_fact_without_approval_stays_open(
+    tmp_path: pathlib.Path,
+):
+    """Keep an Art 35 direct fact open when its approval reference is absent."""
+    quire, quoin, _ = _preflight()
+    config_root = tmp_path / "config"
+    config_root.mkdir()
+    env = {**os.environ, "IX_CONFIG_ROOT": str(config_root)}
+    _checked(quoin, "module", "install", f"path:{PACKAGE_ROOT}", env=env)
+
+    binding = json.loads(
+        _checked(
+            quire,
+            "clauses",
+            "evaluate",
+            "--module",
+            str(PACKAGE_ROOT),
+            "--authority",
+            "eu",
+            "--set",
+            "gdpr-2016-679",
+            "--version",
+            "2016-05-04",
+            "--context",
+            "gdpr_role=controller",
+            "--context",
+            "high_risk_processing=yes",
+            "--json",
+        ).stdout
+    )
+    binding_path = tmp_path / "binding.json"
+    binding_path.write_text(json.dumps(binding))
+    facts_path = tmp_path / "facts.json"
+    facts_path.write_text(
+        json.dumps(
+            [
+                {
+                    "kind": "direct",
+                    "clauseId": "art-35(1)",
+                    "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
+                    "attestation": {
+                        "attestedBy": "reviewer@example.invalid",
+                        "authority": "quality-lead@example.invalid",
+                        "attestedAt": AS_OF,
+                        "expiresAt": "2027-11-15T00:00:00Z",
+                    },
+                }
+            ]
+        )
+    )
+    store = tmp_path / "evidence-store"
+    recorded = run(
+        quoin,
+        "evidence",
+        "record-discharge",
+        "--repo",
+        str(store),
+        "--binding",
+        str(binding_path),
+        "--facts",
+        str(facts_path),
+        "--json",
+        env=env,
+    )
+    if recorded.returncode == 0:
+        report = json.loads(
+            _checked(
+                quoin,
+                "discharge",
+                "--rmm",
+                "--pack",
+                "spec_clauses_eu_law",
+                "--repo",
+                str(store),
+                "--as-of",
+                AS_OF,
+                "--context",
+                "gdpr_role=controller",
+                "--context",
+                "high_risk_processing=yes",
+                "--json",
+                env=env,
+            ).stdout
+        )
+        rows = [
+            row
+            for row in _report_clause_rows(report, "art-35(1)")
+            if "compliance" in row
+        ]
+        assert len(rows) == 1 and rows[0]["compliance"] == "undischarged", rows
+    else:
+        diagnostic = recorded.stderr + recorded.stdout
+        assert "approvalRef" in diagnostic, diagnostic
+
+
 @pytest.mark.trace(
     "FR-008-AC-2",
     "FR-008-AC-3",
