@@ -1,0 +1,42 @@
+{
+  "recordType": "synthetic-generated-records-of-processing",
+  "generatedFrom": "evidence://example.invalid/gdpr/data-flow-model.json",
+  "activities": [
+    {
+      "id": "example-invalid-processing-triage",
+      "connection": "example-invalid-connection-triage",
+      "identity": {
+        "value": "Example Medical Software Cooperative",
+        "sourceField": "fieldSources.identity"
+      },
+      "purposes": {
+        "value": "Route a device-support request for human review.",
+        "sourceField": "fieldSources.purposes"
+      },
+      "dataSubjectCategories": {
+        "value": ["device-user"],
+        "sourceField": "fieldSources.data-subject-categories"
+      },
+      "dataCategories": {
+        "value": ["service-request", "health-data"],
+        "sourceField": "fieldSources.data-categories"
+      },
+      "recipients": {
+        "value": ["synthetic-clinical-review-team"],
+        "sourceField": "fieldSources.recipients"
+      },
+      "transfers": {
+        "value": [],
+        "sourceField": "fieldSources.transfers"
+      },
+      "retention": {
+        "value": "90 days",
+        "sourceField": "fieldSources.retention"
+      },
+      "securityMeasures": {
+        "value": ["encryption-at-rest", "role-based-access"],
+        "sourceField": "fieldSources.security-measures"
+      }
+    }
+  ]
+}

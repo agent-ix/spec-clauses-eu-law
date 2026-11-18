@@ -5,6 +5,7 @@ type: risk
 object: risk
 likelihood: possible
 impact: minor
+decision: undecided
 ---
 # example-invalid-RISK-001: EvidenceReviewDelay
 

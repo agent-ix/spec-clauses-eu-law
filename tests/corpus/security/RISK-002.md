@@ -5,6 +5,7 @@ type: risk
 object: risk
 likelihood: unlikely
 impact: moderate
+decision: undecided
 ---
 # example-invalid-RISK-002: EvidenceIntegrityLoss
 
