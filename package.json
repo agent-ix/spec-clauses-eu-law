@@ -30,7 +30,7 @@
     "url": "git+https://github.com/agent-ix/spec-clauses-eu-law.git"
   },
   "devDependencies": {
-    "@agent-ix/quire-cli": "0.51.0",
-    "@agent-ix/quoin": "0.36.5"
+    "@agent-ix/quire-cli": "0.52.0",
+    "@agent-ix/quoin": "0.36.6"
   }
 }
