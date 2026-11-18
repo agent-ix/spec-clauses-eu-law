@@ -1088,7 +1088,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
         "article_30_records_applicability=applies",
         env=env,
     ).stdout
-    assert "art-30(1)(c)" in missing_discharge_markdown
+    assert r"II-6.1\(b\)" in missing_discharge_markdown
     assert "Not compliant - undischarged" in missing_discharge_markdown
 
     deployer_report = json.loads(
