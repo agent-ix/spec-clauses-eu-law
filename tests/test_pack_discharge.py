@@ -743,7 +743,15 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
     config_root = tmp_path / "config"
     config_root.mkdir()
     env = {**os.environ, "IX_CONFIG_ROOT": str(config_root)}
-    _checked(quoin, "module", "install", f"path:{PACKAGE_ROOT}", env=env)
+    _checked(
+        quoin,
+        "module",
+        "install",
+        f"path:{PACKAGE_ROOT}",
+        "--config-root",
+        str(config_root),
+        env=env,
+    )
 
     binding = json.loads(
         _checked(
@@ -797,6 +805,8 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
         "--facts",
         str(facts_path),
         "--json",
+        "--config-root",
+        str(config_root),
         env=env,
     )
     if recorded.returncode == 0:
@@ -816,6 +826,8 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
                 "--context",
                 "high_risk_processing=yes",
                 "--json",
+                "--config-root",
+                str(config_root),
                 env=env,
             ).stdout
         )
