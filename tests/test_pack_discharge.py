@@ -441,8 +441,7 @@ def _generate_records_of_processing(
         f"{quoin} dossier generate --doc records-of-processing exited "
         f"{result.returncode}: {result.stderr}{result.stdout}"
     )
-    envelope = json.loads(result.stdout)
-    report = json.loads(envelope["rendered"])
+    report = json.loads(result.stdout)
     assert len(report["documents"]) == 1
     document = report["documents"][0]
     assert document["id"] == "DOS-ROP"
@@ -947,6 +946,9 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     ai_act_row = _report_clause_rows(report, "art-10")
     assert len(ai_act_row) == 1 and ai_act_row[0]["compliance"] == "compliant"
     assert any("dataset-lineage.json" in ref for ref in ai_act_row[0]["evidenceRefs"])
+    gdpr_dpia_rows = _report_clause_rows(report, "art-35(1)")
+    assert len(gdpr_dpia_rows) == 1, gdpr_dpia_rows
+    assert GDPR_EVIDENCE_REFS["dpia"] in gdpr_dpia_rows[0]["evidenceRefs"]
 
     gdpr_processor_report = json.loads(
         _checked(
