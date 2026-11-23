@@ -1286,6 +1286,71 @@ def test_ai_act_crosswalks_match_the_annex_table_and_resolve_to_mdr():
     _assert_ai_act_crosswalk_contract(clause_sets)
 
 
+CUSTOMER_SUPPLIED_AI_OUTPUTS = {
+    "data-lineage",
+    "model-description",
+    "event-logging-design",
+    "human-oversight-design",
+    "post-market-monitoring-plan",
+    "conformity-declaration",
+}
+
+
+@pytest.mark.trace("FR-017-AC-5")
+def test_ai_act_outputs_without_a_producer_are_marked_customer_supplied():
+    """Mark AI Act outputs no tool produces as customer-supplied.
+
+    Assumptions: No quoin, quire or engineering-assurance command builds data
+    lineage, oversight design, logging design, a post-market plan, a model
+    description or a declaration of conformity for the customer's AI system.
+    Criteria: Both AI Act sets describe exactly those outputs as
+    customer-supplied with no toolchain producer, name no tool command in
+    them, and art-73 (incident reporting) expects only the customer procedure.
+    """
+    for clause_set in (_ai_act_set(), _ai_act_annex_set()):
+        catalog = clause_set["outputCatalog"]
+        for name, output in catalog.items():
+            description = output["description"]
+            if name in CUSTOMER_SUPPLIED_AI_OUTPUTS:
+                assert description.lower().startswith(
+                    "customer-supplied"
+                ), f"{name} must be described as customer-supplied"
+                assert description.endswith("no toolchain producer.")
+                assert "quoin" not in description and "quire" not in description
+            else:
+                assert (
+                    "customer-supplied" not in description.lower()
+                ), f"{name} has a producer and must not be marked customer-supplied"
+    outputs = _clause_outputs(_ai_act_set())
+    assert outputs["art-73"] == {"written-procedure"}
+    assert "anomaly-list" not in _ai_act_set()["outputCatalog"]
+
+
+@pytest.mark.trace("FR-021-AC-4")
+def test_ai_act_art_15_crosswalks_describe_the_mdr_clauses_they_target():
+    """Describe MDR I-17.2, I-17.4 and I-18.8 by what each covers.
+
+    Assumptions: I-17.2 is software lifecycle controls, I-17.4 the operating
+    prerequisites and I-18.8 protection against unauthorised access.
+    Criteria: Each art-15 rationale names its clause's real subject and none
+    calls I-17.4 verification evidence or I-18.8 a release control; the Annex
+    IV post-market point asserts no counterpart.
+    """
+    rationale = {
+        item["target"]["clause"]: item["rationale"].lower()
+        for item in _ai_act_set()["crosswalks"]
+        if item["sourceClause"] == "art-15"
+    }
+    assert "lifecycle" in rationale["I-17.2"]
+    assert "operating prerequisites" in rationale["I-17.4"]
+    assert "verification" not in rationale["I-17.4"]
+    assert "validation" not in rationale["I-17.4"]
+    assert "unauthorised access" in rationale["I-18.8"]
+    assert "release" not in rationale["I-18.8"]
+    annex_sources = {item["sourceClause"] for item in _ai_act_annex_set()["crosswalks"]}
+    assert "IV-9" not in annex_sources
+
+
 @pytest.mark.trace("FR-021-AC-3")
 @pytest.mark.parametrize(
     ("mutation", "expected_error"),
