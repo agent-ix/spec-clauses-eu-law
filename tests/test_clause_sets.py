@@ -1362,6 +1362,41 @@ def test_ai_act_art_15_crosswalks_describe_the_mdr_clauses_they_target():
     assert "release" not in rationale["I-18.8"]
 
 
+def _assert_article_crosswalks_target_mdr_annexes(ai_set: dict, mdr_set: dict) -> None:
+    """Require every art-* crosswalk to resolve to an MDR Annex I or II clause."""
+    mdr_ids = {clause["id"] for clause in mdr_set["clauses"]}
+    for item in ai_set["crosswalks"]:
+        source = item["sourceClause"]
+        if not source.startswith("art-"):
+            continue
+        target = item["target"]["clause"]
+        assert target in mdr_ids, f"{source} targets unresolved MDR clause {target}"
+        assert re.match(
+            r"II?-", target
+        ), f"{source} targets {target}, which is neither MDR Annex I nor Annex II"
+
+
+@pytest.mark.trace("FR-021-AC-5")
+def test_ai_act_article_crosswalks_target_mdr_annex_i_or_ii():
+    """Keep article crosswalk targets inside MDR Annex I and Annex II.
+
+    Assumptions: MDR clause ids begin with I- for Annex I and II- for Annex II.
+    Criteria: Every art-* crosswalk target resolves in the MDR set within one
+    of those annexes; retargeting one to another annex fails with its source.
+    """
+    ai_set = _ai_act_set()
+    mdr_set = _mdr_set()
+    _assert_article_crosswalks_target_mdr_annexes(ai_set, mdr_set)
+    broken = json.loads(json.dumps(ai_set))
+    broken["crosswalks"][0]["target"]["clause"] = "III-1"
+    with pytest.raises(AssertionError, match=r"art-15 targets unresolved.*III-1"):
+        _assert_article_crosswalks_target_mdr_annexes(broken, mdr_set)
+    mdr_with_other_annex = json.loads(json.dumps(mdr_set))
+    mdr_with_other_annex["clauses"].append({"id": "III-1"})
+    with pytest.raises(AssertionError, match=r"art-15 targets III-1.*neither"):
+        _assert_article_crosswalks_target_mdr_annexes(broken, mdr_with_other_annex)
+
+
 @pytest.mark.trace("FR-021-AC-3")
 @pytest.mark.parametrize(
     ("mutation", "expected_error"),
