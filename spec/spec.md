@@ -252,7 +252,7 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | software-requirements | record | Requirements authored with the `spec-artifacts-iso` StR, FR, and NFR archetypes. |
 | software-architecture | record | `spec-objects-architecture` `part`, `port`, `connection`, and `allocation` artifacts; ADR artifacts from `spec-artifacts-process`. |
 | verification-records | record | `quire matrix` / `quoin matrix` results and `quoin evidence record`. |
-| soup-list | record | Software of unknown provenance (SOUP) report. |
+| soup-list | record | Software of unknown provenance (SOUP) report produced by `quoin soup report`. |
 | security-risk-records | record | `spec-objects-security` threat, risk, and control records. |
 | anomaly-list | record | Unresolved anomalies reported by `quoin anomaly report`. |
 | release-record | record | Release evidence snapshot produced by `quoin release snapshot`. |

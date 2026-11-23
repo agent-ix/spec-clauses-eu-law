@@ -47,7 +47,7 @@
     },
     "soup-list": {
       "kind": "record",
-      "description": "Software of unknown provenance (SOUP) report."
+      "description": "Software of unknown provenance (SOUP) report produced by `quoin soup report`."
     },
     "verification-records": {
       "kind": "record",

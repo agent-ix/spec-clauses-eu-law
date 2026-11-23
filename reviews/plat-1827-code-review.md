@@ -43,6 +43,12 @@ The two crosswalk-test failures seen locally are not caused by this PR (see Cove
 | FND-005 | high | The new missing-set message in `assert_crosswalk_targets_resolve` drops the target clause id. FR-014-AC-2 requires both the missing set key and the clause id, so `test_gdpr_article32_missing_nist_set_names_source_and_target` now fails locally and in CI run 45234136495. | tests/conftest.py:200-205 |
 | FND-006 | high | Every EU set now uses the US origin/main output descriptions, but CI still checks out spec-clauses-us-health at ca78ac0. Its `verification-records` text differs, so `test_all_declared_sets_share_one_output_catalog` fails in CI run 45234136495. It passes against US origin/main 926c22d. | .github/workflows/ci.yml:24-28, spec_clauses_eu_law/clauses/eu-ai-act-2024-1689-annex-iv-2026-07-27.json:208-210 |
 
+## New findings (disposition pass 2)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-007 | high | CI now checks out spec-clauses-us-health main, where #35 (merged after round 1) changed the `soup-list` description to name `quoin soup report`. The EU catalog and the MDCG set still carry the old text, so `test_all_declared_sets_share_one_output_catalog` fails in CI run 45241952623. No other shared name drifts. | spec/spec.md:255, spec_clauses_eu_law/clauses/eu-mdcg-mdcg-2019-16-rev1.json:48-50 |
+
 ## Dispositions
 
 | FND | outcome | reason |
@@ -51,3 +57,5 @@ The two crosswalk-test failures seen locally are not caused by this PR (see Cove
 | FND-002 | fixed | The 5.2→I-3 rationale now states mapping scope only, and the test docstring no longer makes the toolchain claim. |
 | FND-003 | fixed | The 3.8→I-18.8 row and 3.8 expectedOutputs include security-risk-records, and the FR-005-AC-4 test asserts it. |
 | FND-004 | fixed | The 2.1→I-1 rationale now refers to the security goals. |
+| FND-005 | fixed | The missing-set message now ends with `{target_key}#{target['clause']}`. `test_gdpr_article32_missing_nist_set_names_source_and_target` passes locally and is not among the CI failures at 566079f. |
+| FND-006 | fixed | The CI us-health checkout now uses `ref: main` and the pinned commit is gone. The parity test no longer fails on `verification-records`; its remaining CI failure is the new FND-007. |
