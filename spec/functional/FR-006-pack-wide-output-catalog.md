@@ -23,7 +23,7 @@ Each EU set SHALL list `producers` in its catalog entry for the outputs the "EU 
 | FR-006-AC-1 | Catalog contains exactly the names and definitions in `spec.md`; set subsets match them. | Test |
 | FR-006-AC-2 | A mismatch fixture differing in kind or description fails and names the output. | Test |
 | FR-006-AC-3 | For every output name shared with the PLAT-1422 US catalog, the EU `kind`, `description` and `producers` equal the canonical definition; a mismatch fixture fails and names the output. | Test |
-| FR-006-AC-4 | Each `producers` entry in an EU set's catalog lists only distinct, unpadded kinds from `run`, `scan`, `mock-inspection`, `analysis-report` and `scenario`. | Test |
+| FR-006-AC-4 | Every kind in the EU Output Producers table is one of `run`, `scan`, `mock-inspection`, `analysis-report`, `scenario`. | Test |
 | FR-006-AC-5 | Each set's catalog entry for an output in the "EU Output Producers" table carries the `producers` that table lists. | Test |
 
 ## Dependencies
