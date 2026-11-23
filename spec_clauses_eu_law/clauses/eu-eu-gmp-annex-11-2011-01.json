@@ -177,6 +177,10 @@
       "kind": "procedure",
       "description": "Customer-owned assessment of a supplier's competence, quality system and audit information; no quoin, quire or engineering-assurance command produces it."
     },
+    "system-access-control": {
+      "kind": "record",
+      "description": "`spec-objects-security` `security.role` and `security.permission` records the customer authors for the computerised system, or customer-supplied evidence of who may access it; no quoin, quire or engineering-assurance command produces it."
+    },
     "system-inventory": {
       "kind": "procedure",
       "description": "Customer-owned inventory of GMP-relevant computerised systems and their functionality; no quoin, quire or engineering-assurance command produces it."
@@ -798,7 +802,7 @@
       "id": "12.1",
       "force": "recommended",
       "title": "Access restriction",
-      "text": "Physical or logical controls limit access to authorised people. Tool limit: no command reads repository permissions; the customer supplies them. Tool limit: the customer owns and supplies this record.",
+      "text": "Physical or logical controls limit access to authorised people. Tool limit: the customer owns and supplies this record.",
       "subjects": [
         "security"
       ],
@@ -806,7 +810,7 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "access-control",
+        "system-access-control",
         "written-procedure"
       ],
       "applicability": {
@@ -819,7 +823,7 @@
       "id": "12.2",
       "force": "recommended",
       "title": "Security control extent",
-      "text": "How strong the security controls are depends on how critical the system is. Tool limit: accepting a risk is a person's decision. Tool limit: no command reads repository permissions; the customer supplies them.",
+      "text": "How strong the security controls are depends on how critical the system is. Tool limit: accepting a risk is a person's decision.",
       "subjects": [
         "security"
       ],
@@ -830,7 +834,7 @@
       "styles": {},
       "expectedOutputs": [
         "security-risk-records",
-        "access-control"
+        "system-access-control"
       ],
       "applicability": {
         "op": "eq",

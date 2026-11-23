@@ -47,6 +47,7 @@ GMP = "gmp_regulated_use=yes"
 CUSTOMER_SUPPLIED_KINDS = {
     "system-validation": "record",
     "access-control": "record",
+    "system-access-control": "record",
     "written-procedure": "procedure",
     "training-record": "procedure",
     "supplier-agreement": "procedure",
@@ -313,6 +314,18 @@ def test_customer_supplied_outputs_name_no_producer():
         ), name
 
 
+@pytest.mark.trace("FR-025-AC-7")
+def test_system_access_clauses_name_system_not_repository_access():
+    by_id = {c["id"]: c["expectedOutputs"] for c in _annex()["clauses"]}
+    for cid in ("12.1", "12.2"):
+        assert "system-access-control" in by_id[cid], cid
+        assert "access-control" not in by_id[cid], cid
+    for cid in ("7.1", "12.3"):
+        assert "access-control" in by_id[cid], cid
+    description = _annex()["outputCatalog"]["system-access-control"]["description"]
+    assert "repository" not in description
+
+
 @pytest.mark.trace("FR-025-AC-4")
 def test_every_named_producer_command_exists():
     rows = binding_rows()
@@ -442,6 +455,7 @@ EVIDENCE_FOR_OUTPUT = {
     "verification-records": "tests/TM-001.md",
     "system-validation": "tests/TM-001.md",
     "access-control": "security/CTRL-001.md",
+    "system-access-control": "security/system-access-control.json",
     "soup-list": "security/SOUP-001.md",
     "anomaly-list": "safety/HAZ-001.md",
 }

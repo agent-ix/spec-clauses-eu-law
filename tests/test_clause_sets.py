@@ -1689,13 +1689,13 @@ def test_gdpr_clause_ids_fields_and_catalog_match_the_spec():
 
 
 @pytest.mark.trace("FR-010-AC-3")
-def test_gdpr_processing_outputs_are_product_side_and_customer_supplied():
-    """Check Article 32(4) and privacy-by-default name honest outputs.
+def test_gdpr_art32_4_names_processing_access_not_repository_access():
+    """Check Article 32(4) is not mapped to repository permissions.
 
     Assumptions: Repository permissions describe the development repository,
     not the controller's processing.
-    Criteria: art-32(4) names the processing-system output, no GDPR clause binds
-    repository `access-control`, and the two outputs without a producer say so.
+    Criteria: art-32(4) names `processing-access-control`; the GDPR catalog has
+    no `access-control` and no GDPR clause names it.
     """
     clause_set = _gdpr_set()
     by_id = {clause["id"]: clause for clause in clause_set["clauses"]}
@@ -1704,13 +1704,59 @@ def test_gdpr_processing_outputs_are_product_side_and_customer_supplied():
         "access-control" in clause["expectedOutputs"] for clause in by_id.values()
     )
     assert "access-control" not in clause_set["outputCatalog"]
-    catalog = clause_set["outputCatalog"]
-    assert "repository" not in catalog["processing-access-control"]["description"]
-    for name in ("processing-access-control", "privacy-by-default-settings"):
-        assert (
-            "no toolchain producer" in catalog[name]["description"]
-            or "defines no producer" in catalog[name]["description"]
-        ), name
+
+
+@pytest.mark.trace("FR-010-AC-5")
+def test_gdpr_outputs_without_a_producer_say_so():
+    """Check customer-supplied GDPR outputs are not described as produced.
+
+    Assumptions: No quoin, quire or engineering-assurance command produces them.
+    Criteria: Each description says it is customer-supplied or has no producer.
+    """
+    catalog = _gdpr_set()["outputCatalog"]
+    defaults = catalog["privacy-by-default-settings"]["description"]
+    assert "Customer-supplied" in defaults and "no toolchain producer" in defaults
+    access = catalog["processing-access-control"]["description"]
+    assert "customer-supplied" in access and "defines no producer" in access
+
+
+@pytest.mark.trace("FR-010-AC-6")
+def test_gdpr_art32_1_c_names_the_backup_restore_record():
+    """Check Article 32(1)(c) names customer evidence of restoration.
+
+    Assumptions: Records and test results do not show that restoration works.
+    Criteria: art-32(1)(c) keeps its records and adds the catalog's
+    `backup-restore-record`.
+    """
+    clause_set = _gdpr_set()
+    clause = next(c for c in clause_set["clauses"] if c["id"] == "art-32(1)(c)")
+    assert clause["expectedOutputs"] == [
+        "security-risk-records",
+        "verification-records",
+        "backup-restore-record",
+    ]
+    assert (
+        clause_set["outputCatalog"]["backup-restore-record"]
+        == _spec_output_catalog()["backup-restore-record"]
+    )
+
+
+@pytest.mark.trace("FR-013-AC-1")
+def test_gdpr_art30_activity_clauses_name_records_of_processing():
+    """Check every Article 30(1)(a)-(g) and 30(2)(a)-(d) clause names the record.
+
+    Assumptions: The record is produced from the declared data-flow model.
+    Criteria: Each such clause lists `records-of-processing`.
+    """
+    expected = {f"art-30(1)({c})" for c in "abcdefg"} | {
+        f"art-30(2)({c})" for c in "abcd"
+    }
+    named = {
+        clause["id"]
+        for clause in _gdpr_set()["clauses"]
+        if "records-of-processing" in clause["expectedOutputs"]
+    }
+    assert expected <= named
 
 
 @pytest.mark.trace("FR-010-AC-4")

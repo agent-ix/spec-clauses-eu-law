@@ -37,6 +37,10 @@
     }
   },
   "outputCatalog": {
+    "backup-restore-record": {
+      "kind": "procedure",
+      "description": "Customer-owned evidence that backups are taken and restoration is checked; no quoin, quire or engineering-assurance command produces it."
+    },
     "data-flow-model": {
       "kind": "record",
       "description": "Architecture connections with their declared data flows and classifications."
@@ -567,7 +571,8 @@
       "styles": {},
       "expectedOutputs": [
         "security-risk-records",
-        "verification-records"
+        "verification-records",
+        "backup-restore-record"
       ]
     },
     {
