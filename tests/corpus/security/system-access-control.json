@@ -1,0 +1,11 @@
+{
+  "recordType": "synthetic-customer-supplied-system-access-control",
+  "suppliedBy": "customer",
+  "system": {
+    "roles": ["batch-record-reviewer"],
+    "permissions": [
+      {"role": "batch-record-reviewer", "verb": "read", "resource": "batch-record"}
+    ]
+  },
+  "owner": "person://example.invalid/people/system-owner"
+}

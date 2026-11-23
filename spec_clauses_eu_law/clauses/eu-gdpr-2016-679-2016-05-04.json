@@ -37,9 +37,9 @@
     }
   },
   "outputCatalog": {
-    "access-control": {
-      "kind": "record",
-      "description": "Repository permission and branch-rule settings."
+    "backup-restore-record": {
+      "kind": "procedure",
+      "description": "Customer-owned evidence that backups are taken and restoration is checked; no quoin, quire or engineering-assurance command produces it."
     },
     "data-flow-model": {
       "kind": "record",
@@ -51,7 +51,11 @@
     },
     "privacy-by-default-settings": {
       "kind": "record",
-      "description": "Declared default processing settings and data-minimisation choices."
+      "description": "Customer-supplied record of declared default processing settings and data-minimisation choices; no toolchain producer."
+    },
+    "processing-access-control": {
+      "kind": "record",
+      "description": "`spec-objects-security` `security.role` and `security.permission` records the customer authors for the personal-data processing system, or customer-supplied evidence of who may process personal data and on whose instructions; the clause set defines no producer."
     },
     "records-of-processing": {
       "kind": "record",
@@ -510,7 +514,8 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "records-of-processing"
+        "records-of-processing",
+        "written-procedure"
       ],
       "applicability": {
         "op": "eq",
@@ -566,7 +571,8 @@
       "styles": {},
       "expectedOutputs": [
         "security-risk-records",
-        "verification-records"
+        "verification-records",
+        "backup-restore-record"
       ]
     },
     {
@@ -615,7 +621,7 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "access-control",
+        "processing-access-control",
         "written-procedure",
         "training-record"
       ]

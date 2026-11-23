@@ -54,8 +54,11 @@ GDPR_EVIDENCE_REFS = {
     ),
     "security-risk-records": "evidence://example.invalid/security/RISK-002.md",
     "software-architecture": "evidence://example.invalid/architecture/evidence_store.md",
-    "access-control": "evidence://example.invalid/security/CTRL-001.md",
+    "processing-access-control": (
+        "evidence://example.invalid/gdpr/processing-access-control.json"
+    ),
     "written-procedure": "evidence://example.invalid/requirements/FR-001.md",
+    "backup-restore-record": "evidence://example.invalid/gdpr/backup-restore-record.json",
     "training-record": "evidence://example.invalid/requirements/NFR-001.md",
     "verification-records": "evidence://example.invalid/tests/TM-001.md",
 }
@@ -651,56 +654,31 @@ def test_ai_act_human_oversight_requires_named_person_approval():
         _assert_named_person_approvals(missing_approval)
 
 
-@pytest.mark.trace("FR-012-AC-1", "FR-012-AC-2")
-@pytest.mark.parametrize(
-    "fact",
-    [
-        {
-            "kind": "direct",
-            "clauseId": "art-35(1)",
-            "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
+PRIVACY_OFFICER = "person://example.invalid/people/privacy-officer"
+
+
+def _dpia_direct_fact(approval_ref: str | None) -> dict:
+    """Return an Art 35(1) direct fact citing the DPIA with the given approval."""
+    fact = {
+        "kind": "direct",
+        "clauseId": "art-35(1)",
+        "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
+        "attestation": {
+            "attestedBy": (
+                PRIVACY_OFFICER if approval_ref else "reviewer@example.invalid"
+            ),
+            "authority": "quality-lead@example.invalid",
+            "attestedAt": AS_OF,
+            "expiresAt": "2027-11-15T00:00:00Z",
         },
-        {
-            "kind": "disposition",
-            "clauseId": "art-35(1)",
-            "decision": "accepted_risk",
-        },
-    ],
-)
-def test_gdpr_dpia_discharge_requires_named_person_approval(fact: dict):
-    """Reject Art 35 facts without an approval reference naming a person."""
-    with pytest.raises(
-        AssertionError, match=r"art-35\(1\).*approvalRef must name a person"
-    ):
-        _assert_named_person_approvals(
-            [fact], GDPR_APPROVAL_CLAUSES, require_accepted_risk=False
-        )
+    }
+    if approval_ref is not None:
+        fact["approvalRef"] = approval_ref
+    return fact
 
 
-def test_gdpr_dpia_direct_fact_passes_with_named_approval():
-    """Accept a direct Art 35 fact only when its DPIA approver is named."""
-    _assert_named_person_approvals(
-        [
-            {
-                "kind": "direct",
-                "clauseId": "art-35(1)",
-                "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
-                "approvalRef": "person://example.invalid/people/privacy-officer",
-                "attestation": {
-                    "attestedBy": "person://example.invalid/people/privacy-officer"
-                },
-            }
-        ],
-        GDPR_APPROVAL_CLAUSES,
-        require_accepted_risk=False,
-    )
-
-
-@pytest.mark.trace("FR-012-AC-1")
-def test_gdpr_dpia_direct_fact_without_approval_stays_open(
-    tmp_path: pathlib.Path,
-):
-    """Keep an Art 35 direct fact open when its approval reference is absent."""
+def _art35_row_after_recording(tmp_path: pathlib.Path, fact: dict) -> dict:
+    """Record one Art 35(1) fact through quoin and return its RMM row."""
     quire, quoin, _ = _preflight()
     config_root = tmp_path / "config"
     config_root.mkdir()
@@ -714,7 +692,8 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
         str(config_root),
         env=env,
     )
-
+    context = ["--context", "gdpr_role=controller", "--context"]
+    context.append("high_risk_processing=yes")
     binding = json.loads(
         _checked(
             quire,
@@ -728,35 +707,16 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
             "gdpr-2016-679",
             "--version",
             "2016-05-04",
-            "--context",
-            "gdpr_role=controller",
-            "--context",
-            "high_risk_processing=yes",
+            *context,
             "--json",
         ).stdout
     )
     binding_path = tmp_path / "binding.json"
     binding_path.write_text(json.dumps(binding))
     facts_path = tmp_path / "facts.json"
-    facts_path.write_text(
-        json.dumps(
-            [
-                {
-                    "kind": "direct",
-                    "clauseId": "art-35(1)",
-                    "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
-                    "attestation": {
-                        "attestedBy": "reviewer@example.invalid",
-                        "authority": "quality-lead@example.invalid",
-                        "attestedAt": AS_OF,
-                        "expiresAt": "2027-11-15T00:00:00Z",
-                    },
-                }
-            ]
-        )
-    )
+    facts_path.write_text(json.dumps([fact]))
     store = tmp_path / "evidence-store"
-    recorded = run(
+    _checked(
         quoin,
         "evidence",
         "record-discharge",
@@ -771,46 +731,50 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
         str(config_root),
         env=env,
     )
-    if recorded.returncode == 0:
-        report = json.loads(
-            _checked(
-                quoin,
-                "discharge",
-                "--rmm",
-                "--pack",
-                "spec_clauses_eu_law",
-                "--repo",
-                str(store),
-                "--as-of",
-                AS_OF,
-                "--context",
-                "gdpr_role=controller",
-                "--context",
-                "high_risk_processing=yes",
-                "--json",
-                "--config-root",
-                str(config_root),
-                env=env,
-            ).stdout
-        )
-        rows = [
-            row
-            for row in _report_clause_rows(report, "art-35(1)")
-            if "compliance" in row
-        ]
-        assert len(rows) == 1 and rows[0]["compliance"] == "undischarged", rows
-    else:
-        diagnostic = recorded.stderr + recorded.stdout
-        assert "approvalRef" in diagnostic, diagnostic
+    report = json.loads(
+        _checked(
+            quoin,
+            "discharge",
+            "--rmm",
+            "--pack",
+            "spec_clauses_eu_law",
+            "--repo",
+            str(store),
+            "--as-of",
+            AS_OF,
+            *context,
+            "--json",
+            "--config-root",
+            str(config_root),
+            env=env,
+        ).stdout
+    )
+    rows = [
+        row for row in _report_clause_rows(report, "art-35(1)") if "compliance" in row
+    ]
+    assert len(rows) == 1, rows
+    return rows[0]
 
 
-@pytest.mark.trace(
-    "FR-008-AC-2",
-    "FR-008-AC-3",
-    "FR-012-AC-1",
-    "FR-012-AC-2",
-    "FR-013-AC-2",
-)
+@pytest.mark.trace("FR-012-AC-1")
+@pytest.mark.parametrize("approval_ref", [None, "", "   "])
+def test_gdpr_dpia_direct_fact_without_approval_ref_stays_undischarged(
+    tmp_path: pathlib.Path, approval_ref: str | None
+):
+    """Quoin leaves Art 35(1) undischarged when the approval reference is absent."""
+    row = _art35_row_after_recording(tmp_path, _dpia_direct_fact(approval_ref))
+    assert row["compliance"] == "undischarged", row
+    assert "required approval reference is missing" in row["reason"], row
+
+
+@pytest.mark.trace("FR-012-AC-1")
+def test_gdpr_dpia_direct_fact_with_approval_ref_discharges(tmp_path: pathlib.Path):
+    """Quoin discharges Art 35(1) once the fact carries an approval reference."""
+    row = _art35_row_after_recording(tmp_path, _dpia_direct_fact(PRIVACY_OFFICER))
+    assert row["compliance"] == "compliant", row
+
+
+@pytest.mark.trace("FR-008-AC-2", "FR-008-AC-3", "FR-013-AC-2")
 def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     """Record EU law facts and render the pack RMM across all authored sets.
 

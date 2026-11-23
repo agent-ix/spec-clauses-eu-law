@@ -1,5 +1,6 @@
 {
-  "recordType": "synthetic-privacy-by-default-settings",
+  "recordType": "synthetic-customer-supplied-privacy-by-default-settings",
+  "suppliedBy": "customer",
   "defaults": {
     "collection": "only fields required for device-support review",
     "access": "assigned reviewers only",

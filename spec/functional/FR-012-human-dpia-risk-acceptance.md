@@ -14,16 +14,18 @@ relationships:
 
 ## Description
 
-The module SHALL require a named person's approval reference when evidence
-claims to discharge an Article 35 clause by presenting a DPIA whose residual
-risk was accepted. No tool SHALL score the DPIA or accept its residual risk.
+The module SHALL declare the `privacy-officer` approval role on every Article
+35 clause. Quoin verifies the approval when a direct fact claims to discharge
+such a clause: the fact needs a non-blank `approvalRef` (quoin FR-208) that
+engineering-assurance verifies as an approval by the named role (quoin FR-211).
+The pack carries the role and does not check approvals itself. No tool SHALL score the DPIA or accept
+its residual risk.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-012-AC-1 | An Article 35 direct fact citing a DPIA is accepted only when it includes an approval reference identifying the named person who accepted residual risk. | Test |
-| FR-012-AC-2 | An Article 35 `accepted_risk` disposition is accepted only when it includes an approval reference identifying the named person; without it the clause remains open. | Test |
+| FR-012-AC-1 | Every Article 35 clause declares `approvalRoles` equal to `["privacy-officer"]`. An Article 35 direct fact citing a DPIA with a missing or blank `approvalRef` leaves the clause undischarged with the reason that the required approval reference is missing, and the same fact with an `approvalRef` discharges. Verification that the approval names the person who accepted residual risk belongs to quoin FR-211. | Test |
 | FR-012-AC-3 | The set and module contract contain no risk score, threshold, or automated risk-acceptability field for DPIA decisions. | Inspection |
 
 ## Dependencies

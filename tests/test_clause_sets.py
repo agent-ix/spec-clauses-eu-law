@@ -1688,6 +1688,100 @@ def test_gdpr_clause_ids_fields_and_catalog_match_the_spec():
     )
 
 
+@pytest.mark.trace("FR-010-AC-3")
+def test_gdpr_art32_4_names_processing_access_not_repository_access():
+    """Check Article 32(4) is not mapped to repository permissions.
+
+    Assumptions: Repository permissions describe the development repository,
+    not the controller's processing.
+    Criteria: art-32(4) names `processing-access-control`; the GDPR catalog has
+    no `access-control` and no GDPR clause names it.
+    """
+    clause_set = _gdpr_set()
+    by_id = {clause["id"]: clause for clause in clause_set["clauses"]}
+    assert "processing-access-control" in by_id["art-32(4)"]["expectedOutputs"]
+    assert not any(
+        "access-control" in clause["expectedOutputs"] for clause in by_id.values()
+    )
+    assert "access-control" not in clause_set["outputCatalog"]
+
+
+@pytest.mark.trace("FR-010-AC-5")
+def test_gdpr_outputs_without_a_producer_say_so():
+    """Check customer-supplied GDPR outputs are not described as produced.
+
+    Assumptions: No quoin, quire or engineering-assurance command produces them.
+    Criteria: Each description says it is customer-supplied or has no producer.
+    """
+    catalog = _gdpr_set()["outputCatalog"]
+    defaults = catalog["privacy-by-default-settings"]["description"]
+    assert "Customer-supplied" in defaults and "no toolchain producer" in defaults
+    access = catalog["processing-access-control"]["description"]
+    assert "customer-supplied" in access and "defines no producer" in access
+
+
+@pytest.mark.trace("FR-010-AC-6")
+def test_gdpr_art32_1_c_names_the_backup_restore_record():
+    """Check Article 32(1)(c) names customer evidence of restoration.
+
+    Assumptions: Records and test results do not show that restoration works.
+    Criteria: art-32(1)(c) keeps its records and adds the catalog's
+    `backup-restore-record`.
+    """
+    clause_set = _gdpr_set()
+    clause = next(c for c in clause_set["clauses"] if c["id"] == "art-32(1)(c)")
+    assert clause["expectedOutputs"] == [
+        "security-risk-records",
+        "verification-records",
+        "backup-restore-record",
+    ]
+    assert (
+        clause_set["outputCatalog"]["backup-restore-record"]
+        == _spec_output_catalog()["backup-restore-record"]
+    )
+
+
+@pytest.mark.trace("FR-013-AC-1")
+def test_gdpr_art30_activity_clauses_name_records_of_processing():
+    """Check every Article 30(1)(a)-(g) and 30(2)(a)-(d) clause names the record.
+
+    Assumptions: The record is produced from the declared data-flow model.
+    Criteria: Each such clause lists `records-of-processing`.
+    """
+    expected = {f"art-30(1)({c})" for c in "abcdefg"} | {
+        f"art-30(2)({c})" for c in "abcd"
+    }
+    named = {
+        clause["id"]
+        for clause in _gdpr_set()["clauses"]
+        if "records-of-processing" in clause["expectedOutputs"]
+    }
+    assert expected <= named
+
+
+@pytest.mark.trace("FR-010-AC-4")
+def test_gdpr_art30_supervisory_access_names_a_person_procedure():
+    """Check Article 30(4) is not discharged by the generated record alone.
+
+    Assumptions: Making a record available on request is a person's action.
+    Criteria: art-30(4) names `written-procedure` beside the record.
+    """
+    clause = next(c for c in _gdpr_set()["clauses"] if c["id"] == "art-30(4)")
+    assert clause["expectedOutputs"] == ["records-of-processing", "written-procedure"]
+
+
+@pytest.mark.trace("FR-012-AC-1")
+def test_gdpr_article35_clauses_declare_the_privacy_officer_role():
+    """Check approval roles sit on exactly the Article 35 clauses.
+
+    Assumptions: Quoin verifies approvals for clauses that declare a role.
+    Criteria: Every art-35 clause declares `privacy-officer`; no other clause does.
+    """
+    for clause in _gdpr_set()["clauses"]:
+        expected = ["privacy-officer"] if clause["id"].startswith("art-35") else []
+        assert clause["approvalRoles"] == expected, clause["id"]
+
+
 @pytest.mark.trace(
     "FR-011-AC-1", "FR-011-AC-2", "FR-011-AC-3", "FR-011-AC-4", "FR-011-AC-5"
 )
