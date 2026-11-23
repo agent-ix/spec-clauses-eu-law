@@ -23,3 +23,21 @@ Ticket: PLAT-1831. This review covers the new FR-006 paragraph, FR-006-AC-4 to A
 | FND-002 | low | FR-006-AC-4 is compound: it covers kind validity and conformance to the table. The statement also repeats the table ("today that is `verification-records`") in time-bound wording. Split the AC, and drop the "today" clause in favour of the table reference. | spec/functional/FR-006-pack-wide-output-catalog.md:17,26 |
 | FND-003 | low | FR-006-AC-5 is subsumed once FR-006-AC-3 compares the whole catalog definition, which is what its test already does. FR-006-AC-6 is quire-rs FR-073's contract, already covered by the existing publish-check criteria. Widen AC-3 to the whole definition (kind, description, producers) and delete AC-5 and AC-6. | spec/functional/FR-006-pack-wide-output-catalog.md:25,27-28 |
 | FND-004 | low | The new "### EU Output Producers" heading sits between the catalog table and the existing `tests/corpus/` paragraph, so that paragraph now falls under the producers subsection. Move the paragraph above the new heading. | spec/spec.md:458-468 |
+
+## Dispositions
+
+Round 1, checked against `git diff 21140948..26539266` (head 2653926). `quire validate --scope .` passes on FR-006, `spec/spec.md` and the three `reviews/plat-1831-producers-eu-*.md` files. `quoin matrix` shows FR-006-AC-3 to AC-5 as `tagged`, and no test still carries an FR-006-AC-6 tag. The repo has no spec/tests.md.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The SHALL NOT sentence and the "Every other output omits... Omission means" paragraph are deleted. The table is now the contract. |
+| FND-002 | fixed | The statement now refers only to the table, with no "today" clause. AC-4 (kind vocabulary) and AC-5 (conformance to the table, tagged on the MDR and MDCG subset tests) are separate. |
+| FND-003 | fixed | AC-3 now covers kind, description and `producers`. The old AC-5 and AC-6 are removed, and the drift fixture is retagged to AC-3. |
+| FND-004 | fixed | The `tests/corpus/` paragraph now sits above the "### EU Output Producers" heading. |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-005 | low | The EU Output Producers paragraph still allows "an experiment or operational record's `subject.kind`", but FR-006-AC-4 and its test allow only the five family kinds. Fix: state family kinds only, as US FR-005 now does. | spec/spec.md:462 |
+| FND-006 | low | FR-006-AC-4 says each set's `producers` lists "distinct, unpadded" kinds, but its test checks only that spec-table kinds belong to the family set. Fix: reword AC-4 to cover the table's kinds being family kinds. | spec/functional/FR-006-pack-wide-output-catalog.md:26 |
