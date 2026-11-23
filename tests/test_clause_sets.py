@@ -631,13 +631,15 @@ def _synthetic_set(
 
 
 def _installed_clause_sets(module_name: str) -> list[dict]:
-    """Load an optional installed module when checking shared catalog parity."""
+    """Load an installed module; fail when it is absent."""
     result = run(engine_tool("quoin"), "module", "list")
     assert result.returncode == 0, result.stderr + result.stdout
     plugins = json.loads(result.stdout)["plugins"]
     module = next((item for item in plugins if item["name"] == module_name), None)
-    if module is None:
-        return []
+    assert module is not None, (
+        f"module {module_name} is not installed; install it with "
+        f"`quoin module install path:<checkout>/{module_name}`"
+    )
     manifest_path = pathlib.Path(module["targetPath"]) / "manifest.yaml"
     return load_clause_sets(manifest_path)
 
@@ -1095,6 +1097,10 @@ def test_mdr_security_prerequisite_clauses_map_to_security_and_it_outputs():
     outputs = _clause_outputs(clause_set)
     assert outputs["I-17.4"] == {"it-requirements-statement", "security-risk-records"}
     assert outputs["I-18.8"] == {"security-risk-records", "verification-records"}
+    assert outputs["I-14.2(d)"] == {
+        "it-requirements-statement",
+        "security-risk-records",
+    }
     assert "verification-records" in outputs["I-17.2"]
     assert "risk-management-records" in outputs["II-5"]
     description = clause_set["outputCatalog"]["it-requirements-statement"][
@@ -1110,8 +1116,8 @@ def test_mdr_security_prerequisite_clauses_map_to_security_and_it_outputs():
 def test_mdcg_security_sections_map_to_security_and_customer_outputs():
     """Map MDCG security goals and post-market sections to honest outputs.
 
-    Assumptions: Nothing in the toolchain gathers incident or vulnerability
-    intelligence, so surveillance and vigilance procedures are customer-supplied.
+    Assumptions: Incident investigation and reporting is the manufacturer's own
+    procedure, so surveillance and vigilance procedures are customer-supplied.
     Criteria: 2.1 expects security records, 5.2 is all-procedure, 5.1 carries the
     customer procedure, and only 3.8 expects release or anomaly reports.
     """
@@ -1129,6 +1135,50 @@ def test_mdcg_security_sections_map_to_security_and_customer_outputs():
     assert ("3.7", "I-17.2") in targets
     assert ("3.6", "I-17.4") in targets
     assert ("3.7", "I-17.4") not in targets
+    assert "security-risk-records" in outputs["3.8"]
+    assert "security-risk-records" in outputs["2.1"]
+
+
+def _spec_customer_owned_inventory() -> set[tuple[str, str]]:
+    """Read the customer-owned inventory from spec.md."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("## Customer-Owned Obligations", 1)[1].split(
+        "\n## ", 1
+    )[0]
+    inventory = set()
+    for line in section.splitlines():
+        if (
+            not line.startswith("|")
+            or line.startswith("| Clause set")
+            or line.startswith("|---")
+        ):
+            continue
+        set_id, clause_id, _outputs = [
+            cell.strip() for cell in line.strip("|").split("|")
+        ]
+        inventory.add((set_id, clause_id))
+    return inventory
+
+
+@pytest.mark.trace("FR-007-AC-1")
+def test_all_procedure_clauses_match_the_customer_owned_inventory():
+    """Compare every all-procedure clause with the spec inventory.
+
+    Assumptions: A clause is customer-owned when every expected output has kind
+    procedure.
+    Criteria: The clauses found in the shipped sets equal the inventory exactly.
+    """
+    found = set()
+    for clause_set in load_clause_sets():
+        procedures = {
+            name
+            for name, output in clause_set["outputCatalog"].items()
+            if output["kind"] == "procedure"
+        }
+        for clause in clause_set["clauses"]:
+            if set(clause["expectedOutputs"]) <= procedures:
+                found.add((clause_set["id"], clause["id"]))
+    assert found == _spec_customer_owned_inventory()
 
 
 @pytest.mark.trace("FR-005-AC-2")

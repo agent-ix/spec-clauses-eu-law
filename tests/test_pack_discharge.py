@@ -384,6 +384,7 @@ def _facts_for_binding(
                     "kind": "disposition",
                     "clauseId": clause_id,
                     "decision": "delegated",
+                    "owner": "person://example.invalid/people/customer-owner",
                     "rationale": (
                         "Customer procedure is maintained in the synthetic project."
                     ),

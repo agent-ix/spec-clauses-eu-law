@@ -19,7 +19,7 @@
   "outputCatalog": {
     "anomaly-list": {
       "kind": "record",
-      "description": "Unresolved-anomaly report."
+      "description": "Unresolved anomalies reported by `quoin anomaly report`."
     },
     "it-requirements-statement": {
       "kind": "document",
@@ -27,11 +27,11 @@
     },
     "release-record": {
       "kind": "record",
-      "description": "Engineering-assurance release decision."
+      "description": "Release evidence snapshot produced by `quoin release snapshot`."
     },
     "risk-management-records": {
       "kind": "record",
-      "description": "`spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records."
+      "description": "`spec-objects-safety` `hazard` and `failure_mode` artifacts; `quoin risk-summary`."
     },
     "security-risk-records": {
       "kind": "record",
@@ -39,11 +39,11 @@
     },
     "software-architecture": {
       "kind": "record",
-      "description": "`spec-objects-architecture` parts and connections."
+      "description": "`spec-objects-architecture` `part`, `port`, `connection`, and `allocation` artifacts; ADR artifacts from `spec-artifacts-process`."
     },
     "software-requirements": {
       "kind": "record",
-      "description": "Functional and non-functional requirements (FR/NFR)."
+      "description": "Requirements authored with the `spec-artifacts-iso` StR, FR, and NFR archetypes."
     },
     "soup-list": {
       "kind": "record",
@@ -51,7 +51,7 @@
     },
     "verification-records": {
       "kind": "record",
-      "description": "Test matrix and retained evidence."
+      "description": "`quire matrix` / `quoin matrix` results and `quoin evidence record`."
     },
     "written-procedure": {
       "kind": "procedure",
@@ -292,6 +292,7 @@
       "expectedOutputs": [
         "anomaly-list",
         "release-record",
+        "security-risk-records",
         "soup-list"
       ]
     },
@@ -393,7 +394,7 @@
         "clause": "I-1"
       },
       "relation": "informative",
-      "rationale": "Introduces the guidance context for risk management; it does not replace the MDR risk-management requirement."
+      "rationale": "The security goals set the context in which device risks are considered; they do not replace the MDR risk-management requirement."
     },
     {
       "sourceClause": "2.1",
@@ -848,7 +849,7 @@
         "clause": "I-3"
       },
       "relation": "partial",
-      "rationale": "Incident and vulnerability handling feeds the risk process; the toolchain gathers no incident or vulnerability intelligence, so the response and reporting procedure is customer-supplied."
+      "rationale": "Incident and vulnerability handling feeds the risk process; investigating and reporting incidents is the manufacturer's own procedure, which is customer-supplied."
     }
   ]
 }
