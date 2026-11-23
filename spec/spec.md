@@ -103,7 +103,7 @@ The table is normative for clause IDs, force, applicability, and expected output
 | `art-30(4)` | `eq article_30_records_applicability applies` | `records-of-processing`, `written-procedure` |
 | `art-32(1)(a)` | always | `security-risk-records`, `verification-records` |
 | `art-32(1)(b)` | always | `security-risk-records`, `verification-records` |
-| `art-32(1)(c)` | always | `security-risk-records`, `verification-records` |
+| `art-32(1)(c)` | always | `security-risk-records`, `verification-records`, `backup-restore-record` |
 | `art-32(1)(d)` | always | `security-risk-records`, `verification-records` |
 | `art-32(2)` | always | `security-risk-records` |
 | `art-32(4)` | always | `processing-access-control`, `written-procedure`, `training-record` |
@@ -118,7 +118,7 @@ The table is normative for clause IDs, force, applicability, and expected output
 
 Articles 25(3) and 32(3) are not clauses because they describe optional ways to demonstrate compliance. Article 30(5)'s exemption decision is represented by the person-supplied `article_30_records_applicability` value; a medical-product context or assumed health-data use is not enough to resolve it. Article 30(3) and (4) explicitly inherit this value because they concern records required under paragraphs 1 and 2. Article 35(3) and (4) are triggers rather than separate clauses; paragraphs (5) and (6) are supervisory-authority duties; paragraph (8) is conditional on a code-of-conduct circumstance not represented by the selected dimensions; paragraph (10) is an exception dependent on external legal-basis and prior-assessment facts. Those Article 35 paragraphs are identified as coverage limits and are not evaluated by this set. Any residual-risk decision associated with a DPIA remains with a named person.
 
-GDPR output bindings state what produces each output today. `records-of-processing` is produced by `quoin dossier generate --doc records-of-processing` from the declared data-flow model, with explicit GAP lines where the model lacks a field; making the record available to a supervisory authority on request (Article 30(4)) is the controller's or processor's own procedure, so `art-30(4)` also names `written-procedure`. `privacy-by-default-settings` and `processing-access-control` have no toolchain producer: the customer supplies them, and the pack never marks them as produced. `processing-access-control` describes the product's processing system (who may process personal data, on whose instructions); the repository permission and branch-rule settings in `access-control` describe the development repository and are not mapped to `art-32(4)`. `dpia` is authored by people. For the Article 35 clauses, quoin decides discharge: today (quoin FR-208) a fact on an approval-role clause discharges only with a non-blank `approvalRef`, and once quoin FR-211 ships it requires an engineering-assurance-verified approval by the named role. The pack carries `approvalRoles` and does not check approvals itself.
+GDPR output bindings state what produces each output. `records-of-processing` is produced by `quoin dossier generate --doc records-of-processing` from the declared data-flow model, with explicit GAP lines where the model lacks a field; making the record available to a supervisory authority on request (Article 30(4)) is the controller's or processor's own procedure, so `art-30(4)` also names `written-procedure`. `privacy-by-default-settings` and `processing-access-control` have no toolchain producer: the customer supplies them, and the pack never marks them as produced. `processing-access-control` describes the product's processing system (who may process personal data, on whose instructions); the repository permission and branch-rule settings in `access-control` describe the development repository, so the GDPR set does not contain `access-control` and no GDPR clause names it. `art-32(1)(c)` also names `backup-restore-record`, the customer-owned evidence that backups are taken and restoration is checked, because the tool's records and test results do not show that restoration works. `dpia` is authored by people. For the Article 35 clauses, quoin decides discharge: a direct fact on an approval-role clause needs a non-blank `approvalRef` (quoin FR-208) that engineering-assurance verifies as an approval by the named role (quoin FR-211). The pack carries `approvalRoles` and does not check approvals itself.
 
 ## AI Act Set Design
 
@@ -225,8 +225,8 @@ The table is normative for clause IDs, force, applicability and expected outputs
 | `9` | Risk-based audit trail of GMP-relevant changes and deletions, with reasons, readable and regularly reviewed | gmp_regulated_use | `audit-trail`, `approval-trail`, `written-procedure` |
 | `10` | Changes and configuration changes only under a defined, controlled procedure | gmp_regulated_use | `change-assurance-record`, `baseline-record`, `written-procedure` |
 | `11` | Periodic evaluation confirms the system stays validated and GMP-compliant | gmp_regulated_use | `periodic-evaluation-record` |
-| `12.1` | Physical or logical controls limit access to authorised people | gmp_regulated_use | `access-control`, `written-procedure` |
-| `12.2` | How strong the security controls are depends on how critical the system is | gmp_regulated_use | `security-risk-records`, `access-control` |
+| `12.1` | Physical or logical controls limit access to authorised people | gmp_regulated_use | `system-access-control`, `written-procedure` |
+| `12.2` | How strong the security controls are depends on how critical the system is | gmp_regulated_use | `security-risk-records`, `system-access-control` |
 | `12.3` | Creating, changing and cancelling access authorisations is recorded | gmp_regulated_use | `access-control`, `signer-registry`, `audit-trail` |
 | `12.4` | Systems record who entered, changed, confirmed or deleted data, with date and time | gmp_regulated_use | `audit-trail`, `approval-trail`, `signer-registry` |
 | `13` | Incidents are reported and assessed; critical incidents get root cause and corrective and preventive action | gmp_regulated_use | `anomaly-list`, `written-procedure` |
@@ -300,6 +300,7 @@ Expected outputs that already exist in the US Health-Law Output Catalog (`audit-
 | `record-export` | `quoin matrix`, `engineering-assurance approval-trail`, `quoin evidence audit` | Retained records | No printout shows a record's change history since first entry |
 | `system-validation` | none | Customer-supplied | No command produces validation evidence |
 | `access-control` | none | Customer-supplied | No command reads repository permissions |
+| `system-access-control` | none | Customer-supplied | No command reads or checks who may access the computerised system |
 | `written-procedure`, `training-record` | none | Customer-supplied | The customer owns and supplies the record |
 | `supplier-agreement`, `supplier-assessment`, `system-inventory`, `backup-restore-record`, `periodic-evaluation-record`, `business-continuity-plan`, `archive-verification-record`, `batch-certification-record` | none | Customer-supplied | No backup or restore check, periodic evaluation, or archive re-verification after a signer or system change exists |
 
@@ -429,6 +430,7 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | approval-trail | record | Signed approval history for a record produced by the `approval-trail` capability. |
 | access-control | record | Repository permission and branch-rule settings. |
 | processing-access-control | record | `spec-objects-security` `security.role` and `security.permission` records the customer authors for the personal-data processing system, or customer-supplied evidence of who may process personal data and on whose instructions; the clause set defines no producer. |
+| system-access-control | record | `spec-objects-security` `security.role` and `security.permission` records the customer authors for the computerised system, or customer-supplied evidence of who may access it; no quoin, quire or engineering-assurance command produces it. |
 | system-validation | record | Validation evidence for the toolchain's intended use. |
 | training-record | procedure | Customer-owned training record. |
 | data-flow-model | record | Architecture connections with their declared data flows and classifications. |

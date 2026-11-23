@@ -15,20 +15,18 @@ relationships:
 ## Description
 
 The module SHALL declare the `privacy-officer` approval role on every Article
-35 clause. Quoin verifies the approval when evidence claims to discharge such a
-clause: today (quoin FR-208) a fact or disposition discharges only with a
-non-blank `approvalRef`, and once quoin FR-211 ships it requires an
-engineering-assurance-verified approval by the named role. The pack carries the
-role and does not check approvals itself. No tool SHALL score the DPIA or accept
+35 clause. Quoin verifies the approval when a direct fact claims to discharge
+such a clause: the fact needs a non-blank `approvalRef` (quoin FR-208) that
+engineering-assurance verifies as an approval by the named role (quoin FR-211).
+The pack carries the role and does not check approvals itself. No tool SHALL score the DPIA or accept
 its residual risk.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-012-AC-1 | Every Article 35 clause declares `approvalRoles` equal to `["privacy-officer"]`. An Article 35 direct fact citing a DPIA with a missing or blank `approvalRef` leaves the clause undischarged under quoin FR-208. That the approval identifies the named person who accepted residual risk is verified by quoin FR-211 and is not tested here until it ships. | Test |
-| FR-012-AC-2 | An Article 35 `accepted_risk` disposition with a missing or blank `approvalRef` leaves the clause undischarged under quoin FR-208. That the approval identifies the named person is verified by quoin FR-211 and is not tested here until it ships. | Test |
-| FR-012-AC-3 | The set and module contract contain no risk score, threshold, or automated risk-acceptability field for DPIA decisions. | Inspection |
+| FR-012-AC-1 | Every Article 35 clause declares `approvalRoles` equal to `["privacy-officer"]`. An Article 35 direct fact citing a DPIA with a missing or blank `approvalRef` leaves the clause undischarged with the reason that the required approval reference is missing, and the same fact with an `approvalRef` discharges. Verification that the approval names the person who accepted residual risk belongs to quoin FR-211. | Test |
+| FR-012-AC-2 | The set and module contract contain no risk score, threshold, or automated risk-acceptability field for DPIA decisions. | Inspection |
 
 ## Dependencies
 
