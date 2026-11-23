@@ -59,3 +59,4 @@ The two crosswalk-test failures seen locally are not caused by this PR (see Cove
 | FND-004 | fixed | The 2.1→I-1 rationale now refers to the security goals. |
 | FND-005 | fixed | The missing-set message now ends with `{target_key}#{target['clause']}`. `test_gdpr_article32_missing_nist_set_names_source_and_target` passes locally and is not among the CI failures at 566079f. |
 | FND-006 | fixed | The CI us-health checkout now uses `ref: main` and the pinned commit is gone. The parity test no longer fails on `verification-records`; its remaining CI failure is the new FND-007. |
+| FND-007 | fixed | The `soup-list` description in spec.md and the MDCG set now matches spec-clauses-us-health main (64f95e4). CI run 45244010595 on ba19c61 passed. |
