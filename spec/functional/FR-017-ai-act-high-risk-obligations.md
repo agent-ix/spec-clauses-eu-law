@@ -24,6 +24,8 @@ The provider set SHALL contain exactly the Article 9–20, 43, 47, 72 and 73 obl
 | FR-017-AC-2 | Each clause's force, applicability expression, and expected outputs equal its table row; every output resolves in the catalog and every summary is nonempty. | Test |
 | FR-017-AC-3 | A changed applicability expression, force, or unresolved output fails and names the clause and field. | Test |
 | FR-017-AC-4 | No clause includes an obligation assigned only to an importer, distributor, notified body, market-surveillance authority, or other out-of-scope actor. | Inspection |
+| FR-017-AC-5 | The catalog entries `data-lineage`, `model-description`, `event-logging-design`, `human-oversight-design`, `post-market-monitoring-plan` and `conformity-declaration` are described as customer-supplied with no toolchain producer; every other output the AI Act sets use, except the customer-owned `written-procedure`, names its producing command or artifact archetype. | Test |
+| FR-017-AC-6 | Clauses `art-20` and `art-73` expect only `written-procedure` and are customer-owned. | Test |
 
 ## Dependencies
 

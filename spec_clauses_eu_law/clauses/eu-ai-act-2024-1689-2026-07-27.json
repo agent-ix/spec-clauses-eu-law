@@ -36,37 +36,33 @@
     }
   },
   "outputCatalog": {
-    "anomaly-list": {
-      "kind": "record",
-      "description": "Unresolved anomalies reported by `quoin anomaly report`."
-    },
     "audit-trail": {
       "kind": "record",
       "description": "Git history and signed-approval history produced by the `approval-trail` capability for the record."
     },
     "conformity-declaration": {
       "kind": "document",
-      "description": "EU declaration of conformity and its controlled reference."
+      "description": "Customer-supplied EU declaration of conformity and its controlled reference; no toolchain producer."
     },
     "data-lineage": {
       "kind": "record",
-      "description": "Provenance, selection, preparation and transformations for data used by the AI system."
+      "description": "Customer-supplied record of provenance, selection, preparation and transformations for data used by the AI system; no toolchain producer."
     },
     "event-logging-design": {
       "kind": "record",
-      "description": "Declared events, retention and access controls for AI system logs."
+      "description": "Customer-supplied record of declared events, retention and access controls for AI system logs; no toolchain producer."
     },
     "human-oversight-design": {
       "kind": "record",
-      "description": "Human oversight roles, measures, competence and output-interpretation controls."
+      "description": "Customer-supplied record of human oversight roles, measures, competence and output-interpretation controls; no toolchain producer."
     },
     "model-description": {
       "kind": "document",
-      "description": "Original description of AI system purpose, version, behavior, limits and use."
+      "description": "Customer-supplied original description of AI system purpose, version, behavior, limits and use; no toolchain producer."
     },
     "post-market-monitoring-plan": {
       "kind": "document",
-      "description": "Provider plan and evidence for post-market performance monitoring."
+      "description": "Customer-supplied provider plan and evidence for post-market performance monitoring; no toolchain producer."
     },
     "release-record": {
       "kind": "record",
@@ -457,8 +453,7 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "written-procedure",
-        "release-record"
+        "written-procedure"
       ],
       "applicability": {
         "op": "all",
@@ -617,8 +612,7 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "written-procedure",
-        "anomaly-list"
+        "written-procedure"
       ],
       "applicability": {
         "op": "all",
@@ -649,7 +643,7 @@
         "clause": "I-17.2"
       },
       "relation": "partial",
-      "rationale": "This MDR clause covers cybersecurity risk controls for device software, one part of the AI Act obligation."
+      "rationale": "This MDR clause covers software lifecycle controls, including information-security risk management and verification, one part of the AI Act obligation."
     },
     {
       "sourceClause": "art-15",
@@ -662,7 +656,7 @@
         "clause": "I-17.4"
       },
       "relation": "partial",
-      "rationale": "This MDR clause covers software verification and validation evidence, which supports but does not exhaust AI accuracy and robustness work."
+      "rationale": "The minimum hardware, network and IT-security prerequisites the manufacturer states bound the conditions the AI system operates in, without covering the accuracy, robustness or cybersecurity evaluation itself."
     },
     {
       "sourceClause": "art-15",
@@ -675,7 +669,7 @@
         "clause": "I-18.8"
       },
       "relation": "partial",
-      "rationale": "This MDR clause covers release controls relevant to software integrity, not the full AI Act cybersecurity obligation."
+      "rationale": "This MDR clause covers protection against unauthorised access that could stop the device operating as intended, one aspect of the AI Act cybersecurity obligation."
     },
     {
       "sourceClause": "art-9",

@@ -1,6 +1,6 @@
 ---
 id: FR-021
-title: "AI Act to MDR Annex II crosswalks"
+title: "AI Act to MDR crosswalks"
 type: FR
 relationships:
   - target: "ix://agent-ix/spec-clauses-eu-law/US-001"
@@ -10,11 +10,11 @@ relationships:
   - target: "ix://agent-ix/spec-clauses-eu-law/FR-003"
     type: "depends_on"
 ---
-# FR-021: AI Act to MDR Annex II crosswalks
+# FR-021: AI Act to MDR crosswalks
 
 ## Description
 
-Every Annex IV point SHALL have at least one crosswalk to a resolving MDR Annex II clause, or an explicit `none` entry in the table where no direct counterpart is asserted. Each crosswalk SHALL state a relation and original rationale. The relation `equivalent` SHALL NOT be used.
+Every Annex IV point SHALL have at least one crosswalk to a resolving MDR Annex II clause, or an explicit `none` entry in the table where no direct counterpart is asserted. The provider set's article crosswalks (`art-9`, `art-15`) SHALL target resolving MDR Annex I or Annex II clauses. Each crosswalk SHALL state a relation and original rationale. The relation `equivalent` SHALL NOT be used.
 
 ## Acceptance Criteria
 
@@ -23,6 +23,8 @@ Every Annex IV point SHALL have at least one crosswalk to a resolving MDR Annex 
 | FR-021-AC-1 | Every Annex IV table row has one or more resolving MDR Annex II targets or the explicit `none` value; no row has an omitted target. | Test |
 | FR-021-AC-2 | Every declared target resolves in the loaded MDR set, has relation `partial` or `informative`, and includes a nonempty rationale. | Test |
 | FR-021-AC-3 | An injected unknown target, `equivalent` relation, or empty rationale fails and names its source clause and field. | Test |
+| FR-021-AC-4 | The `art-15` crosswalks to `I-17.2`, `I-17.4` and `I-18.8` describe those MDR clauses by what they cover: `I-17.2` software lifecycle controls including information-security risk management and verification, `I-17.4` the hardware, network and IT-security prerequisites the manufacturer states, and `I-18.8` protection against unauthorised access. | Test |
+| FR-021-AC-5 | Every `art-*` crosswalk target is a clause of the loaded MDR set whose id is in Annex I (`I-*`) or Annex II (`II-*`); a target in any other annex fails and names its source clause. | Test |
 
 ## Dependencies
 

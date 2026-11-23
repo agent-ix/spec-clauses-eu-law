@@ -1286,6 +1286,117 @@ def test_ai_act_crosswalks_match_the_annex_table_and_resolve_to_mdr():
     _assert_ai_act_crosswalk_contract(clause_sets)
 
 
+CUSTOMER_SUPPLIED_AI_OUTPUTS = {
+    "data-lineage",
+    "model-description",
+    "event-logging-design",
+    "human-oversight-design",
+    "post-market-monitoring-plan",
+    "conformity-declaration",
+}
+
+
+@pytest.mark.trace("FR-017-AC-5")
+def test_ai_act_outputs_without_a_producer_are_marked_customer_supplied():
+    """Mark AI Act outputs no tool produces as customer-supplied.
+
+    Assumptions: No quoin, quire or engineering-assurance command builds data
+    lineage, oversight design, logging design, a post-market plan, a model
+    description or a declaration of conformity for the customer's AI system.
+    Criteria: Both AI Act sets describe exactly those outputs as
+    customer-supplied with no toolchain producer, name no tool command in
+    them, and art-73 (incident reporting) expects only the customer procedure.
+    """
+    for clause_set in (_ai_act_set(), _ai_act_annex_set()):
+        catalog = clause_set["outputCatalog"]
+        for name, output in catalog.items():
+            description = output["description"]
+            if name in CUSTOMER_SUPPLIED_AI_OUTPUTS:
+                assert description.lower().startswith(
+                    "customer-supplied"
+                ), f"{name} must be described as customer-supplied"
+                assert description.endswith("no toolchain producer.")
+                assert "quoin" not in description and "quire" not in description
+            elif output["kind"] != "procedure":
+                assert (
+                    "customer-supplied" not in description.lower()
+                ), f"{name} has a producer and must not be marked customer-supplied"
+                assert re.search(
+                    r"`[^`]+`", description
+                ), f"{name} must name its producing command or archetype"
+    assert "anomaly-list" not in _ai_act_set()["outputCatalog"]
+
+
+@pytest.mark.trace("FR-017-AC-6")
+def test_ai_act_corrective_action_and_incident_clauses_are_customer_owned():
+    """Keep art-20 and art-73 as customer procedures only.
+
+    Assumptions: A release snapshot or anomaly report cannot show corrective
+    action, withdrawal, notification or serious-incident reporting.
+    Criteria: Both clauses expect only the written procedure.
+    """
+    outputs = _clause_outputs(_ai_act_set())
+    assert outputs["art-20"] == {"written-procedure"}
+    assert outputs["art-73"] == {"written-procedure"}
+
+
+@pytest.mark.trace("FR-021-AC-4")
+def test_ai_act_art_15_crosswalks_describe_the_mdr_clauses_they_target():
+    """Describe MDR I-17.2, I-17.4 and I-18.8 by what each covers.
+
+    Assumptions: I-17.2 is software lifecycle controls, I-17.4 the operating
+    prerequisites and I-18.8 protection against unauthorised access.
+    Criteria: Each art-15 rationale names its clause's real subject and none
+    calls I-17.4 verification evidence or I-18.8 a release control.
+    """
+    rationale = {
+        item["target"]["clause"]: item["rationale"].lower()
+        for item in _ai_act_set()["crosswalks"]
+        if item["sourceClause"] == "art-15"
+    }
+    assert "lifecycle" in rationale["I-17.2"]
+    assert "hardware, network and it-security prerequisites" in rationale["I-17.4"]
+    assert "verification" not in rationale["I-17.4"]
+    assert "validation" not in rationale["I-17.4"]
+    assert "unauthorised access" in rationale["I-18.8"]
+    assert "release" not in rationale["I-18.8"]
+
+
+def _assert_article_crosswalks_target_mdr_annexes(ai_set: dict, mdr_set: dict) -> None:
+    """Require every art-* crosswalk to resolve to an MDR Annex I or II clause."""
+    mdr_ids = {clause["id"] for clause in mdr_set["clauses"]}
+    for item in ai_set["crosswalks"]:
+        source = item["sourceClause"]
+        if not source.startswith("art-"):
+            continue
+        target = item["target"]["clause"]
+        assert target in mdr_ids, f"{source} targets unresolved MDR clause {target}"
+        assert re.match(
+            r"II?-", target
+        ), f"{source} targets {target}, which is neither MDR Annex I nor Annex II"
+
+
+@pytest.mark.trace("FR-021-AC-5")
+def test_ai_act_article_crosswalks_target_mdr_annex_i_or_ii():
+    """Keep article crosswalk targets inside MDR Annex I and Annex II.
+
+    Assumptions: MDR clause ids begin with I- for Annex I and II- for Annex II.
+    Criteria: Every art-* crosswalk target resolves in the MDR set within one
+    of those annexes; retargeting one to another annex fails with its source.
+    """
+    ai_set = _ai_act_set()
+    mdr_set = _mdr_set()
+    _assert_article_crosswalks_target_mdr_annexes(ai_set, mdr_set)
+    broken = json.loads(json.dumps(ai_set))
+    broken["crosswalks"][0]["target"]["clause"] = "III-1"
+    with pytest.raises(AssertionError, match=r"art-15 targets unresolved.*III-1"):
+        _assert_article_crosswalks_target_mdr_annexes(broken, mdr_set)
+    mdr_with_other_annex = json.loads(json.dumps(mdr_set))
+    mdr_with_other_annex["clauses"].append({"id": "III-1"})
+    with pytest.raises(AssertionError, match=r"art-15 targets III-1.*neither"):
+        _assert_article_crosswalks_target_mdr_annexes(broken, mdr_with_other_annex)
+
+
 @pytest.mark.trace("FR-021-AC-3")
 @pytest.mark.parametrize(
     ("mutation", "expected_error"),
