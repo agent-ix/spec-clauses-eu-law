@@ -50,3 +50,9 @@ Disposition pass 1, head cba6ffb91b6170f5a192ead07d3670e38239e157, fix commits 9
 | FND-003 | high | The new FR-021 sentence "The provider set's article crosswalks (`art-9`, `art-15`) SHALL target resolving MDR Annex I clauses" is false for the data: `art-9` → `II-5` targets Annex II. No test checks which annex is targeted, so this passes unnoticed. Fix: "SHALL target resolving MDR Annex I or Annex II clauses", or drop the annex qualifier. | spec/functional/FR-021-ai-act-mdr-crosswalks.md:17, spec_clauses_eu_law/clauses/eu-ai-act-2024-1689-2026-07-27.json (art-9 → II-5) |
 
 Coverage for this pass: `quire validate` with spec-artifacts-iso passes on spec.md, FR-017 and FR-021 (exit 0). Full `spec/**/*.md` validation exits 0; its only warnings are EARS warnings on FR-024, FR-027 and FR-028, which came from PR #21, not this PR. The rebase merge of spec.md is clean. The catalog keeps the six customer-supplied AI rows next to the Annex 11 supplier rows, and the inventory lists art-20, art-73, MDCG 5.2 and the Annex 11 rows with no duplicates.
+
+Disposition pass 2, head b71766d61f1e3649f746174326ab167ce8741b68, fix commit range cba6ffb9..b71766d6.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-003 | fixed | FR-021 now reads "SHALL target resolving MDR Annex I or Annex II clauses". The new FR-021-AC-5 test, `test_ai_act_article_crosswalks_target_mdr_annex_i_or_ii`, asserts that every `art-*` target resolves and matches `II?-`, and its in-test mutation proves a resolving Annex III target fails with "neither". Separately, retargeting the real art-9 → II-5 crosswalk to III-1 in a temp copy turns the test red ("art-9 targets unresolved MDR clause III-1"). Focused run on the branch with a throwaway HOME and us-health origin/main: 28 passed. `quire validate` on FR-021 exits 0. |
