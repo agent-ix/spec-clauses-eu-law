@@ -90,20 +90,9 @@ def _corpus_validation_modules() -> list[str]:
         "spec-objects-architecture",
         "spec-objects-business",
         "spec-objects-safety",
+        "spec-objects-security",
     ]
-    security_root = os.environ.get(
-        "SPEC_OBJECTS_SECURITY_MODULE", str(modules_root / "spec-objects-security")
-    )
-    return [*(str(modules_root / name) for name in roots), security_root]
-
-
-def _records_of_processing_modules() -> list[str]:
-    """Return the corpus module roots needed to resolve producer records."""
-    modules = _corpus_validation_modules()
-    producer_security = os.environ.get("SPEC_OBJECTS_SECURITY_PRODUCER_MODULE")
-    if producer_security is not None:
-        modules[-1] = producer_security
-    return modules
+    return [str(modules_root / name) for name in roots]
 
 
 def _checked(
@@ -428,7 +417,7 @@ def _generate_records_of_processing(
     """Run PLAT-1658's producer and return its JSON report and generated file."""
     module_args = [
         argument
-        for module in _records_of_processing_modules()
+        for module in _corpus_validation_modules()
         for argument in ("--module", module)
     ]
     result = run(
