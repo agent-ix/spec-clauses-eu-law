@@ -30,6 +30,7 @@ from conftest import (
     PACKAGE_ROOT,
     assert_crosswalk_targets_resolve,
     assert_output_catalog_consistent,
+    assert_shared_producers_identical,
     clause_set_key,
     engine_tool,
     evaluate_clause_set,
@@ -288,6 +289,7 @@ def test_shared_outputs_equal_the_us_health_law_catalog():
     for name in shared:
         assert _annex()["outputCatalog"][name] == us_catalog[name], name
     assert_output_catalog_consistent([*load_clause_sets(), *us_sets])
+    assert_shared_producers_identical([*load_clause_sets(), *us_sets])
     drifted = copy.deepcopy(_annex())
     drifted["outputCatalog"]["verification-records"]["description"] = "changed"
     with pytest.raises(AssertionError, match="verification-records"):

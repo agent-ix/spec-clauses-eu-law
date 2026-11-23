@@ -22,6 +22,7 @@ from conftest import (
     REPO_ROOT,
     assert_crosswalk_targets_resolve,
     assert_output_catalog_consistent,
+    assert_shared_producers_identical,
     clause_set_key,
     engine_tool,
     evaluate_clause_set,
@@ -581,18 +582,36 @@ def _spec_mdcg_crosswalks() -> list[dict[str, str]]:
 def _spec_output_catalog() -> dict[str, dict[str, str]]:
     """Read the canonical output definitions from the master specification."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
-    section = specification.split("## EU Pack Output Catalog", 1)[1].split("\n## ", 1)[
-        0
-    ]
+    section = specification.split("## EU Pack Output Catalog", 1)[1].split("\n##", 1)[0]
+    producers = _spec_output_producers()
     catalog = {}
+    for name, kind, description in _spec_table_rows(section):
+        catalog[name] = {"kind": kind, "description": description}
+        if name in producers:
+            catalog[name]["producers"] = producers[name]
+    return catalog
+
+
+def _spec_table_rows(section: str) -> list[list[str]]:
+    """Return the three-cell data rows of every table in a spec section."""
+    rows = []
     for line in section.splitlines():
         if not line.startswith("|"):
             continue
-        name, kind, description = [cell.strip() for cell in line.strip("|").split("|")]
-        if name == "Name" or name.startswith("---"):
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        if cells[0] == "Name" or cells[0].startswith("---"):
             continue
-        catalog[name] = {"kind": kind, "description": description}
-    return catalog
+        rows.append(cells)
+    return rows
+
+
+def _spec_output_producers() -> dict[str, list[str]]:
+    """Read the "EU Output Producers" table: output name to its producer kinds."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("### EU Output Producers", 1)[1].split("\n##", 1)[0]
+    return {
+        name: cell.split(", ") for name, cell, _evidence in _spec_table_rows(section)
+    }
 
 
 def _outcomes(binding: dict) -> dict[str, str]:
@@ -806,6 +825,35 @@ def test_all_declared_sets_share_one_output_catalog():
     clause_sets = load_clause_sets()
     clause_sets.extend(_installed_clause_sets("spec_clauses_us_health"))
     assert_output_catalog_consistent(clause_sets)
+    assert_shared_producers_identical(clause_sets)
+
+
+@pytest.mark.trace("FR-006-AC-5")
+def test_shared_producers_drift_fails_and_names_the_output():
+    base = _synthetic_set(
+        "example.invalid",
+        "base",
+        "1.0.0",
+        output_catalog={
+            "verification-records": {
+                "kind": "record",
+                "description": "Test runs.",
+                "producers": ["run"],
+            }
+        },
+    )
+    same = copy.deepcopy(base)
+    assert_shared_producers_identical([base, same])
+    for drifted_producers in (["scan"], None):
+        drifted = copy.deepcopy(base)
+        if drifted_producers is None:
+            del drifted["outputCatalog"]["verification-records"]["producers"]
+        else:
+            drifted["outputCatalog"]["verification-records"][
+                "producers"
+            ] = drifted_producers
+        with pytest.raises(AssertionError, match="verification-records"):
+            assert_shared_producers_identical([base, drifted])
 
 
 @pytest.mark.trace("FR-003-AC-1", "FR-003-AC-2")
@@ -2512,3 +2560,52 @@ def test_clause_files_ship_in_wheel_and_npm_tarball(tmp_path):
         npm_files = set(archive.getnames())
     assert "package/manifest.yaml" in npm_files
     assert "package/clauses/synthetic.json" in npm_files
+
+
+# Retained evidence-store kinds a catalog `producers` entry may name (quoin FR-211).
+FR_211_FIXED_KINDS = {"run", "scan", "mock-inspection", "analysis-report", "scenario"}
+
+
+@pytest.mark.trace("FR-006-AC-4")
+def test_catalog_producers_name_only_fr_211_kinds_and_match_the_spec():
+    """`producers` are valid retained kinds on exactly the outputs the spec lists."""
+    expected = _spec_output_producers()
+    assert expected, "the spec lists no output with producers"
+    for clause_set in load_clause_sets():
+        key = clause_set_key(clause_set)
+        for name, entry in clause_set["outputCatalog"].items():
+            if "producers" not in entry:
+                assert name not in expected, f"{key}: {name} lacks producers"
+                continue
+            kinds = entry["producers"]
+            assert kinds, f"{key}: {name} has empty producers"
+            assert len(kinds) == len(set(kinds)), f"{key}: {name} repeats a kind"
+            assert all(
+                kind == kind.strip() and kind in FR_211_FIXED_KINDS for kind in kinds
+            ), f"{key}: {name} names a kind outside FR-211: {kinds!r}"
+            assert kinds == expected.get(name), f"{key}: {name} differs from the spec"
+
+
+@pytest.mark.trace("FR-006-AC-6")
+def test_quire_accepts_sets_that_carry_producers():
+    """The installed quire validates and evaluates every set with `producers`."""
+    publish = run(engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT))
+    assert publish.returncode == 0, publish.stderr + publish.stdout
+    for clause_set in load_clause_sets():
+        if not any("producers" in e for e in clause_set["outputCatalog"].values()):
+            continue
+        result = run(
+            engine_tool("quire"),
+            "clauses",
+            "evaluate",
+            "--module",
+            str(PACKAGE_ROOT),
+            "--authority",
+            clause_set["authority"],
+            "--set",
+            clause_set["id"],
+            "--version",
+            clause_set["version"],
+            "--json",
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
