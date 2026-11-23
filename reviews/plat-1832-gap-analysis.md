@@ -86,9 +86,10 @@ Expected fix: Tag the Annex 11 corpus test with FR-007-AC-2 (it proves the AC th
 
 ## Dispositions
 
-Round 1 at head 355a76a9b4f3b9757913b38bf714ee1aebcbc4b6.
+Round 1 at head 355a76a9b4f3b9757913b38bf714ee1aebcbc4b6; round 2 at head 1f35d5e7b3adee40b9d1ef3d9c3344e0c3584041.
 
 | FND | outcome | reason |
 |---|---|---|
 | FND-001 | deferred | deferred: PLAT-1805. Lead decision (Round 2 lead): rejecting a direct fact on a customer-owned clause is quoin's job under quoin FR-211, which PLAT-1805 is implementing. FR-007-AC-3 and FR-027-AC-6 now state that requirement and are untested until FR-211 ships. The helper-based test test_all_procedure_clauses_accept_only_a_delegated_disposition was removed, and FR-027-AC-2 is narrowed to 'delegated disposition renders tailored', which the corpus test asserts through quoin. |
 | FND-002 | fixed | - |
+| FND-003 | fixed | - |

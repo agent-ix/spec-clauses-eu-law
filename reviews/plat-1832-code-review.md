@@ -117,7 +117,7 @@ Expected fix: Factor the title and subject comparison into a helper and assert t
 
 ## Dispositions
 
-Round 1 at head 355a76a9b4f3b9757913b38bf714ee1aebcbc4b6.
+Round 1 at head 355a76a9b4f3b9757913b38bf714ee1aebcbc4b6; round 2 at head 1f35d5e7b3adee40b9d1ef3d9c3344e0c3584041.
 
 | FND | outcome | reason |
 |---|---|---|
@@ -127,3 +127,4 @@ Round 1 at head 355a76a9b4f3b9757913b38bf714ee1aebcbc4b6.
 | FND-004 | fixed | - |
 | FND-005 | fixed | - |
 | FND-006 | fixed | - |
+| FND-007 | fixed | - |
