@@ -35,4 +35,4 @@ treat that field as evidence of compliance.
 ## Dependencies
 
 - The clause IDs and applicability are specified by [FR-010](./FR-010-gdpr-clause-table.md) and [FR-011](./FR-011-gdpr-role-and-risk-applicability.md).
-- `data-flow-model` and `records-of-processing` are defined in [FR-006](./FR-006-pack-wide-output-catalog.md). The records-of-processing generator and data-flow connection classification remain separate work in PLAT-1658 and PLAT-1440.
+- `data-flow-model` and `records-of-processing` are defined in [FR-006](./FR-006-pack-wide-output-catalog.md). `records-of-processing` is produced by `quoin dossier generate --doc records-of-processing` from the declared data-flow model.

@@ -100,13 +100,13 @@ The table is normative for clause IDs, force, applicability, and expected output
 | `art-30(2)(c)` | `all[eq gdpr_role processor, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
 | `art-30(2)(d)` | `all[eq gdpr_role processor, eq article_30_records_applicability applies]` | `records-of-processing`, `data-flow-model` |
 | `art-30(3)` | `eq article_30_records_applicability applies` | `records-of-processing` |
-| `art-30(4)` | `eq article_30_records_applicability applies` | `records-of-processing` |
+| `art-30(4)` | `eq article_30_records_applicability applies` | `records-of-processing`, `written-procedure` |
 | `art-32(1)(a)` | always | `security-risk-records`, `verification-records` |
 | `art-32(1)(b)` | always | `security-risk-records`, `verification-records` |
 | `art-32(1)(c)` | always | `security-risk-records`, `verification-records` |
 | `art-32(1)(d)` | always | `security-risk-records`, `verification-records` |
 | `art-32(2)` | always | `security-risk-records` |
-| `art-32(4)` | always | `access-control`, `written-procedure`, `training-record` |
+| `art-32(4)` | always | `processing-access-control`, `written-procedure`, `training-record` |
 | `art-35(1)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model`, `security-risk-records` |
 | `art-35(2)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model` |
 | `art-35(7)(a)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model` |
@@ -117,6 +117,8 @@ The table is normative for clause IDs, force, applicability, and expected output
 | `art-35(11)` | `all[eq gdpr_role controller, eq high_risk_processing yes]` | `dpia`, `data-flow-model`, `security-risk-records` |
 
 Articles 25(3) and 32(3) are not clauses because they describe optional ways to demonstrate compliance. Article 30(5)'s exemption decision is represented by the person-supplied `article_30_records_applicability` value; a medical-product context or assumed health-data use is not enough to resolve it. Article 30(3) and (4) explicitly inherit this value because they concern records required under paragraphs 1 and 2. Article 35(3) and (4) are triggers rather than separate clauses; paragraphs (5) and (6) are supervisory-authority duties; paragraph (8) is conditional on a code-of-conduct circumstance not represented by the selected dimensions; paragraph (10) is an exception dependent on external legal-basis and prior-assessment facts. Those Article 35 paragraphs are identified as coverage limits and are not evaluated by this set. Any residual-risk decision associated with a DPIA remains with a named person.
+
+GDPR output bindings state what produces each output today. `records-of-processing` is produced by `quoin dossier generate --doc records-of-processing` from the declared data-flow model, with explicit GAP lines where the model lacks a field; making the record available to a supervisory authority on request (Article 30(4)) is the controller's or processor's own procedure, so `art-30(4)` also names `written-procedure`. `privacy-by-default-settings` and `processing-access-control` have no toolchain producer: the customer supplies them, and the pack never marks them as produced. `processing-access-control` describes the product's processing system (who may process personal data, on whose instructions); the repository permission and branch-rule settings in `access-control` describe the development repository and are not mapped to `art-32(4)`. `dpia` is authored by people. For the Article 35 clauses, quoin decides discharge: today (quoin FR-208) a fact on an approval-role clause discharges only with a non-blank `approvalRef`, and once quoin FR-211 ships it requires an engineering-assurance-verified approval by the named role. The pack carries `approvalRoles` and does not check approvals itself.
 
 ## AI Act Set Design
 
@@ -426,12 +428,13 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | fda-certification-record | record | Evidence that the electronic-signature certification was submitted to FDA. |
 | approval-trail | record | Signed approval history for a record produced by the `approval-trail` capability. |
 | access-control | record | Repository permission and branch-rule settings. |
+| processing-access-control | record | `spec-objects-security` `security.role` and `security.permission` records the customer authors for the personal-data processing system, or customer-supplied evidence of who may process personal data and on whose instructions; the clause set defines no producer. |
 | system-validation | record | Validation evidence for the toolchain's intended use. |
 | training-record | procedure | Customer-owned training record. |
 | data-flow-model | record | Architecture connections with their declared data flows and classifications. |
 | records-of-processing | record | Controller or processor record of processing activities derived from the declared data-flow model. |
 | dpia | document | Product-specific data protection impact assessment authored by people, with any residual-risk acceptance recorded by a named approver. |
-| privacy-by-default-settings | record | Declared default processing settings and data-minimisation choices. |
+| privacy-by-default-settings | record | Customer-supplied record of declared default processing settings and data-minimisation choices; no toolchain producer. |
 | data-lineage | record | Customer-supplied record of provenance, selection, preparation and transformations for data used by the AI system; no toolchain producer. |
 | model-description | document | Customer-supplied original description of AI system purpose, version, behavior, limits and use; no toolchain producer. |
 | event-logging-design | record | Customer-supplied record of declared events, retention and access controls for AI system logs; no toolchain producer. |
