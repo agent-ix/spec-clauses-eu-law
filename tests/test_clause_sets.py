@@ -43,6 +43,27 @@ def _spec_mdr_ids() -> list[str]:
     ]
 
 
+def _spec_mdr_rows() -> list[dict]:
+    """Read normative MDR IDs and expected outputs from spec.md."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("## MDR Clause Table", 1)[1].split("\n## ", 1)[0]
+    rows = []
+    for line in section.splitlines():
+        if (
+            not line.startswith("|")
+            or line.startswith("| Clause ID")
+            or line.startswith("|---")
+        ):
+            continue
+        clause_id, _applicability, outputs = [
+            cell.strip() for cell in line.strip("|").split("|", 2)
+        ]
+        rows.append(
+            {"id": clause_id, "outputs": [item.strip() for item in outputs.split(",")]}
+        )
+    return rows
+
+
 def _spec_gdpr_rows() -> list[dict[str, str]]:
     """Read normative GDPR IDs, applicability, and outputs from spec.md."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
@@ -1051,6 +1072,61 @@ def test_mdcg_crosswalks_match_spec_and_resolve_to_mdr():
     )
     assert all(item["rationale"].strip() for item in clause_set["crosswalks"])
     assert_crosswalk_targets_resolve(clause_sets)
+
+
+def _clause_outputs(clause_set: dict) -> dict[str, set[str]]:
+    return {
+        clause["id"]: set(clause["expectedOutputs"]) for clause in clause_set["clauses"]
+    }
+
+
+@pytest.mark.trace("FR-003-AC-4")
+def test_mdr_security_prerequisite_clauses_map_to_security_and_it_outputs():
+    """Map MDR I-17.4 and I-18.8 to the outputs that address them.
+
+    Assumptions: Operating prerequisites are stated by the customer; the
+    security records are the only toolchain output about access protection.
+    Criteria: I-17.4 expects the IT-requirements statement and security
+    records, I-18.8 expects security records and their verification, and
+    neither expects release, anomaly or SOUP reports; the IT-requirements
+    statement is described as customer-supplied.
+    """
+    clause_set = _mdr_set()
+    outputs = _clause_outputs(clause_set)
+    assert outputs["I-17.4"] == {"it-requirements-statement", "security-risk-records"}
+    assert outputs["I-18.8"] == {"security-risk-records", "verification-records"}
+    assert "verification-records" in outputs["I-17.2"]
+    assert "risk-management-records" in outputs["II-5"]
+    assert "customer-supplied" in (
+        clause_set["outputCatalog"]["it-requirements-statement"]["description"]
+    )
+    rows = {row["id"]: set(row["outputs"]) for row in _spec_mdr_rows()}
+    assert rows == outputs
+
+
+@pytest.mark.trace("FR-005-AC-4")
+def test_mdcg_security_sections_map_to_security_and_customer_outputs():
+    """Map MDCG security goals and post-market sections to honest outputs.
+
+    Assumptions: Nothing in the toolchain gathers incident or vulnerability
+    intelligence, so surveillance and vigilance procedures are customer-supplied.
+    Criteria: 2.1 expects security records, 5.2 is all-procedure, 5.1 carries the
+    customer procedure, and only 3.8 expects release or anomaly reports.
+    """
+    outputs = _clause_outputs(_mdcg_set())
+    assert "security-risk-records" in outputs["2.1"]
+    assert outputs["5.2"] == {"written-procedure"}
+    assert "written-procedure" in outputs["5.1"]
+    for clause_id, expected in outputs.items():
+        if clause_id != "3.8":
+            assert not expected & {"release-record", "anomaly-list"}, clause_id
+    targets = {
+        (item["sourceClause"], item["target"]["clause"])
+        for item in _mdcg_set()["crosswalks"]
+    }
+    assert ("3.7", "I-17.2") in targets
+    assert ("3.6", "I-17.4") in targets
+    assert ("3.7", "I-17.4") not in targets
 
 
 @pytest.mark.trace("FR-005-AC-2")
