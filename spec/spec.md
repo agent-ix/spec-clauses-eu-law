@@ -16,7 +16,7 @@ security_critical: false
 
 ## Purpose
 
-This specification defines the clause-only EU-law module and its sets for software-related requirements from Regulation (EU) 2017/745 (MDR), interpretive cybersecurity guidance from MDCG 2019-16 rev.1, selected obligations in Regulation (EU) 2016/679 (GDPR), and selected high-risk AI obligations and technical-documentation elements in Regulation (EU) 2024/1689 (AI Act). Clause summaries use original expression and link to official sources. The pack records evidence and produces an RMM; it does not determine legal compliance.
+This specification defines the clause-only EU-law module and its sets for software-related requirements from Regulation (EU) 2017/745 (MDR), interpretive cybersecurity guidance from MDCG 2019-16 rev.1, selected obligations in Regulation (EU) 2016/679 (GDPR), selected high-risk AI obligations and technical-documentation elements in Regulation (EU) 2024/1689 (AI Act), and the EU GMP guideline Annex 11 on computerised systems (EudraLex Volume 4). Clause summaries use original expression and link to official sources. The pack records evidence and produces an RMM; it does not determine legal compliance.
 
 ## Scope
 
@@ -24,6 +24,7 @@ This specification defines the clause-only EU-law module and its sets for softwa
 
 - Repository `agent-ix/spec-clauses-eu-law`, Python package `spec_clauses_eu_law`, module `clause_sets`.
 - MDR set `eu/mdr-2017-745@2026-07-19`, MDCG set `eu-mdcg/mdcg-2019-16@rev1`, GDPR set `eu/gdpr-2016-679@2016-05-04`, and AI Act sets `eu/ai-act-2024-1689@2026-07-27` and `eu/ai-act-2024-1689-annex-iv@2026-07-27`.
+- Annex 11 set `eu/eu-gmp-annex-11@2011-01`: every numbered paragraph of the January 2011 Annex 11, person-supplied scope dimensions, Part 11 crosswalks to `us-fda/21-cfr-11@2026-11-12`, and output bindings stating which tool command produces each expected output or that the customer supplies it.
 - Set identities, sources, rights metadata, clause identifiers, applicability, expected outputs, MDCG-to-MDR and GDPR-to-NIST/HIPAA crosswalks, shared output catalog, customer-owned obligations, and synthetic reference corpus rules.
 - GDPR Articles 25, 30, 32 and 35; the person-supplied controller/processor, high-risk-processing, and Article 30(5) applicability values; human approval for DPIA residual-risk acceptance; and the security-analysis skill's coverage boundary for GDPR material.
 - AI Act high-risk provider obligations in Articles 9–20, 43, 47, 72 and 73; deployer obligations in Article 26; Annex IV technical-documentation elements; person-supplied high-risk, operator-role and per-point applicability values; and crosswalks to MDR Annex II.
@@ -32,6 +33,7 @@ This specification defines the clause-only EU-law module and its sets for softwa
 
 - Clause JSON/content, package manifest, corpus, implementation tests, CI, publish gate, output bindings, and scaffold beyond this specification (PLAT-1425, PLAT-1623, PLAT-1624, PLAT-1626).
 - GDPR Articles outside 25, 30, 32 and 35, including data-subject rights, international transfers, and breach notifications under Articles 33 and 34; AI Act provisions outside the selected high-risk provider/deployer duties and Annex IV, including prohibited practices, general-purpose AI models and fundamental-rights impact assessments; engine changes; legal advice or compliance determinations.
+- The 2025 consultation drafts of a revised Annex 11, a revised Chapter 4 and a new Annex 22; none is in force, and none is specified here. The Chapter 4 in force is not part of this set.
 - Any source text or expression from harmonised or other paywalled standards.
 
 ## System Overview
@@ -182,6 +184,165 @@ This table is normative for every Annex IV point included. Each point has mandat
 
 The `ai_annex_iv_<point>_applicable` dimensions are person-supplied yes/no values. Each point can therefore resolve independently to binding, not_binding, or unresolved without inferring system features. For `IV-7`, the set records the documentation category without naming, numbering, quoting, or paraphrasing any harmonised standard, standardisation-request deliverable, or other paywalled standard. `IV-8` has no direct Annex II counterpart because the MDR declaration is defined separately from its Annex II technical-documentation contents.
 
+## Annex 11 Set Design
+
+The Annex 11 set uses authority `eu`, ID `eu-gmp-annex-11`, and version `2011-01`. The source is EudraLex Volume 4, Annex 11 "Computerised Systems", the January 2011 revision published by the European Commission, which the Commission's Volume 4 page lists as the current Annex 11. The official document URL is `https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf` and the listing page is `https://health.ec.europa.eu/medicinal-products/eudralex/eudralex-volume-4_en`. The version string is the year and month of the revision in force. A draft revision of Annex 11 was published for stakeholder consultation in July 2025 with comments due 7 October 2025; it is a draft, not in force, and this set does not specify it. If the Commission adopts a revised Annex 11, the adopted text is a new set version named by its own revision date, and the `2011-01` set stays unchanged for systems still assessed against the 2011 text.
+
+Rights are `structure: citation_only`, `text: original`, and `clearance_ref: null`. Licence metadata says exactly: `European Commission documents may be reused under the Commission reuse policy (Decision 2011/833/EU); the Commission legal notice (https://commission.europa.eu/legal-notice_en) licenses Commission content under CC BY 4.0 with attribution. The Annex 11 document carries no licence statement of its own. This set reproduces no Annex 11 text.` Attribution says `© European Union. Source: <{official document URL}>. Original summaries; changes made.` The set reproduces no Annex 11 sentence, so it does not depend on the reuse licence for any copied text.
+
+Annex 11 is part of the EU GMP guidelines, which interpret the binding GMP requirements; its wording is "should". All clauses are therefore `recommended`. The module does not say whether a system complies with the underlying GMP law.
+
+Clause IDs are the Annex 11 paragraph numbers: `1`, `2`, `3.1`, `4.3`, `12.4`, and `14(a)`. The Principle statement is not a clause. IDs contain no slash. The person supplies every applicability dimension; the tool never infers one from the product, the data, or a risk score. Dimensions each have values `yes` and `no`: `gmp_regulated_use` (the system is used in GMP-regulated activity), `third_party_supplier`, `custom_or_customised`, `data_exchange` (data exchanged electronically with other systems), `data_migration`, `manual_critical_entry`, `batch_release_records`, `electronic_signature_use`, `batch_certification_in_system`, `critical_process_support`, and `data_archived`. Every clause requires `eq gmp_regulated_use yes`; a clause with a second dimension requires `all[eq gmp_regulated_use yes, eq <dimension> yes]`. A `no` value makes the clause not binding; a missing value leaves it unresolved. The risk-scaled paragraphs carry `approvalRoles: [system-owner]`. Annex 11 paragraph 2 names the system owner, with the process owner, as the person responsible for the system, so these decisions are the system owner's. Quoin decides discharge: today (quoin FR-208) a fact on an approval-role clause discharges only with a non-blank `approvalRef`, and once quoin FR-211 ships it requires an engineering-assurance-verified signed tag whose meaning equals an approval role. Whether a system, process, entry or datum is critical, and how the risk-scaled paragraphs (1, 3.2, 4.1, 4.3, 4.4, 6, 9, 12.2, 13, 16) are scaled, are human decisions the pack records but never makes.
+
+## Annex 11 Clause Table
+
+The table is normative for clause IDs, force, applicability and expected outputs. All clauses are `recommended`. `all[...]` denotes the engine's `all` expression, and `D` means the clause also requires `eq <dimension> yes`.
+
+| Clause ID | Subject (original summary) | Applicability | Expected outputs |
+|---|---|---|---|
+| `1` | Risk management across the system lifecycle, covering patient safety, data integrity and product quality | gmp_regulated_use | `risk-management-records`, `written-procedure` |
+| `2` | Close cooperation and suitable training and access for all people involved | gmp_regulated_use | `written-procedure`, `training-record` |
+| `3.1` | Formal agreement with a third party that provides or supports the system | D third_party_supplier | `supplier-agreement` |
+| `3.2` | Supplier competence and reliability weigh heavily in selection | D third_party_supplier | `supplier-assessment` |
+| `3.3` | Documentation and quality information of off-the-shelf products is assessed | D third_party_supplier | `soup-list`, `supplier-assessment` |
+| `3.4` | Inspectors can obtain the supplier's quality-system and audit information when they ask | D third_party_supplier | `supplier-assessment` |
+| `4.1` | Validation documentation covers the lifecycle and is justified by risk | gmp_regulated_use | `system-validation`, `verification-records` |
+| `4.2` | Validation documentation includes change-control and deviation records | gmp_regulated_use | `change-assurance-record`, `anomaly-list` |
+| `4.3` | Current inventory of GMP systems; critical systems also have a system description | gmp_regulated_use | `system-inventory`, `software-architecture`, `data-flow-model` |
+| `4.4` | Traceable user requirements based on GMP impact and risk | gmp_regulated_use | `software-requirements` |
+| `4.5` | The system is developed under a quality management system and the supplier is assessed | D third_party_supplier | `supplier-assessment`, `written-procedure` |
+| `4.6` | Custom or customised systems have formal assessment of quality and performance measures at each lifecycle stage | D custom_or_customised | `verification-records`, `system-validation` |
+| `4.7` | Evidence of suitable test methods, scenarios, limits, error handling, and adequate test tools and environments | gmp_regulated_use | `verification-records`, `system-validation` |
+| `4.8` | Data migrated to another format or system is checked for unchanged value and meaning | D data_migration | `verification-records`, `system-validation` |
+| `5` | Electronic data exchange has built-in checks for correct and secure entry and processing | D data_exchange | `data-flow-model`, `verification-records` |
+| `6` | Manually entered critical data has an additional accuracy check, with risk considered | D manual_critical_entry | `written-procedure`, `verification-records` |
+| `7.1` | Data is protected physically and electronically, remains accessible, readable and accurate through retention | gmp_regulated_use | `access-control`, `signed-record`, `written-procedure` |
+| `7.2` | Regular backups, with integrity, accuracy and restorability checked in validation and periodically | gmp_regulated_use | `backup-restore-record`, `written-procedure` |
+| `8.1` | Clear printed copies of stored electronic data can be obtained | gmp_regulated_use | `record-export` |
+| `8.2` | Batch-release supporting records can be printed showing whether data changed since first entry | D batch_release_records | `record-export`, `audit-trail` |
+| `9` | Risk-based audit trail of GMP-relevant changes and deletions, with reasons, readable and regularly reviewed | gmp_regulated_use | `audit-trail`, `approval-trail`, `written-procedure` |
+| `10` | Changes and configuration changes only under a defined, controlled procedure | gmp_regulated_use | `change-assurance-record`, `baseline-record`, `written-procedure` |
+| `11` | Periodic evaluation confirms the system stays validated and GMP-compliant | gmp_regulated_use | `periodic-evaluation-record` |
+| `12.1` | Physical or logical controls limit access to authorised people | gmp_regulated_use | `access-control`, `written-procedure` |
+| `12.2` | How strong the security controls are depends on how critical the system is | gmp_regulated_use | `security-risk-records`, `access-control` |
+| `12.3` | Creating, changing and cancelling access authorisations is recorded | gmp_regulated_use | `access-control`, `signer-registry`, `audit-trail` |
+| `12.4` | Systems record who entered, changed, confirmed or deleted data, with date and time | gmp_regulated_use | `audit-trail`, `approval-trail`, `signer-registry` |
+| `13` | Incidents are reported and assessed; critical incidents get root cause and corrective and preventive action | gmp_regulated_use | `anomaly-list`, `written-procedure` |
+| `14(a)` | Within the company an electronic signature has the same standing as a handwritten one | D electronic_signature_use | `signature-meaning`, `signer-registry`, `written-procedure` |
+| `14(b)` | A signature stays bound to the record it signs and cannot be detached | D electronic_signature_use | `signed-record`, `approval-trail` |
+| `14(c)` | A signature shows when it was applied | D electronic_signature_use | `signed-record`, `approval-trail` |
+| `15` | A system used for batch certification lets only Qualified Persons certify and records who did | D batch_certification_in_system | `batch-certification-record`, `written-procedure` |
+| `16` | Continuity arrangements for systems supporting critical processes, documented and tested | D critical_process_support | `business-continuity-plan` |
+| `17` | Archived data is periodically confirmed to be reachable, legible and intact, and retrieval is retested when equipment or programs change | D data_archived | `archive-verification-record`, `written-procedure` |
+
+A clause whose expected outputs are all procedures is customer-owned: `2`, `3.1`, `3.2`, `3.4`, `4.5`, `7.2`, `11`, `15`, `16` and `17`.
+
+## Annex 11 Clause Titles and Subjects
+
+Each clause carries the title and subject tags below. They label the clause for readers and selection; no applicability expression reads them.
+
+| Clause ID | Title | Subjects |
+|---|---|---|
+| `1` | Risk management | `risk` |
+| `2` | Personnel | `personnel` |
+| `3.1` | Supplier agreement | `suppliers` |
+| `3.2` | Supplier competence | `suppliers` |
+| `3.3` | Off-the-shelf product assessment | `suppliers` |
+| `3.4` | Supplier information for inspectors | `suppliers` |
+| `4.1` | Validation documentation | `validation` |
+| `4.2` | Validation change and deviation records | `validation` |
+| `4.3` | System inventory and description | `validation` |
+| `4.4` | User requirements | `validation` |
+| `4.5` | Development quality system | `validation` |
+| `4.6` | Custom system assessment | `validation` |
+| `4.7` | Testing evidence | `validation` |
+| `4.8` | Data migration checks | `validation` |
+| `5` | Data exchange checks | `data-exchange` |
+| `6` | Accuracy checks | `data-accuracy` |
+| `7.1` | Data protection and retention | `data-storage` |
+| `7.2` | Backup and restore | `data-storage` |
+| `8.1` | Printed copies | `printouts` |
+| `8.2` | Release printouts and data changes | `printouts` |
+| `9` | Audit trail | `audit-trail` |
+| `10` | Change and configuration management | `change-control` |
+| `11` | Periodic evaluation | `periodic-evaluation` |
+| `12.1` | Access restriction | `security` |
+| `12.2` | Security control extent | `security` |
+| `12.3` | Access authorisation records | `security` |
+| `12.4` | Operator identity records | `security` |
+| `13` | Incident management | `incidents` |
+| `14(a)` | Signature standing | `electronic-signature` |
+| `14(b)` | Signature linking | `electronic-signature` |
+| `14(c)` | Signature time | `electronic-signature` |
+| `15` | Batch certification | `batch-certification` |
+| `16` | Business continuity | `continuity` |
+| `17` | Archiving | `archiving` |
+
+## Annex 11 Output Bindings
+
+Expected outputs that already exist in the US Health-Law Output Catalog (`audit-trail`, `approval-trail`, `signed-record`, `signature-meaning`, `signer-registry`, `access-control`, `system-validation`, `written-procedure`, `training-record`, `verification-records`, `risk-management-records`, `software-requirements`, `software-architecture`, `soup-list`, `security-risk-records`, `anomaly-list`) keep that catalog's kind and description exactly; their tool limits travel in the Annex 11 clause text (see Annex 11 Tool Limits). A binding below states the command that produces the output today; "customer-supplied" means no quoin, quire or engineering-assurance command produces it, and the person supplies it. The pack never marks a customer-supplied output as produced.
+
+| Output | Producer command | Source and authoring | Limit stated |
+|---|---|---|---|
+| `audit-trail`, `approval-trail` | `engineering-assurance approval-trail` | Git history | Deleted tags are invisible; no reason-for-change field exists for every change, so paragraph 9 reasons stay a customer procedure |
+| `signed-record`, `signature-meaning` | `engineering-assurance signature-verify`, `engineering-assurance approval-verify` | Signed commits and tags | The signing time is the signer's own claim, neither attested nor checked |
+| `signer-registry` | none | Allowed-signers file the customer authors; read by `approval-trail` and `signature-verify` | It has no audit trail beyond git |
+| `change-assurance-record` | `quoin change-assurance write-record` | Explicit inputs from the producer | Records attribution only; it does not establish authorisation |
+| `baseline-record` | `quire validate` | Engineering-assurance `Baseline` artifact authored by a person and read by `release-verify` | A person decides its contents |
+| `verification-records` | `quoin matrix`, `quoin evidence record` | Suite run results | Reports what ran; does not judge adequacy |
+| `software-requirements`, `software-architecture`, `data-flow-model` | `quire validate` | Spec artifacts authored by people | None |
+| `security-risk-records` | `quire validate` | Security artifacts authored by people | Risk acceptance is a person's decision |
+| `risk-management-records` | `quoin risk-summary` | Safety artifacts authored by people | Risk acceptance is a person's decision |
+| `soup-list` | `quoin soup report` | SBOM components | Supplier assessment stays with the customer |
+| `anomaly-list` | `quoin anomaly check`, `quoin anomaly report` | Anomaly documents authored by people | Anomaly content is a person's assessment |
+| `record-export` | `quoin matrix`, `engineering-assurance approval-trail`, `quoin evidence audit` | Retained records | No printout shows a record's change history since first entry |
+| `system-validation` | none | Customer-supplied | No command produces validation evidence |
+| `access-control` | none | Customer-supplied | No command reads repository permissions |
+| `written-procedure`, `training-record` | none | Customer-supplied | The customer owns and supplies the record |
+| `supplier-agreement`, `supplier-assessment`, `system-inventory`, `backup-restore-record`, `periodic-evaluation-record`, `business-continuity-plan`, `archive-verification-record`, `batch-certification-record` | none | Customer-supplied | No backup or restore check, periodic evaluation, or archive re-verification after a signer or system change exists |
+
+## Annex 11 Tool Limits
+
+Descriptions of names shared with the US Health-Law Output Catalog are canonical and cannot carry Annex 11 limits. For each shared output that has a limit other than `None` in the Annex 11 Output Bindings table, whether or not a command produces it, the limit travels in the `text` of every Annex 11 clause whose expected outputs include that output, as a closing sentence beginning "Tool limit:". A clause binding several such outputs ends with each distinct sentence once. Names used only by Annex 11 carry their limit in their own catalog description.
+
+| Output | Tool limit sentence |
+|---|---|
+| `audit-trail`, `approval-trail` | Tool limit: deleted tags are invisible, and no reason-for-change field exists for every change. |
+| `signed-record`, `signature-meaning` | Tool limit: the signing time is the signer's own claim, neither attested nor checked. |
+| `signer-registry` | Tool limit: the allowed-signers registry has no audit trail beyond git. |
+| `verification-records` | Tool limit: the matrix and evidence report what ran and do not judge whether it is adequate. |
+| `risk-management-records`, `security-risk-records` | Tool limit: accepting a risk is a person's decision. |
+| `soup-list` | Tool limit: assessing the supplier stays with the customer. |
+| `anomaly-list` | Tool limit: an anomaly's content is a person's assessment. |
+| `system-validation` | Tool limit: no command produces validation evidence; the customer supplies it. |
+| `access-control` | Tool limit: no command reads repository permissions; the customer supplies them. |
+| `written-procedure`, `training-record` | Tool limit: the customer owns and supplies this record. |
+
+## Annex 11 Part 11 Crosswalk Policy
+
+Selected Annex 11 clauses crosswalk to `us-fda/21-cfr-11@2026-11-12` in `spec-clauses-us-health`. The target module is a test-time dependency and is never copied into this module. Relations are `partial` or `informative`; they never assert equivalence and never discharge the source clause. Every target resolves in the installed target module. Rationales use original wording that states the limited overlap.
+
+| Source clause | Part 11 targets | Relation |
+|---|---|---|
+| `2` | `11.10(i)` | `partial` |
+| `4.1` | `11.10(a)` | `partial` |
+| `4.7` | `11.10(a)` | `partial` |
+| `5` | `11.10(h)` | `informative` |
+| `7.1` | `11.10(c)` | `partial` |
+| `8.1` | `11.10(b)` | `partial` |
+| `8.2` | `11.10(b)` | `informative` |
+| `9` | `11.10(e)` | `partial` |
+| `10` | `11.10(k)` | `partial` |
+| `12.1` | `11.10(d)` | `partial` |
+| `12.1` | `11.10(g)` | `partial` |
+| `12.3` | `11.10(d)` | `informative` |
+| `12.4` | `11.10(e)` | `partial` |
+| `14(a)` | `11.10(j)` | `partial` |
+| `14(a)` | `11.100(c)` | `informative` |
+| `14(b)` | `11.70` | `partial` |
+| `14(c)` | `11.50(a)` | `partial` |
+| `17` | `11.10(c)` | `informative` |
+
 ## Security-Analysis Skill Disposition
 
 For PLAT-1628, retain `skills/spec-security-analysis/references/gdpr/ChII-Principles.md`, `ChIII-DataSubjectRights.md`, and `ChV-DataTransfers.md` as clearly labeled untyped context until future clause sets cover those chapters. Do not delete their summaries or treat them as evaluated clauses. Modify `skills/spec-security-analysis/references/gdpr/ChIV-ControllerProcessor.md` to replace the covered Article 25, 30, 32, and 35 summaries with links to `eu/gdpr-2016-679@2016-05-04`. Modify `skills/spec-security-analysis/references/gdpr/index.md`, `skills/spec-security-analysis/SKILL.md`, and `skills/spec-security-analysis/references/standards-index.md` to link the set and state the uncovered-topic boundary. These are the complete affected Quoin files; no other GDPR reference files are to be deleted or modified for this set.
@@ -277,6 +438,17 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | human-oversight-design | record | Human oversight roles, measures, competence and output-interpretation controls. |
 | post-market-monitoring-plan | document | Provider plan and evidence for post-market performance monitoring. |
 | conformity-declaration | document | EU declaration of conformity and its controlled reference. |
+| supplier-agreement | procedure | Customer-owned formal agreement with a third party that provides or supports a computerised system; no quoin, quire or engineering-assurance command produces it. |
+| supplier-assessment | procedure | Customer-owned assessment of a supplier's competence, quality system and audit information; no quoin, quire or engineering-assurance command produces it. |
+| system-inventory | procedure | Customer-owned inventory of GMP-relevant computerised systems and their functionality; no quoin, quire or engineering-assurance command produces it. |
+| backup-restore-record | procedure | Customer-owned evidence that backups are taken and restoration is checked; no quoin, quire or engineering-assurance command produces it. |
+| periodic-evaluation-record | procedure | Customer-owned periodic evaluation of a system's validated and compliant state; no quoin, quire or engineering-assurance command produces it. |
+| business-continuity-plan | procedure | Customer-owned documented and tested continuity arrangements for a critical process; no quoin, quire or engineering-assurance command produces it. |
+| archive-verification-record | procedure | Customer-owned check of archived data for accessibility, readability and integrity; no quoin, quire or engineering-assurance command produces it. |
+| batch-certification-record | procedure | Customer-owned record of who certified batch release and their authority; no quoin, quire or engineering-assurance command produces it. |
+| change-assurance-record | record | Change-assurance record written by `quoin change-assurance write-record`, addressed by record id and revision; attribution only, it does not establish authorisation. |
+| baseline-record | record | Engineering-assurance Baseline document naming configuration items by repository path at one git commit; a person decides its contents. |
+| record-export | record | Human-readable rendering of retained records from `quoin matrix`, `engineering-assurance approval-trail` and `quoin evidence audit`; it does not show a record's change history since first entry. |
 
 `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
 
@@ -287,12 +459,22 @@ A clause whose expected outputs are all procedures is customer-owned and require
 | Clause set | Clause ID | Expected outputs |
 |---|---|---|
 | mdcg-2019-16 | 5.2 | written-procedure |
+| eu-gmp-annex-11 | 2 | written-procedure, training-record |
+| eu-gmp-annex-11 | 3.1 | supplier-agreement |
+| eu-gmp-annex-11 | 3.2 | supplier-assessment |
+| eu-gmp-annex-11 | 3.4 | supplier-assessment |
+| eu-gmp-annex-11 | 4.5 | supplier-assessment, written-procedure |
+| eu-gmp-annex-11 | 7.2 | backup-restore-record, written-procedure |
+| eu-gmp-annex-11 | 11 | periodic-evaluation-record |
+| eu-gmp-annex-11 | 15 | batch-certification-record, written-procedure |
+| eu-gmp-annex-11 | 16 | business-continuity-plan |
+| eu-gmp-annex-11 | 17 | archive-verification-record, written-procedure |
 
 ## Requirements Architecture
 
-FR-001 through FR-015 define module home, rights, MDR, MDCG and GDPR clauses and applicability, crosswalks, catalog, customer-owned obligations, skill mapping, and corpus. FR-016 through FR-022 define the AI Act sets, provider/deployer obligations, Annex IV table, human decision evidence, MDR crosswalks and application date. NFR-001 defines the general licensing and standards boundary; NFR-002 defines the GDPR-specific source and original-expression boundary; NFR-003 defines the AI Act source and standards boundary. StR-001 records the manufacturer's need for reviewable evidence; US-001 describes the human review outcome. All functional requirements trace to US-001.
+FR-001 through FR-015 define module home, rights, MDR, MDCG and GDPR clauses and applicability, crosswalks, catalog, customer-owned obligations, skill mapping, and corpus. FR-016 through FR-022 define the AI Act sets, provider/deployer obligations, Annex IV table, human decision evidence, MDR crosswalks and application date. NFR-001 defines the general licensing and standards boundary; NFR-002 defines the GDPR-specific source and original-expression boundary; NFR-003 defines the AI Act source and standards boundary. FR-023 through FR-028 define the Annex 11 set, its clause table and applicability, output bindings, Part 11 crosswalks, corpus discharge and human decisions; NFR-004 defines the Annex 11 source and rights boundary. StR-001 records the manufacturer's need for reviewable evidence; US-001 describes the human review outcome. All functional requirements trace to US-001.
 
-Dependency graph (an edge A → B means A depends on B): FR-003 → FR-001, FR-002, FR-006; FR-004 → FR-003; FR-005 → FR-001, FR-002, FR-003, FR-006; FR-006 → FR-001; FR-007 → FR-006; FR-008 → FR-001, FR-003, FR-004, FR-005, FR-006, FR-007; FR-009 → FR-001, FR-002, FR-006; FR-010 → FR-009; FR-011 → FR-010; FR-012 → FR-010, FR-011; FR-013 → FR-010, FR-011; FR-014 → FR-010; FR-015 → FR-009, FR-010; FR-016 → FR-001, FR-002; FR-017 → FR-016, FR-006; FR-018 → FR-016, FR-006; FR-019 → FR-017, FR-018; FR-020 → FR-017, FR-018; FR-021 → FR-018, FR-003; FR-022 → FR-016. NFR-001 constrains FR-001 through FR-022; NFR-002 constrains FR-009 through FR-015; NFR-003 constrains FR-016 through FR-022.
+Dependency graph (an edge A → B means A depends on B): FR-003 → FR-001, FR-002, FR-006; FR-004 → FR-003; FR-005 → FR-001, FR-002, FR-003, FR-006; FR-006 → FR-001; FR-007 → FR-006; FR-008 → FR-001, FR-003, FR-004, FR-005, FR-006, FR-007; FR-009 → FR-001, FR-002, FR-006; FR-010 → FR-009; FR-011 → FR-010; FR-012 → FR-010, FR-011; FR-013 → FR-010, FR-011; FR-014 → FR-010; FR-015 → FR-009, FR-010; FR-016 → FR-001, FR-002; FR-017 → FR-016, FR-006; FR-018 → FR-016, FR-006; FR-019 → FR-017, FR-018; FR-020 → FR-017, FR-018; FR-021 → FR-018, FR-003; FR-022 → FR-016. NFR-001 constrains FR-001 through FR-022; NFR-002 constrains FR-009 through FR-015; NFR-003 constrains FR-016 through FR-022. FR-023 → FR-001, FR-002; FR-024 → FR-023, FR-006; FR-025 → FR-024, FR-006; FR-026 → FR-024; FR-027 → FR-024, FR-025, FR-007, FR-008; FR-028 → FR-024, FR-027. NFR-004 constrains FR-023 through FR-028.
 
 ## Upstream Contracts
 
@@ -306,5 +488,7 @@ The module uses existing `clause-set-v1`, `clause_sets`, `quire clauses evaluate
 - Commission MDCG listing: `https://health.ec.europa.eu/medical-devices-sector/new-regulations/guidance-mdcg-endorsed-documents-and-other-guidance_en`.
 - EUR-Lex current consolidated GDPR text consulted: `https://eur-lex.europa.eu/eli/reg/2016/679/2016-05-04/eng`.
 - EUR-Lex legal notice on reuse and attribution: `https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en`.
+- EudraLex Volume 4 Annex 11 (January 2011) official document: `https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf`; Volume 4 listing: `https://health.ec.europa.eu/medicinal-products/eudralex/eudralex-volume-4_en`.
+- European Commission legal notice (reuse, CC BY 4.0): `https://commission.europa.eu/legal-notice_en`.
 - EUR-Lex consolidated AI Act text consulted: `https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng`.
 - EUR-Lex legal notice on reuse and attribution: `https://eur-lex.europa.eu/content/legal-notice/legal-notice.html?locale=en`.

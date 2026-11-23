@@ -7,3 +7,4 @@ clause_sets:
   - clauses/eu-gdpr-2016-679-2016-05-04.json
   - clauses/eu-ai-act-2024-1689-2026-07-27.json
   - clauses/eu-ai-act-2024-1689-annex-iv-2026-07-27.json
+  - clauses/eu-eu-gmp-annex-11-2011-01.json

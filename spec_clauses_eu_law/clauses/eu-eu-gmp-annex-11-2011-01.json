@@ -1,0 +1,1333 @@
+{
+  "schemaVersion": "clause-set-v1",
+  "authority": "eu",
+  "id": "eu-gmp-annex-11",
+  "title": "EU GMP Annex 11 computerised systems",
+  "version": "2011-01",
+  "rights": {
+    "structure": "citation_only",
+    "text": "original",
+    "clearance_ref": null,
+    "licence": "European Commission documents may be reused under the Commission reuse policy (Decision 2011/833/EU); the Commission legal notice (https://commission.europa.eu/legal-notice_en) licenses Commission content under CC BY 4.0 with attribution. The Annex 11 document carries no licence statement of its own. This set reproduces no Annex 11 text.",
+    "attribution": "© European Union. Source: <https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf>. Original summaries; changes made."
+  },
+  "source": {
+    "title": "EudraLex Volume 4, Annex 11: Computerised Systems",
+    "identifier": "EudraLex Volume 4 Annex 11 (January 2011)",
+    "officialUrl": "https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf"
+  },
+  "classificationDimensions": {
+    "gmp_regulated_use": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "batch_certification_in_system": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "batch_release_records": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "critical_process_support": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "custom_or_customised": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "data_archived": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "data_exchange": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "data_migration": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "electronic_signature_use": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "manual_critical_entry": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "third_party_supplier": {
+      "values": [
+        "yes",
+        "no"
+      ]
+    }
+  },
+  "outputCatalog": {
+    "access-control": {
+      "kind": "record",
+      "description": "Repository permission and branch-rule settings."
+    },
+    "anomaly-list": {
+      "kind": "record",
+      "description": "Unresolved anomalies reported by `quoin anomaly report`."
+    },
+    "approval-trail": {
+      "kind": "record",
+      "description": "Signed approval history for a record produced by the `approval-trail` capability."
+    },
+    "archive-verification-record": {
+      "kind": "procedure",
+      "description": "Customer-owned check of archived data for accessibility, readability and integrity; no quoin, quire or engineering-assurance command produces it."
+    },
+    "audit-trail": {
+      "kind": "record",
+      "description": "Git history and signed-approval history produced by the `approval-trail` capability for the record."
+    },
+    "backup-restore-record": {
+      "kind": "procedure",
+      "description": "Customer-owned evidence that backups are taken and restoration is checked; no quoin, quire or engineering-assurance command produces it."
+    },
+    "baseline-record": {
+      "kind": "record",
+      "description": "Engineering-assurance Baseline document naming configuration items by repository path at one git commit; a person decides its contents."
+    },
+    "batch-certification-record": {
+      "kind": "procedure",
+      "description": "Customer-owned record of who certified batch release and their authority; no quoin, quire or engineering-assurance command produces it."
+    },
+    "business-continuity-plan": {
+      "kind": "procedure",
+      "description": "Customer-owned documented and tested continuity arrangements for a critical process; no quoin, quire or engineering-assurance command produces it."
+    },
+    "change-assurance-record": {
+      "kind": "record",
+      "description": "Change-assurance record written by `quoin change-assurance write-record`, addressed by record id and revision; attribution only, it does not establish authorisation."
+    },
+    "data-flow-model": {
+      "kind": "record",
+      "description": "Architecture connections with their declared data flows and classifications."
+    },
+    "periodic-evaluation-record": {
+      "kind": "procedure",
+      "description": "Customer-owned periodic evaluation of a system's validated and compliant state; no quoin, quire or engineering-assurance command produces it."
+    },
+    "record-export": {
+      "kind": "record",
+      "description": "Human-readable rendering of retained records from `quoin matrix`, `engineering-assurance approval-trail` and `quoin evidence audit`; it does not show a record's change history since first entry."
+    },
+    "risk-management-records": {
+      "kind": "record",
+      "description": "`spec-objects-safety` `hazard` and `failure_mode` artifacts; `quoin risk-summary`."
+    },
+    "security-risk-records": {
+      "kind": "record",
+      "description": "`spec-objects-security` threat, risk, and control records."
+    },
+    "signature-meaning": {
+      "kind": "record",
+      "description": "The `Signed-off-meaning:` trailer verified by the `approval-verify` capability."
+    },
+    "signed-record": {
+      "kind": "record",
+      "description": "Signed commits and tags verified by the `signature-verify` capability."
+    },
+    "signer-registry": {
+      "kind": "record",
+      "description": "Allowed-signers mapping from signing key to named person, read by the `approval-trail` capability."
+    },
+    "software-architecture": {
+      "kind": "record",
+      "description": "`spec-objects-architecture` `part`, `port`, `connection`, and `allocation` artifacts; ADR artifacts from `spec-artifacts-process`."
+    },
+    "software-requirements": {
+      "kind": "record",
+      "description": "Requirements authored with the `spec-artifacts-iso` StR, FR, and NFR archetypes."
+    },
+    "soup-list": {
+      "kind": "record",
+      "description": "Software of unknown provenance (SOUP) report produced by `quoin soup report`."
+    },
+    "supplier-agreement": {
+      "kind": "procedure",
+      "description": "Customer-owned formal agreement with a third party that provides or supports a computerised system; no quoin, quire or engineering-assurance command produces it."
+    },
+    "supplier-assessment": {
+      "kind": "procedure",
+      "description": "Customer-owned assessment of a supplier's competence, quality system and audit information; no quoin, quire or engineering-assurance command produces it."
+    },
+    "system-inventory": {
+      "kind": "procedure",
+      "description": "Customer-owned inventory of GMP-relevant computerised systems and their functionality; no quoin, quire or engineering-assurance command produces it."
+    },
+    "system-validation": {
+      "kind": "record",
+      "description": "Validation evidence for the toolchain's intended use."
+    },
+    "training-record": {
+      "kind": "procedure",
+      "description": "Customer-owned training record."
+    },
+    "verification-records": {
+      "kind": "record",
+      "description": "`quire matrix` / `quoin matrix` results and `quoin evidence record`."
+    },
+    "written-procedure": {
+      "kind": "procedure",
+      "description": "Customer-owned written procedure."
+    }
+  },
+  "clauses": [
+    {
+      "id": "1",
+      "force": "recommended",
+      "title": "Risk management",
+      "text": "Risk management across the system lifecycle, covering patient safety, data integrity and product quality. Tool limit: accepting a risk is a person's decision. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "risk"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "risk-management-records",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "2",
+      "force": "recommended",
+      "title": "Personnel",
+      "text": "Close cooperation and suitable training and access for all people involved. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "personnel"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "written-procedure",
+        "training-record"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "3.1",
+      "force": "recommended",
+      "title": "Supplier agreement",
+      "text": "Formal agreement with a third party that provides or supports the system.",
+      "subjects": [
+        "suppliers"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "supplier-agreement"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "third_party_supplier",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3.2",
+      "force": "recommended",
+      "title": "Supplier competence",
+      "text": "Supplier competence and reliability weigh heavily in selection.",
+      "subjects": [
+        "suppliers"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "supplier-assessment"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "third_party_supplier",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3.3",
+      "force": "recommended",
+      "title": "Off-the-shelf product assessment",
+      "text": "Documentation and quality information of off-the-shelf products is assessed. Tool limit: assessing the supplier stays with the customer.",
+      "subjects": [
+        "suppliers"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "soup-list",
+        "supplier-assessment"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "third_party_supplier",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3.4",
+      "force": "recommended",
+      "title": "Supplier information for inspectors",
+      "text": "Inspectors can obtain the supplier's quality-system and audit information when they ask.",
+      "subjects": [
+        "suppliers"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "supplier-assessment"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "third_party_supplier",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "4.1",
+      "force": "recommended",
+      "title": "Validation documentation",
+      "text": "Validation documentation covers the lifecycle and is justified by risk. Tool limit: no command produces validation evidence; the customer supplies it. Tool limit: the matrix and evidence report what ran and do not judge whether it is adequate.",
+      "subjects": [
+        "validation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "system-validation",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "4.2",
+      "force": "recommended",
+      "title": "Validation change and deviation records",
+      "text": "Validation documentation includes change-control and deviation records. Tool limit: an anomaly's content is a person's assessment.",
+      "subjects": [
+        "validation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "change-assurance-record",
+        "anomaly-list"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "4.3",
+      "force": "recommended",
+      "title": "System inventory and description",
+      "text": "Current inventory of GMP systems; critical systems also have a system description.",
+      "subjects": [
+        "validation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "system-inventory",
+        "software-architecture",
+        "data-flow-model"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "4.4",
+      "force": "recommended",
+      "title": "User requirements",
+      "text": "Traceable user requirements based on GMP impact and risk.",
+      "subjects": [
+        "validation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "software-requirements"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "4.5",
+      "force": "recommended",
+      "title": "Development quality system",
+      "text": "The system is developed under a quality management system and the supplier is assessed. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "validation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "supplier-assessment",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "third_party_supplier",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "4.6",
+      "force": "recommended",
+      "title": "Custom system assessment",
+      "text": "Custom or customised systems have formal assessment of quality and performance measures at each lifecycle stage. Tool limit: the matrix and evidence report what ran and do not judge whether it is adequate. Tool limit: no command produces validation evidence; the customer supplies it.",
+      "subjects": [
+        "validation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "verification-records",
+        "system-validation"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "custom_or_customised",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "4.7",
+      "force": "recommended",
+      "title": "Testing evidence",
+      "text": "Evidence of suitable test methods, scenarios, limits, error handling, and adequate test tools and environments. Tool limit: the matrix and evidence report what ran and do not judge whether it is adequate. Tool limit: no command produces validation evidence; the customer supplies it.",
+      "subjects": [
+        "validation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "verification-records",
+        "system-validation"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "4.8",
+      "force": "recommended",
+      "title": "Data migration checks",
+      "text": "Data migrated to another format or system is checked for unchanged value and meaning. Tool limit: the matrix and evidence report what ran and do not judge whether it is adequate. Tool limit: no command produces validation evidence; the customer supplies it.",
+      "subjects": [
+        "validation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "verification-records",
+        "system-validation"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "data_migration",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "5",
+      "force": "recommended",
+      "title": "Data exchange checks",
+      "text": "Electronic data exchange has built-in checks for correct and secure entry and processing. Tool limit: the matrix and evidence report what ran and do not judge whether it is adequate.",
+      "subjects": [
+        "data-exchange"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "data-flow-model",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "data_exchange",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "6",
+      "force": "recommended",
+      "title": "Accuracy checks",
+      "text": "Manually entered critical data has an additional accuracy check, with risk considered. Tool limit: the customer owns and supplies this record. Tool limit: the matrix and evidence report what ran and do not judge whether it is adequate.",
+      "subjects": [
+        "data-accuracy"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "written-procedure",
+        "verification-records"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "manual_critical_entry",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "7.1",
+      "force": "recommended",
+      "title": "Data protection and retention",
+      "text": "Data is protected physically and electronically, remains accessible, readable and accurate through retention. Tool limit: no command reads repository permissions; the customer supplies them. Tool limit: the signing time is the signer's own claim, neither attested nor checked. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "data-storage"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "access-control",
+        "signed-record",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "7.2",
+      "force": "recommended",
+      "title": "Backup and restore",
+      "text": "Regular backups, with integrity, accuracy and restorability checked in validation and periodically. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "data-storage"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "backup-restore-record",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "8.1",
+      "force": "recommended",
+      "title": "Printed copies",
+      "text": "Clear printed copies of stored electronic data can be obtained.",
+      "subjects": [
+        "printouts"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "record-export"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "8.2",
+      "force": "recommended",
+      "title": "Release printouts and data changes",
+      "text": "Batch-release supporting records can be printed showing whether data changed since first entry. Tool limit: deleted tags are invisible, and no reason-for-change field exists for every change.",
+      "subjects": [
+        "printouts"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "record-export",
+        "audit-trail"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "batch_release_records",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "9",
+      "force": "recommended",
+      "title": "Audit trail",
+      "text": "Risk-based audit trail of GMP-relevant changes and deletions, with reasons, readable and regularly reviewed. Tool limit: deleted tags are invisible, and no reason-for-change field exists for every change. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "audit-trail"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "audit-trail",
+        "approval-trail",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "10",
+      "force": "recommended",
+      "title": "Change and configuration management",
+      "text": "Changes and configuration changes only under a defined, controlled procedure. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "change-control"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "change-assurance-record",
+        "baseline-record",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "11",
+      "force": "recommended",
+      "title": "Periodic evaluation",
+      "text": "Periodic evaluation confirms the system stays validated and GMP-compliant.",
+      "subjects": [
+        "periodic-evaluation"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "periodic-evaluation-record"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "12.1",
+      "force": "recommended",
+      "title": "Access restriction",
+      "text": "Physical or logical controls limit access to authorised people. Tool limit: no command reads repository permissions; the customer supplies them. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "access-control",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "12.2",
+      "force": "recommended",
+      "title": "Security control extent",
+      "text": "How strong the security controls are depends on how critical the system is. Tool limit: accepting a risk is a person's decision. Tool limit: no command reads repository permissions; the customer supplies them.",
+      "subjects": [
+        "security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "security-risk-records",
+        "access-control"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "12.3",
+      "force": "recommended",
+      "title": "Access authorisation records",
+      "text": "Creating, changing and cancelling access authorisations is recorded. Tool limit: no command reads repository permissions; the customer supplies them. Tool limit: the allowed-signers registry has no audit trail beyond git. Tool limit: deleted tags are invisible, and no reason-for-change field exists for every change.",
+      "subjects": [
+        "security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "access-control",
+        "signer-registry",
+        "audit-trail"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "12.4",
+      "force": "recommended",
+      "title": "Operator identity records",
+      "text": "Systems record who entered, changed, confirmed or deleted data, with date and time. Tool limit: deleted tags are invisible, and no reason-for-change field exists for every change. Tool limit: the allowed-signers registry has no audit trail beyond git.",
+      "subjects": [
+        "security"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "audit-trail",
+        "approval-trail",
+        "signer-registry"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "13",
+      "force": "recommended",
+      "title": "Incident management",
+      "text": "Incidents are reported and assessed; critical incidents get root cause and corrective and preventive action. Tool limit: an anomaly's content is a person's assessment. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "incidents"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "anomaly-list",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "eq",
+        "dimension": "gmp_regulated_use",
+        "value": "yes"
+      }
+    },
+    {
+      "id": "14(a)",
+      "force": "recommended",
+      "title": "Signature standing",
+      "text": "Within the company an electronic signature has the same standing as a handwritten one. Tool limit: the signing time is the signer's own claim, neither attested nor checked. Tool limit: the allowed-signers registry has no audit trail beyond git. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "electronic-signature"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "signature-meaning",
+        "signer-registry",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "electronic_signature_use",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "14(b)",
+      "force": "recommended",
+      "title": "Signature linking",
+      "text": "A signature stays bound to the record it signs and cannot be detached. Tool limit: the signing time is the signer's own claim, neither attested nor checked. Tool limit: deleted tags are invisible, and no reason-for-change field exists for every change.",
+      "subjects": [
+        "electronic-signature"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "signed-record",
+        "approval-trail"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "electronic_signature_use",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "14(c)",
+      "force": "recommended",
+      "title": "Signature time",
+      "text": "A signature shows when it was applied. Tool limit: the signing time is the signer's own claim, neither attested nor checked. Tool limit: deleted tags are invisible, and no reason-for-change field exists for every change.",
+      "subjects": [
+        "electronic-signature"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "signed-record",
+        "approval-trail"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "electronic_signature_use",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "15",
+      "force": "recommended",
+      "title": "Batch certification",
+      "text": "A system used for batch certification lets only Qualified Persons certify and records who did. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "batch-certification"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "batch-certification-record",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "batch_certification_in_system",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "16",
+      "force": "recommended",
+      "title": "Business continuity",
+      "text": "Continuity arrangements for systems supporting critical processes, documented and tested.",
+      "subjects": [
+        "continuity"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [
+        "system-owner"
+      ],
+      "styles": {},
+      "expectedOutputs": [
+        "business-continuity-plan"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "critical_process_support",
+            "value": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "17",
+      "force": "recommended",
+      "title": "Archiving",
+      "text": "Archived data is periodically confirmed to be reachable, legible and intact, and retrieval is retested when equipment or programs change. Tool limit: the customer owns and supplies this record.",
+      "subjects": [
+        "archiving"
+      ],
+      "obligatedActors": [],
+      "approvalRoles": [],
+      "styles": {},
+      "expectedOutputs": [
+        "archive-verification-record",
+        "written-procedure"
+      ],
+      "applicability": {
+        "op": "all",
+        "terms": [
+          {
+            "op": "eq",
+            "dimension": "gmp_regulated_use",
+            "value": "yes"
+          },
+          {
+            "op": "eq",
+            "dimension": "data_archived",
+            "value": "yes"
+          }
+        ]
+      }
+    }
+  ],
+  "crosswalks": [
+    {
+      "sourceClause": "2",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(i)"
+      },
+      "relation": "partial",
+      "rationale": "Training and experience of the people who develop and use the system overlaps with the Annex duty for cooperation and suitable training, but Part 11 does not address process-owner and system-owner cooperation."
+    },
+    {
+      "sourceClause": "4.1",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(a)"
+      },
+      "relation": "partial",
+      "rationale": "Validating a system to show it performs as intended overlaps with lifecycle validation documentation, but the Annex ties the extent of documentation to a documented risk judgement."
+    },
+    {
+      "sourceClause": "4.7",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(a)"
+      },
+      "relation": "partial",
+      "rationale": "Validation to show reliable intended performance overlaps with evidence of test methods and scenarios, but the Annex also asks for limit testing, error handling and an adequacy review of test tools."
+    },
+    {
+      "sourceClause": "5",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(h)"
+      },
+      "relation": "informative",
+      "rationale": "Checks on the validity of data sources or operations can inform built-in checks on exchanged data, but they do not cover secure processing of data received from other systems."
+    },
+    {
+      "sourceClause": "7.1",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(c)"
+      },
+      "relation": "partial",
+      "rationale": "Protecting records so they stay accurate and retrievable through the retention period overlaps with secured, readable and accessible stored data, without covering physical protection against damage."
+    },
+    {
+      "sourceClause": "8.1",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(b)"
+      },
+      "relation": "partial",
+      "rationale": "Producing accurate and complete copies of records overlaps with obtaining clear printed copies, but the copies are for inspection and the Annex does not require a particular form."
+    },
+    {
+      "sourceClause": "8.2",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(b)"
+      },
+      "relation": "informative",
+      "rationale": "Complete copies of records can inform release-supporting printouts, but they do not show whether data changed since first entry."
+    },
+    {
+      "sourceClause": "9",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(e)"
+      },
+      "relation": "partial",
+      "rationale": "Secure, time-stamped audit trails of record changes overlap with a risk-based record of GMP-relevant changes and deletions, but the Annex also asks for documented reasons and regular review."
+    },
+    {
+      "sourceClause": "10",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(k)"
+      },
+      "relation": "partial",
+      "rationale": "Revision and change-control procedures over system documentation overlap with controlled changes to a computerised system, but the Annex covers configuration changes to the system itself."
+    },
+    {
+      "sourceClause": "12.1",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(d)"
+      },
+      "relation": "partial",
+      "rationale": "Limiting system access to authorised individuals overlaps with physical or logical access restrictions, but the Annex also lists physical access to equipment and storage areas."
+    },
+    {
+      "sourceClause": "12.1",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(g)"
+      },
+      "relation": "partial",
+      "rationale": "Authority checks on who may use the system, sign or alter records contribute to access restrictions, but they cover only operations inside the system."
+    },
+    {
+      "sourceClause": "12.3",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(d)"
+      },
+      "relation": "informative",
+      "rationale": "Limiting access to authorised individuals informs the authorisations, but it does not require a record of creating, changing and cancelling them."
+    },
+    {
+      "sourceClause": "12.4",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(e)"
+      },
+      "relation": "partial",
+      "rationale": "Audit trails that record operator actions overlap with recording who entered, changed, confirmed or deleted data and when, but the Annex scopes this to data and document management systems."
+    },
+    {
+      "sourceClause": "14(a)",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(j)"
+      },
+      "relation": "partial",
+      "rationale": "Written policies that hold individuals accountable for actions under their signatures overlap with giving electronic signatures the standing of handwritten ones within the company."
+    },
+    {
+      "sourceClause": "14(a)",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.100(c)"
+      },
+      "relation": "informative",
+      "rationale": "The certification that electronic signatures are intended as legally binding equivalents informs signature standing, but it is a submission to a regulator, not an in-company rule."
+    },
+    {
+      "sourceClause": "14(b)",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.70"
+      },
+      "relation": "partial",
+      "rationale": "Linking signatures to their records so they cannot be copied or removed overlaps with permanent linking, without prescribing how the link is made."
+    },
+    {
+      "sourceClause": "14(c)",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.50(a)"
+      },
+      "relation": "partial",
+      "rationale": "Signed records showing the date and time of signing overlap with signatures including the time and date applied, but Part 11 also requires the signer's name and the meaning."
+    },
+    {
+      "sourceClause": "17",
+      "target": {
+        "set": {
+          "authority": "us-fda",
+          "id": "21-cfr-11",
+          "version": "2026-11-12"
+        },
+        "clause": "11.10(c)"
+      },
+      "relation": "informative",
+      "rationale": "Keeping records accurate and retrievable through the retention period informs archived-data checks, but it does not require retrieval tests after system changes."
+    }
+  ]
+}

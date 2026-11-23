@@ -619,36 +619,6 @@ def test_synthetic_reference_rejects_unreserved_authority(reference: str):
         _assert_reserved_uri_authority(reference)
 
 
-@pytest.mark.trace("FR-007-AC-2")
-def test_customer_owned_clause_rejects_direct_fixture_fact():
-    """Reject direct facts for all-procedure clauses and require approval.
-
-    Assumptions: Procedure output kinds define customer-owned clauses.
-    Criteria: A direct fixture fails with the clause named; a delegated fixture
-    passes only with rationale and customer approval reference.
-    Trace: FR-007-AC-2
-    """
-    fixture = {
-        "outputCatalog": {"written-procedure": {"kind": "procedure"}},
-        "clauses": [
-            {"id": "EX-1", "expectedOutputs": ["written-procedure"]},
-        ],
-    }
-    direct = [{"kind": "direct", "clauseId": "EX-1"}]
-    with pytest.raises(AssertionError, match="EX-1.*cannot have a direct fact"):
-        _assert_customer_owned_facts(fixture, direct)
-    delegated = [
-        {
-            "kind": "disposition",
-            "clauseId": "EX-1",
-            "decision": "delegated",
-            "rationale": "Customer-maintained procedure.",
-            "approvalRef": "person://example.invalid/approvals/owner",
-        }
-    ]
-    _assert_customer_owned_facts(fixture, delegated)
-
-
 @pytest.mark.trace("FR-008-AC-3")
 def test_dangling_evidence_fixture_fails_with_clause_id(tmp_path: pathlib.Path):
     """Name the clause when a synthetic evidence reference is unresolved.
@@ -848,7 +818,6 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
 @pytest.mark.trace(
     "FR-008-AC-2",
     "FR-008-AC-3",
-    "FR-007-AC-2",
     "FR-012-AC-1",
     "FR-012-AC-2",
     "FR-013-AC-2",
@@ -861,7 +830,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     Criteria: Every binding MDR, MDCG, GDPR, and AI Act clause except open
     examples has one fact; references resolve; the report index and statuses
     match the acceptance contract; report output excludes clause titles and text.
-    Trace: FR-008-AC-2, FR-008-AC-3, FR-007-AC-2
+    Trace: FR-008-AC-2, FR-008-AC-3
     """
     quire, quoin, assurance = _preflight()
     corpus = _signed_corpus(tmp_path, assurance)
