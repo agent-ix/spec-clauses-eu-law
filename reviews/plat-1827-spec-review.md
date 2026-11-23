@@ -32,3 +32,11 @@ Ticket: PLAT-1827. Reviewed the MDR Clause Table edits, the MDCG Companion Table
 
 - Examined: MDR rows I-14.2(d), I-17.2, I-17.4, I-18.8, II-5. MDCG rows 2.1, 2.3, 2.6, 3.1, 3.2, 3.3, 3.6, 3.7, 3.8, 4.3, 5.1, 5.2. Catalog row it-requirements-statement. FR-003-AC-4, FR-005-AC-4.
 - The spec prose has no standard text, designators, scores, classes or ticket narration.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | I-14.2(d) now expects it-requirements-statement and security-risk-records in spec.md and the MDR JSON. FR-003-AC-4 states it and the test asserts it. |
+| FND-002 | fixed | FR-003-AC-4 now names the I-17.2 and II-5 additions. |
+| FND-003 | fixed | FR-005-AC-4 now names the 3.7/3.6 crosswalk pairs and 3.8 security records. |

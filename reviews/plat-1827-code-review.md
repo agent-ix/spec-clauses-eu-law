@@ -35,3 +35,19 @@ The two crosswalk-test failures seen locally are not caused by this PR (see Cove
 - Pre-existing, not caused by this PR: `test_mdcg_crosswalks_match_spec_and_resolve_to_mdr` and `test_ai_act_crosswalks_match_the_annex_table_and_resolve_to_mdr` fail identically on origin/main 4c159e2. `assert_crosswalk_targets_resolve` walks every loaded set, including the GDPR→HIPAA crosswalks. On this machine, `quoin module list` (global quoin 0.36.8) has no `spec_clauses_us_health` module. `_installed_clause_set` returns None, so the target clause list is empty, and the first us-hhs crosswalk (`art-32(1)(a)`→`164.312(a)(2)(iv)`) is reported as a missing clause. That id exists in `us-hhs/45-cfr-164-subpart-c@2026-11-12` at both spec-clauses-us-health origin/main and the CI-pinned ca78ac0. CI installs that module and both tests pass there. PLAT-1824 is unrelated.
 - Hard rules: the diff contains no standard text, designators, scores, classes or ticket narration. Nothing is vendored.
 - MDCG section topics were judged from the module's own original section summaries. The official PDF could not be fetched (HTTP 429).
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-005 | high | The new missing-set message in `assert_crosswalk_targets_resolve` drops the target clause id. FR-014-AC-2 requires both the missing set key and the clause id, so `test_gdpr_article32_missing_nist_set_names_source_and_target` now fails locally and in CI run 45234136495. | tests/conftest.py:200-205 |
+| FND-006 | high | Every EU set now uses the US origin/main output descriptions, but CI still checks out spec-clauses-us-health at ca78ac0. Its `verification-records` text differs, so `test_all_declared_sets_share_one_output_catalog` fails in CI run 45234136495. It passes against US origin/main 926c22d. | .github/workflows/ci.yml:24-28, spec_clauses_eu_law/clauses/eu-ai-act-2024-1689-annex-iv-2026-07-27.json:208-210 |
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The delegated fact now carries `owner`. `test_records_facts_and_renders_both_clause_sets` passes locally (quoin 0.36.8) and is not among the CI failures at 479718c. FR-007 now names the owner field. |
+| FND-002 | fixed | The 5.2→I-3 rationale now states mapping scope only, and the test docstring no longer makes the toolchain claim. |
+| FND-003 | fixed | The 3.8→I-18.8 row and 3.8 expectedOutputs include security-risk-records, and the FR-005-AC-4 test asserts it. |
+| FND-004 | fixed | The 2.1→I-1 rationale now refers to the security goals. |

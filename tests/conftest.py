@@ -201,7 +201,7 @@ def assert_crosswalk_targets_resolve(
                     raise AssertionError(
                         f"crosswalk from {source_key}#{crosswalk['sourceClause']} "
                         f"targets clause set {target_key}, which is neither loaded "
-                        f"nor installed"
+                        f"nor installed: {target_key}#{target['clause']}"
                     )
                 target_clauses = target_clause_set.get("clauses", [])
             if not any(clause["id"] == target["clause"] for clause in target_clauses):

@@ -34,3 +34,9 @@ Ticket: PLAT-1827. `quoin matrix --repo . --json` was run on head d8b6d5e. FR-00
 
 - Bindings verified: test_mdr_security_prerequisite_clauses_map_to_security_and_it_outputs → FR-003-AC-4 (correct). test_mdcg_security_sections_map_to_security_and_customer_outputs → FR-005-AC-4 (correct).
 - Pre-existing, outside this diff: FR-006-AC-3 (`test_all_declared_sets_share_one_output_catalog`, tests/test_clause_sets.py:793) passes vacuously when `spec_clauses_us_health` is not installed, because `_installed_clause_sets` returns []. FR-006's Dependencies section requires the gate to fail instead. Against spec-clauses-us-health origin/main, six shared names drift: anomaly-list, release-record, risk-management-records, software-architecture, software-requirements and verification-records. The CI checkout of the older ca78ac0 hides this. This PR's catalog edits (it-requirements-statement, which is not in the US catalog, and soup-list and written-procedure, which match US exactly) add no drift.
+
+## Dispositions
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | spec.md has an exhaustive Customer-Owned Obligations inventory (mdcg-2019-16 5.2). `test_all_procedure_clauses_match_the_customer_owned_inventory` is tagged FR-007-AC-1 and passes. FR-007-AC-1 now requires an exact match. |
