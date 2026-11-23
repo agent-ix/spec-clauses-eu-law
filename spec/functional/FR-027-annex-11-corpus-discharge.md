@@ -39,4 +39,4 @@ The pack SHALL NOT render an aggregate score, percentage or overall determinatio
 
 ## Dependencies
 
-Corpus rules are defined in [FR-008](./FR-008-reference-corpus.md); customer-owned handling in [FR-007](./FR-007-customer-owned-obligations.md). If `quire` or `quoin` lacks the needed capability the gate fails naming it. FR-027-AC-6 is verified through quoin once quoin FR-211 ships; temporary-store cleanup is covered by FR-008-AC-2.
+Corpus rules are defined in [FR-008](./FR-008-reference-corpus.md); customer-owned handling in [FR-007](./FR-007-customer-owned-obligations.md). If `quire` or `quoin` lacks the needed capability the gate fails naming it. FR-027-AC-6 is verified through quoin under its FR-211; temporary-store cleanup is covered by FR-008-AC-2.

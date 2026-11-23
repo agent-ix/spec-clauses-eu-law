@@ -24,4 +24,4 @@ When a clause has only outputs of kind `procedure`, the pack SHALL accept a dele
 
 ## Dependencies
 
-Depends on FR-006 because procedure output kinds define which clauses are customer-owned. The pack owns the classification test; quoin owns the direct-fact rejection, so FR-007-AC-3 is verified through quoin once FR-211 ships; Quoin owns disposition evaluation and rendering of tailoring fields in the RMM. If `quoin evidence record-discharge` or `quoin discharge --rmm` is unavailable, integration verification fails with the missing executable or capability and does not skip the criterion.
+Depends on FR-006 because procedure output kinds define which clauses are customer-owned. The pack owns the classification test; quoin owns the direct-fact rejection, so FR-007-AC-3 is verified through quoin under its FR-211; Quoin owns disposition evaluation and rendering of tailoring fields in the RMM. If `quoin evidence record-discharge` or `quoin discharge --rmm` is unavailable, integration verification fails with the missing executable or capability and does not skip the criterion.

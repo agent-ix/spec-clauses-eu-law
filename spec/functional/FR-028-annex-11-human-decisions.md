@@ -14,7 +14,7 @@ relationships:
 
 ## Description
 
-The pack SHALL leave every risk-based and criticality decision in Annex 11 to the system owner: the risk scaling of paragraphs 1, 3.2, 4.1, 4.4, 6, 9 and 16, and the criticality judgments in 4.3, 12.2 and 13. These ten clauses SHALL carry the approval role `system-owner`, and quoin SHALL discharge a fact or disposition on any of them only with an `approvalRef`: a non-blank value under quoin FR-208 today, and an engineering-assurance-verified signed tag whose meaning equals the role under quoin FR-211 once it ships. The tool SHALL NOT create, infer, score or accept any such decision.
+The pack SHALL leave every risk-based and criticality decision in Annex 11 to the system owner: the risk scaling of paragraphs 1, 3.2, 4.1, 4.4, 6, 9 and 16, and the criticality judgments in 4.3, 12.2 and 13. These ten clauses SHALL carry the approval role `system-owner`, and quoin SHALL discharge a fact or disposition on any of them only with an `approvalRef`: a non-blank value (quoin FR-208) that engineering-assurance verifies as a signed tag whose meaning equals the role (quoin FR-211). The tool SHALL NOT create, infer, score or accept any such decision.
 
 ## Acceptance Criteria
 
