@@ -58,7 +58,7 @@ GDPR_EVIDENCE_REFS = {
         "evidence://example.invalid/gdpr/processing-access-control.json"
     ),
     "written-procedure": "evidence://example.invalid/requirements/FR-001.md",
-    "backup-restore-record": "evidence://example.invalid/evidence/index.json",
+    "backup-restore-record": "evidence://example.invalid/gdpr/backup-restore-record.json",
     "training-record": "evidence://example.invalid/requirements/NFR-001.md",
     "verification-records": "evidence://example.invalid/tests/TM-001.md",
 }

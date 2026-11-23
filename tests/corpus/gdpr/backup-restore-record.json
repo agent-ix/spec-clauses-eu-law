@@ -1,0 +1,9 @@
+{
+  "recordType": "synthetic-customer-supplied-backup-restore-record",
+  "suppliedBy": "customer",
+  "backups": {
+    "frequency": "daily",
+    "restoreCheck": "quarterly restore of the support-request store to a scratch system"
+  },
+  "owner": "person://example.invalid/people/privacy-officer"
+}

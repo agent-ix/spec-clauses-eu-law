@@ -57,3 +57,12 @@ Changes requested on FND-001. Bindings verified:
 - FR-013-AC-2 (examined)
 - FR-010-AC-1 (context_only)
 - FR-010-AC-2 (context_only)
+
+## Dispositions
+
+Round 1, verified against `git diff b249533c..f3f72745` with `quoin matrix --repo . --json` (quoin 0.36.10) at f3f72745.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The old FR-012-AC-2 (accepted_risk disposition) was deleted along with its disposition test cases. FR-012-AC-1 is now backed by three tests: the static role test, the negative direct test and the positive control. |
+| FND-002 | fixed | quoin matrix now reports FR-013-AC-1 as tagged by test_gdpr_art30_activity_clauses_name_records_of_processing and FR-013-AC-2 as tagged by test_records_facts_and_renders_both_clause_sets (the marker is now a single line). |

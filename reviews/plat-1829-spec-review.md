@@ -73,3 +73,26 @@ Out of this PR, recommended as a follow-up ticket: the Annex 11 set binds reposi
 - FR-012-AC-2 (examined)
 - FR-012-AC-3 (examined)
 - FR-013 (examined)
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-005 | low | Deleting FR-012-AC-2 renumbered the old Inspection criterion FR-012-AC-3 to FR-012-AC-2. The id now names a different criterion, so earlier review records (SR-033 FND-001, SR-034 FND-002) point at text they never examined. | spec/functional/FR-012-human-dpia-risk-acceptance.md:29 |
+
+### FND-005 — FR-012-AC-2
+
+New text: "The set and module contract contain no risk score, threshold, or automated risk-acceptability field for DPIA decisions." That is the former FR-012-AC-3.
+
+Expected fix: Restore the id FR-012-AC-3 for this criterion and leave AC-2 unused. Never reuse a criterion id for different text.
+
+## Dispositions
+
+Round 1, verified against `git diff b249533c..f3f72745`.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | art-32(1)(c) names backup-restore-record in the spec table and JSON. The GDPR catalog entry equals the Annex 11 kind and description, FR-010-AC-6 was added, and test_gdpr_art32_1_c_names_the_backup_restore_record fails on the b249533c JSON. |
+| FND-002 | fixed | The accepted_risk disposition AC was deleted, and the Description now says "when a direct fact claims to discharge such a clause". |
+| FND-003 | fixed | The today / ships / until-it-ships wording was removed from FR-012, the GDPR bindings paragraph, the Annex 11 design paragraph (spec.md:197), FR-007, FR-027 and FR-028. Each now states the FR-208/FR-211 target once. |
+| FND-004 | fixed | Split into FR-010-AC-3 (the art-32(4) mapping, plus access-control absent from both the GDPR catalog and its clauses) and FR-010-AC-5 (the producer statements), each with its own test. |

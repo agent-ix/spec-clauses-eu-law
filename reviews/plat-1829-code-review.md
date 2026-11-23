@@ -69,3 +69,24 @@ Changes requested (FND-001). The clause-set tests are sound:
 - tests/corpus/gdpr/processing-access-control.json (examined)
 - tests/corpus/gdpr/privacy-by-default-settings.json (examined)
 - spec_clauses_eu_law/clauses/eu-gdpr-2016-679-2016-05-04.json (examined)
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-003 | low | The new GDPR evidence ref for backup-restore-record points at evidence/index.json, which is the corpus signature index. The art-32(1)(c) direct fact in test_records_facts_and_renders_both_clause_sets therefore cites a signature index as customer backup and restore evidence. | tests/test_pack_discharge.py:61 |
+
+### FND-003 — tests/test_pack_discharge.py#GDPR_EVIDENCE_REFS
+
+`"backup-restore-record": "evidence://example.invalid/evidence/index.json"`. That file lists signature-commit and signature-tag refs. It is not a backup or restore record, so the reference corpus contradicts the customer-supplied framing this PR introduces.
+
+Expected fix: Add tests/corpus/gdpr/backup-restore-record.json, a synthetic record with `recordType: synthetic-customer-supplied-backup-restore-record`, `suppliedBy: customer` and a person:// owner, and point the ref at it.
+
+## Dispositions
+
+Round 1, verified against `git diff b249533c..f3f72745` (fix commits 3d3bc8e, 458a57d, f3f7274).
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | The rejection branch and the disposition cases are gone. Direct facts must record and report undischarged with the missing-reference reason, and a positive control requires compliant. With approvalRoles stripped from art-35, all three negative cases fail; the control passes at head. |
+| FND-002 | fixed | Both helper-only GDPR tests were deleted. The GDPR helper call in test_records_facts_and_renders_both_clause_sets remains; it only validates that test's own synthetic facts and is harmless. |
