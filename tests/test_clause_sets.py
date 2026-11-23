@@ -1097,9 +1097,11 @@ def test_mdr_security_prerequisite_clauses_map_to_security_and_it_outputs():
     assert outputs["I-18.8"] == {"security-risk-records", "verification-records"}
     assert "verification-records" in outputs["I-17.2"]
     assert "risk-management-records" in outputs["II-5"]
-    assert "customer-supplied" in (
-        clause_set["outputCatalog"]["it-requirements-statement"]["description"]
-    )
+    description = clause_set["outputCatalog"]["it-requirements-statement"][
+        "description"
+    ]
+    assert "customer-supplied" in description.lower()
+    assert "no toolchain producer" in description
     rows = {row["id"]: set(row["outputs"]) for row in _spec_mdr_rows()}
     assert rows == outputs
 
