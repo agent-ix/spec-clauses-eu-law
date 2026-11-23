@@ -457,6 +457,14 @@ The same artifact has the same name, kind and description in every EU-law set. E
 
 `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
 
+### EU Output Producers
+
+An output whose evidence is a retained record in the quoin evidence store carries `producers` in the catalog entry of every set that declares it: a non-empty list of retained kinds as defined by quoin FR-211. This pack uses only the family kinds `run`, `scan`, `mock-inspection`, `analysis-report` and `scenario`. Quoin resolves an `evidenceRefs` entry against this list. A shared name carries the same kind, description and `producers` as in the US Health-Law Output Catalog.
+
+| Name | Producers | Evidence |
+|---|---|---|
+| verification-records | run | `quoin evidence record` run records of test suites. |
+
 ## Customer-Owned Obligations
 
 A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with an owner, rationale and customer approval reference, never a direct fact. The inventory is exhaustive:

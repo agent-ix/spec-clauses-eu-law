@@ -581,18 +581,36 @@ def _spec_mdcg_crosswalks() -> list[dict[str, str]]:
 def _spec_output_catalog() -> dict[str, dict[str, str]]:
     """Read the canonical output definitions from the master specification."""
     specification = (REPO_ROOT / "spec" / "spec.md").read_text()
-    section = specification.split("## EU Pack Output Catalog", 1)[1].split("\n## ", 1)[
-        0
-    ]
+    section = specification.split("## EU Pack Output Catalog", 1)[1].split("\n##", 1)[0]
+    producers = _spec_output_producers()
     catalog = {}
+    for name, kind, description in _spec_table_rows(section):
+        catalog[name] = {"kind": kind, "description": description}
+        if name in producers:
+            catalog[name]["producers"] = producers[name]
+    return catalog
+
+
+def _spec_table_rows(section: str) -> list[list[str]]:
+    """Return the three-cell data rows of every table in a spec section."""
+    rows = []
     for line in section.splitlines():
         if not line.startswith("|"):
             continue
-        name, kind, description = [cell.strip() for cell in line.strip("|").split("|")]
-        if name == "Name" or name.startswith("---"):
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        if cells[0] == "Name" or cells[0].startswith("---"):
             continue
-        catalog[name] = {"kind": kind, "description": description}
-    return catalog
+        rows.append(cells)
+    return rows
+
+
+def _spec_output_producers() -> dict[str, list[str]]:
+    """Read the "EU Output Producers" table: output name to its producer kinds."""
+    specification = (REPO_ROOT / "spec" / "spec.md").read_text()
+    section = specification.split("### EU Output Producers", 1)[1].split("\n##", 1)[0]
+    return {
+        name: cell.split(", ") for name, cell, _evidence in _spec_table_rows(section)
+    }
 
 
 def _outcomes(binding: dict) -> dict[str, str]:
@@ -808,6 +826,34 @@ def test_all_declared_sets_share_one_output_catalog():
     assert_output_catalog_consistent(clause_sets)
 
 
+@pytest.mark.trace("FR-006-AC-3")
+def test_shared_producers_drift_fails_and_names_the_output():
+    base = _synthetic_set(
+        "example.invalid",
+        "base",
+        "1.0.0",
+        output_catalog={
+            "verification-records": {
+                "kind": "record",
+                "description": "Test runs.",
+                "producers": ["run"],
+            }
+        },
+    )
+    same = copy.deepcopy(base)
+    assert_output_catalog_consistent([base, same])
+    for drifted_producers in (["scan"], None):
+        drifted = copy.deepcopy(base)
+        if drifted_producers is None:
+            del drifted["outputCatalog"]["verification-records"]["producers"]
+        else:
+            drifted["outputCatalog"]["verification-records"][
+                "producers"
+            ] = drifted_producers
+        with pytest.raises(AssertionError, match="verification-records"):
+            assert_output_catalog_consistent([base, drifted])
+
+
 @pytest.mark.trace("FR-003-AC-1", "FR-003-AC-2")
 def test_mdr_clause_ids_and_required_fields_match_the_spec():
     """Check the MDR clause table and required clause fields.
@@ -985,7 +1031,7 @@ def test_mdr_publish_check_accepts_the_set_and_rejects_licensed_text(tmp_path):
     assert _spec_set_key("mdr") in refused.stderr + refused.stdout
 
 
-@pytest.mark.trace("FR-006-AC-1")
+@pytest.mark.trace("FR-006-AC-1", "FR-006-AC-5")
 def test_mdr_declares_the_spec_catalog_subset_used_by_its_clauses():
     """Check that the MDR set uses only its exact catalog subset.
 
@@ -1612,7 +1658,7 @@ def test_nist_and_hipaa_clause_files_are_not_copied_into_the_eu_pack():
     assert copied == []
 
 
-@pytest.mark.trace("FR-006-AC-1")
+@pytest.mark.trace("FR-006-AC-1", "FR-006-AC-5")
 def test_mdcg_declares_the_spec_catalog_subset_used_by_its_clauses():
     """Check that the MDCG set uses its exact canonical output subset.
 
@@ -2512,3 +2558,16 @@ def test_clause_files_ship_in_wheel_and_npm_tarball(tmp_path):
         npm_files = set(archive.getnames())
     assert "package/manifest.yaml" in npm_files
     assert "package/clauses/synthetic.json" in npm_files
+
+
+# Retained evidence-store kinds a catalog `producers` entry may name (quoin FR-211).
+FR_211_FIXED_KINDS = {"run", "scan", "mock-inspection", "analysis-report", "scenario"}
+
+
+@pytest.mark.trace("FR-006-AC-4")
+def test_spec_producers_name_only_fr_211_kinds():
+    """Every kind in the spec's producers table is an FR-211 family kind."""
+    expected = _spec_output_producers()
+    assert expected, "the spec lists no output with producers"
+    for name, kinds in expected.items():
+        assert kinds and set(kinds) <= FR_211_FIXED_KINDS, f"{name}: {kinds!r}"

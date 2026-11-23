@@ -2,7 +2,7 @@
 id: SR-004
 title: "Article 30 missing-applicability outcome"
 type: SpecReview
-analysis: correctness
+analysis: spec-correctness
 scope: "PLAT-1628 GDPR Article 30 clause applicability"
 review_set: subset
 relationships:
