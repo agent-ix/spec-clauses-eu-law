@@ -26,7 +26,7 @@ its residual risk.
 | ID | Criteria | Verification |
 |----|----------|--------------|
 | FR-012-AC-1 | Every Article 35 clause declares `approvalRoles` equal to `["privacy-officer"]`. An Article 35 direct fact citing a DPIA with a missing or blank `approvalRef` leaves the clause undischarged with the reason that the required approval reference is missing, and the same fact with an `approvalRef` discharges. Verification that the approval names the person who accepted residual risk belongs to quoin FR-211. | Test |
-| FR-012-AC-2 | The set and module contract contain no risk score, threshold, or automated risk-acceptability field for DPIA decisions. | Inspection |
+| FR-012-AC-3 | The set and module contract contain no risk score, threshold, or automated risk-acceptability field for DPIA decisions. | Inspection |
 
 ## Dependencies
 
