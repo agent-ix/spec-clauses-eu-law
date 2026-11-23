@@ -455,6 +455,16 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | baseline-record | record | Engineering-assurance Baseline document naming configuration items by repository path at one git commit; a person decides its contents. |
 | record-export | record | Human-readable rendering of retained records from `quoin matrix`, `engineering-assurance approval-trail` and `quoin evidence audit`; it does not show a record's change history since first entry. |
 
+### EU Output Producers
+
+An output whose evidence is a retained record in the quoin evidence store carries `producers` in the catalog entry of every set that declares it: a non-empty list of distinct retained kinds as defined by quoin FR-211 (`run`, `scan`, `mock-inspection`, `analysis-report`, `scenario`, or an experiment or operational record's `subject.kind`). Quoin resolves an `evidenceRefs` entry against this list. A shared name carries the same `producers` as in the US Health-Law Output Catalog.
+
+| Name | Producers | Evidence |
+|---|---|---|
+| verification-records | run | `quoin evidence record` run records of test suites. |
+
+Every other output omits `producers`: tool-generated documents and reports (`quoin soup report`, `quoin anomaly report`, `quoin release snapshot`, `quoin risk-summary`, `quoin change-assurance write-record`, the record export) and everything the customer supplies. Omission means the output is not machine-produced into the evidence store.
+
 `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
 
 ## Customer-Owned Obligations
