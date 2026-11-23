@@ -125,7 +125,7 @@ Expected fix: Say 'US Health-Law Output Catalog (the FR-006 comparison source)' 
 
 ## Dispositions
 
-Round 1 at head ceb584e0c8c0568364f5b31d71739718800a4690; round 2 at head b936c7ba3920b9298fb3d7d52b4ece8678dc066f (rows appended after round 1).
+Round 1 at head ceb584e0c8c0568364f5b31d71739718800a4690; round 2 at head b936c7ba3920b9298fb3d7d52b4ece8678dc066f (rows appended after round 1); round 3 at head 645527d4e838b4b46c25192ec45b043a1680dba4.
 
 | FND | outcome | reason |
 |---|---|---|
@@ -136,3 +136,5 @@ Round 1 at head ceb584e0c8c0568364f5b31d71739718800a4690; round 2 at head b936c7
 | FND-005 | fixed | - |
 | FND-006 | deferred | Coordinator decision: PR #21 will be rebased on #22 and gain the Annex 11 JSON, tests and corpus before it merges. The five test_clause_sets.py catalog-parity failures are a merge-order condition, not a spec-content defect. Re-check that the suite is green on the rebased head before merging. |
 | FND-007 | still-open | FR-025 and FR-025-AC-2 now say 'US Health-Law Output Catalog', but spec/spec.md:242 (the Annex 11 Output Bindings paragraph) still says 'Expected outputs that already exist in the US Part 11 catalog (...) keep that catalog's kind and description exactly', and its list includes names that are not in the Part 11 set. Change that one phrase to 'US Health-Law Output Catalog'. |
+| FND-006 | fixed | - |
+| FND-007 | fixed | - |

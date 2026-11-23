@@ -192,7 +192,7 @@ Rights are `structure: citation_only`, `text: original`, and `clearance_ref: nul
 
 Annex 11 is part of the EU GMP guidelines, which interpret the binding GMP requirements; its wording is "should". All clauses are therefore `recommended`. The module does not say whether a system complies with the underlying GMP law.
 
-Clause IDs are the Annex 11 paragraph numbers: `1`, `2`, `3.1`, `4.3`, `12.4`, and `14(a)`. The Principle statement is not a clause. IDs contain no slash. The person supplies every applicability dimension; the tool never infers one from the product, the data, or a risk score. Dimensions each have values `yes` and `no`: `gmp_regulated_use` (the system is used in GMP-regulated activity), `third_party_supplier`, `custom_or_customised`, `data_exchange` (data exchanged electronically with other systems), `data_migration`, `manual_critical_entry`, `batch_release_records`, `electronic_signature_use`, `batch_certification_in_system`, `critical_process_support`, and `data_archived`. Every clause requires `eq gmp_regulated_use yes`; a clause with a second dimension requires `all[eq gmp_regulated_use yes, eq <dimension> yes]`. A `no` value makes the clause not binding; a missing value leaves it unresolved. Whether a system, process, entry or datum is critical, and how the risk-scaled paragraphs (1, 3.2, 4.1, 4.3, 4.4, 6, 9, 12.2, 13, 16) are scaled, are human decisions the pack records but never makes.
+Clause IDs are the Annex 11 paragraph numbers: `1`, `2`, `3.1`, `4.3`, `12.4`, and `14(a)`. The Principle statement is not a clause. IDs contain no slash. The person supplies every applicability dimension; the tool never infers one from the product, the data, or a risk score. Dimensions each have values `yes` and `no`: `gmp_regulated_use` (the system is used in GMP-regulated activity), `third_party_supplier`, `custom_or_customised`, `data_exchange` (data exchanged electronically with other systems), `data_migration`, `manual_critical_entry`, `batch_release_records`, `electronic_signature_use`, `batch_certification_in_system`, `critical_process_support`, and `data_archived`. Every clause requires `eq gmp_regulated_use yes`; a clause with a second dimension requires `all[eq gmp_regulated_use yes, eq <dimension> yes]`. A `no` value makes the clause not binding; a missing value leaves it unresolved. The risk-scaled paragraphs carry `approvalRoles: [system-owner]`. Annex 11 paragraph 2 names the system owner, with the process owner, as the person responsible for the system, so these decisions are the system owner's. Quoin decides discharge: today (quoin FR-208) a fact on an approval-role clause discharges only with a non-blank `approvalRef`, and once quoin FR-211 ships it requires an engineering-assurance-verified signed tag whose meaning equals an approval role. Whether a system, process, entry or datum is critical, and how the risk-scaled paragraphs (1, 3.2, 4.1, 4.3, 4.4, 6, 9, 12.2, 13, 16) are scaled, are human decisions the pack records but never makes.
 
 ## Annex 11 Clause Table
 
@@ -236,6 +236,47 @@ The table is normative for clause IDs, force, applicability and expected outputs
 | `17` | Archived data is periodically confirmed to be reachable, legible and intact, and retrieval is retested when equipment or programs change | D data_archived | `archive-verification-record`, `written-procedure` |
 
 A clause whose expected outputs are all procedures is customer-owned: `2`, `3.1`, `3.2`, `3.4`, `4.5`, `7.2`, `11`, `15`, `16` and `17`.
+
+## Annex 11 Clause Titles and Subjects
+
+Each clause carries the title and subject tags below. They label the clause for readers and selection; no applicability expression reads them.
+
+| Clause ID | Title | Subjects |
+|---|---|---|
+| `1` | Risk management | `risk` |
+| `2` | Personnel | `personnel` |
+| `3.1` | Supplier agreement | `suppliers` |
+| `3.2` | Supplier competence | `suppliers` |
+| `3.3` | Off-the-shelf product assessment | `suppliers` |
+| `3.4` | Supplier information for inspectors | `suppliers` |
+| `4.1` | Validation documentation | `validation` |
+| `4.2` | Validation change and deviation records | `validation` |
+| `4.3` | System inventory and description | `validation` |
+| `4.4` | User requirements | `validation` |
+| `4.5` | Development quality system | `validation` |
+| `4.6` | Custom system assessment | `validation` |
+| `4.7` | Testing evidence | `validation` |
+| `4.8` | Data migration checks | `validation` |
+| `5` | Data exchange checks | `data-exchange` |
+| `6` | Accuracy checks | `data-accuracy` |
+| `7.1` | Data protection and retention | `data-storage` |
+| `7.2` | Backup and restore | `data-storage` |
+| `8.1` | Printed copies | `printouts` |
+| `8.2` | Release printouts and data changes | `printouts` |
+| `9` | Audit trail | `audit-trail` |
+| `10` | Change and configuration management | `change-control` |
+| `11` | Periodic evaluation | `periodic-evaluation` |
+| `12.1` | Access restriction | `security` |
+| `12.2` | Security control extent | `security` |
+| `12.3` | Access authorisation records | `security` |
+| `12.4` | Operator identity records | `security` |
+| `13` | Incident management | `incidents` |
+| `14(a)` | Signature standing | `electronic-signature` |
+| `14(b)` | Signature linking | `electronic-signature` |
+| `14(c)` | Signature time | `electronic-signature` |
+| `15` | Batch certification | `batch-certification` |
+| `16` | Business continuity | `continuity` |
+| `17` | Archiving | `archiving` |
 
 ## Annex 11 Output Bindings
 

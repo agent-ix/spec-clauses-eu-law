@@ -6,13 +6,6 @@ import re
 
 from conftest import REPO_ROOT
 
-SET_KEY = "eu/eu-gmp-annex-11@2011-01"
-SET_PATH = "clauses/eu-eu-gmp-annex-11-2011-01.json"
-OFFICIAL_URL = (
-    "https://health.ec.europa.eu/document/download/"
-    "8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf"
-)
-
 
 def _spec() -> str:
     return (REPO_ROOT / "spec" / "spec.md").read_text()
@@ -101,6 +94,43 @@ def crosswalk_rows() -> set[tuple[str, str, str]]:
     }
 
 
+def identity() -> tuple[str, str, str]:
+    """Authority, id and version the Annex 11 Set Design declares."""
+    design = section("Annex 11 Set Design")
+    match = re.search(
+        r"authority `([^`]+)`, ID `([^`]+)`, and version `([^`]+)`", design
+    )
+    assert match, "spec.md must declare the Annex 11 identity"
+    return match.group(1), match.group(2), match.group(3)
+
+
+def official_url() -> str:
+    """Official document URL the Annex 11 Set Design declares."""
+    match = re.search(
+        r"official document URL is `([^`]+)`", section("Annex 11 Set Design")
+    )
+    assert match, "spec.md must declare the Annex 11 official URL"
+    return match.group(1)
+
+
+def set_key() -> str:
+    authority, set_id, version = identity()
+    return f"{authority}/{set_id}@{version}"
+
+
+def set_path() -> str:
+    authority, set_id, version = identity()
+    return f"clauses/{authority}-{set_id}-{version}.json"
+
+
+def title_rows() -> dict[str, tuple[str, list[str]]]:
+    """Parse the Clause Titles and Subjects table."""
+    return {
+        cid.strip("`"): (title, backticked(subjects))
+        for cid, title, subjects in table_rows("Annex 11 Clause Titles and Subjects")
+    }
+
+
 def expected_metadata() -> dict:
     """Source and rights values the spec states for the Annex 11 set."""
     design = section("Annex 11 Set Design")
@@ -108,11 +138,11 @@ def expected_metadata() -> dict:
     attribution = (
         re.search(r"Attribution says `([^`]+)`", design)
         .group(1)
-        .replace("{official document URL}", OFFICIAL_URL)
+        .replace("{official document URL}", official_url())
     )
     return {
-        SET_KEY: {
-            "officialUrl": OFFICIAL_URL,
+        set_key(): {
+            "officialUrl": official_url(),
             "licence": licence,
             "attribution": attribution,
             "rights": {

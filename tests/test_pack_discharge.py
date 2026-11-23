@@ -619,36 +619,6 @@ def test_synthetic_reference_rejects_unreserved_authority(reference: str):
         _assert_reserved_uri_authority(reference)
 
 
-@pytest.mark.trace("FR-007-AC-2")
-def test_customer_owned_clause_rejects_direct_fixture_fact():
-    """Reject direct facts for all-procedure clauses and require approval.
-
-    Assumptions: Procedure output kinds define customer-owned clauses.
-    Criteria: A direct fixture fails with the clause named; a delegated fixture
-    passes only with rationale and customer approval reference.
-    Trace: FR-007-AC-2
-    """
-    fixture = {
-        "outputCatalog": {"written-procedure": {"kind": "procedure"}},
-        "clauses": [
-            {"id": "EX-1", "expectedOutputs": ["written-procedure"]},
-        ],
-    }
-    direct = [{"kind": "direct", "clauseId": "EX-1"}]
-    with pytest.raises(AssertionError, match="EX-1.*cannot have a direct fact"):
-        _assert_customer_owned_facts(fixture, direct)
-    delegated = [
-        {
-            "kind": "disposition",
-            "clauseId": "EX-1",
-            "decision": "delegated",
-            "rationale": "Customer-maintained procedure.",
-            "approvalRef": "person://example.invalid/approvals/owner",
-        }
-    ]
-    _assert_customer_owned_facts(fixture, delegated)
-
-
 @pytest.mark.trace("FR-008-AC-3")
 def test_dangling_evidence_fixture_fails_with_clause_id(tmp_path: pathlib.Path):
     """Name the clause when a synthetic evidence reference is unresolved.

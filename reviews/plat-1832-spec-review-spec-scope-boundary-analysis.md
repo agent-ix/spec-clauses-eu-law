@@ -81,9 +81,10 @@ Expected fix: Make the rule and the table agree. Either select every shared outp
 
 ## Dispositions
 
-Round 1 at head ceb584e0c8c0568364f5b31d71739718800a4690; round 2 at head b936c7ba3920b9298fb3d7d52b4ece8678dc066f (rows appended after round 1).
+Round 1 at head ceb584e0c8c0568364f5b31d71739718800a4690; round 2 at head b936c7ba3920b9298fb3d7d52b4ece8678dc066f (rows appended after round 1); round 3 at head 645527d4e838b4b46c25192ec45b043a1680dba4.
 
 | FND | outcome | reason |
 |---|---|---|
 | FND-001 | still-open | The fix adds the mechanism (limits in Annex-11-only descriptions, and 'Tool limit:' sentences for shared names) but covers only 7 clauses, and FR-025-AC-6 checks only the clauses in that table. Clauses that bind a shared output whose stated limit never reaches the shipped text: verification-records (no adequacy judgement) on 4.6, 4.7, 4.8, 5 and 6; signed-record (signer-claimed time) on 7.1 and 14(b); signer-registry on 12.4 and 14(a); anomaly-list on 4.2 and 13; risk-management-records on 1; security-risk-records on 12.2; soup-list on 3.3. The 12.4 sentence also names quoin actor labels, which are not among 12.4's outputs. Either add a limit sentence to every clause that binds a limited shared output and make AC-6 derive the clause list from the bindings table, or narrow FR-025's 'each binding's limit' to the listed clauses. |
 | FND-001 | fixed | - |
+| FND-002 | fixed | - |

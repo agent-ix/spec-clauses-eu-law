@@ -14,8 +14,8 @@ import zipfile
 
 import pytest
 import yaml
-from annex11_spec import SET_PATH as ANNEX11_SET_PATH
 from annex11_spec import expected_metadata as annex11_expected_metadata
+from annex11_spec import set_path as annex11_set_path
 from conftest import (
     MANIFEST_PATH,
     PACKAGE_ROOT,
@@ -660,7 +660,7 @@ def test_manifest_declares_all_implemented_clause_sets():
         _spec_set_path("gdpr"),
         "clauses/eu-ai-act-2024-1689-2026-07-27.json",
         "clauses/eu-ai-act-2024-1689-annex-iv-2026-07-27.json",
-        ANNEX11_SET_PATH,
+        annex11_set_path(),
     ]
 
 

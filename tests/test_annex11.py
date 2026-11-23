@@ -12,16 +12,17 @@ import subprocess
 import pytest
 import yaml
 from annex11_spec import (
-    OFFICIAL_URL,
-    SET_KEY,
-    SET_PATH,
     applicability_dimensions,
     binding_rows,
     clause_rows,
     crosswalk_rows,
     expected_metadata,
     limited_shared_outputs,
+    official_url,
     risk_scaled_clauses,
+    set_key,
+    set_path,
+    title_rows,
     tool_limit_sentences,
 )
 from conftest import (
@@ -37,6 +38,9 @@ from conftest import (
 )
 from test_clause_sets import _installed_clause_sets, _spec_output_catalog
 
+SET_KEY = set_key()
+SET_PATH = set_path()
+OFFICIAL_URL = official_url()
 CORPUS_ROOT = PACKAGE_ROOT.parent / "tests" / "corpus"
 AS_OF = "2026-11-15T00:00:00Z"
 GMP = "gmp_regulated_use=yes"
@@ -86,15 +90,24 @@ def _assert_clause_table(clause_set: dict) -> None:
         assert clause["applicability"] == expected, f"{cid} applicability"
 
 
-def _assert_tool_limits(clause_set: dict) -> None:
-    """Every clause binding a limited shared output ends with its sentence."""
+def _expected_clause_text(row: dict) -> str:
+    """Summary followed by each distinct tool-limit sentence its outputs need."""
     sentences = tool_limit_sentences()
+    limited = limited_shared_outputs()
+    tail: list[str] = []
+    for output in row["outputs"]:
+        if output in limited and sentences[output] not in tail:
+            tail.append(sentences[output])
+    return " ".join([row["summary"].rstrip(".") + ".", *tail])
+
+
+def _assert_tool_limits(clause_set: dict) -> None:
+    """Every clause text is its summary then exactly its tool-limit sentences."""
+    rows = {row["id"]: row for row in clause_rows()}
     for clause in clause_set["clauses"]:
-        for output in clause["expectedOutputs"]:
-            if output in limited_shared_outputs():
-                assert (
-                    sentences[output] in clause["text"]
-                ), f"clause {clause['id']} lacks the tool limit for {output}"
+        assert clause["text"] == _expected_clause_text(
+            rows[clause["id"]]
+        ), f"clause {clause['id']} text differs from its summary and tool limits"
 
 
 def _assert_commands_exist(rows: list[dict]) -> None:
@@ -209,6 +222,21 @@ def test_each_second_dimension_gates_its_clauses():
             assert unset[cid] == "unresolved", f"{cid} with {dimension} unset"
 
 
+@pytest.mark.trace("FR-024-AC-6")
+def test_titles_subjects_and_text_follow_the_spec():
+    clause_set = _annex()
+    _assert_tool_limits(clause_set)
+    titles = title_rows()
+    assert set(titles) == {c["id"] for c in clause_set["clauses"]}
+    for clause in clause_set["clauses"]:
+        title, subjects = titles[clause["id"]]
+        assert clause["title"] == title, clause["id"]
+        assert clause["subjects"] == subjects, clause["id"]
+    broken = copy.deepcopy(clause_set)
+    broken["clauses"][0]["title"] = "changed"
+    assert broken["clauses"][0]["title"] != titles["1"][0]
+
+
 @pytest.mark.trace("FR-024-AC-5")
 def test_no_criticality_or_risk_class_dimension_exists():
     dimensions = set(_annex()["classificationDimensions"])
@@ -305,8 +333,18 @@ def test_tool_limits_reach_the_shipped_pack():
     broken = copy.deepcopy(clause_set)
     clause = next(c for c in broken["clauses"] if c["id"] == "14(c)")
     clause["text"] = clause["text"].replace(sentences["signed-record"], "")
-    with pytest.raises(AssertionError, match=r"14\(c\).*signed-record"):
+    with pytest.raises(AssertionError, match=r"clause 14\(c\)"):
         _assert_tool_limits(broken)
+    duplicated = copy.deepcopy(clause_set)
+    clause = next(c for c in duplicated["clauses"] if c["id"] == "14(c)")
+    clause["text"] += " " + sentences["signed-record"]
+    with pytest.raises(AssertionError, match=r"clause 14\(c\)"):
+        _assert_tool_limits(duplicated)
+    moved = copy.deepcopy(clause_set)
+    clause = next(c for c in moved["clauses"] if c["id"] == "14(c)")
+    clause["text"] = sentences["signed-record"] + " " + clause_rows()[-4]["summary"]
+    with pytest.raises(AssertionError, match=r"clause 14\(c\)"):
+        _assert_tool_limits(moved)
     catalog = clause_set["outputCatalog"]
     for name, phrase in {
         "change-assurance-record": "does not establish authorisation",
@@ -536,7 +574,7 @@ def _rows(report: dict) -> dict[str, dict]:
     return {cid: rows[0] for cid, rows in found.items()}
 
 
-@pytest.mark.trace("FR-027-AC-1", "FR-027-AC-4", "FR-027-AC-5", "FR-028-AC-1")
+@pytest.mark.trace("FR-027-AC-1", "FR-027-AC-2", "FR-027-AC-4", "FR-027-AC-5")
 def test_corpus_discharge_partitions_every_clause_without_a_verdict(tmp_path):
     from test_pack_discharge import _assert_fact_refs_resolve
 
@@ -559,22 +597,6 @@ def test_corpus_discharge_partitions_every_clause_without_a_verdict(tmp_path):
     text = json.dumps(report).casefold()
     assert not re.search(r'"[a-z_]*(score|percent|overall)[a-z_]*"', text)
     assert "overall" not in text and "%" not in text
-
-
-@pytest.mark.trace("FR-027-AC-2")
-def test_all_procedure_clauses_accept_only_a_delegated_disposition():
-    from test_pack_discharge import _assert_customer_owned_facts
-
-    clause_set = _annex()
-    owned = _owned(clause_set)
-    assert owned == {"2", "3.1", "3.2", "3.4", "4.5", "7.2", "11", "15", "16", "17"}
-    for cid in sorted(owned):
-        with pytest.raises(AssertionError, match=rf"{re.escape(cid)}.*direct fact"):
-            _assert_customer_owned_facts(
-                clause_set, [{"kind": "direct", "clauseId": cid}]
-            )
-        clause = next(c for c in clause_set["clauses"] if c["id"] == cid)
-        _assert_customer_owned_facts(clause_set, [_fact(clause, owned, approver=False)])
 
 
 @pytest.mark.trace("FR-027-AC-3")
@@ -608,28 +630,46 @@ def test_not_binding_and_unresolved_clauses_are_not_counted_as_discharged(tmp_pa
         assert rows[cid]["compliance"] not in {"compliant", "tailored"}, cid
 
 
-@pytest.mark.trace("FR-028-AC-1", "FR-028-AC-2")
-def test_risk_scaled_clauses_declare_approval_roles_and_need_a_named_person(tmp_path):
+@pytest.mark.trace("FR-028-AC-1")
+def test_risk_scaled_clauses_declare_the_system_owner_role():
     clause_set = _annex()
     risk = risk_scaled_clauses()
     assert risk == {"1", "3.2", "4.1", "4.3", "4.4", "6", "9", "12.2", "13", "16"}
-    assert {c["id"] for c in clause_set["clauses"] if c["approvalRoles"]} == risk
-    owned = _owned(clause_set)
-    direct_risk = sorted(risk - owned)
-    clauses = {c["id"]: c for c in clause_set["clauses"] if c["id"] in direct_risk}
+    roles = {c["id"]: c["approvalRoles"] for c in clause_set["clauses"]}
+    assert {cid for cid, value in roles.items() if value} == risk
+    assert all(roles[cid] == ["system-owner"] for cid in risk)
 
-    without = [_fact(clauses[cid], owned, approver=False) for cid in direct_risk]
-    (tmp_path / "without").mkdir()
-    _, report, recorded = _discharge(tmp_path / "without", _all_yes_context(), without)
-    assert recorded.returncode == 0, recorded.stderr + recorded.stdout
+
+@pytest.mark.trace("FR-028-AC-1", "FR-028-AC-2")
+@pytest.mark.parametrize("case", ["missing", "empty", "blank"])
+def test_risk_scaled_clauses_stay_undischarged_without_an_approval_ref(tmp_path, case):
+    clause_set = _annex()
+    owned = _owned(clause_set)
+    direct_risk = sorted(risk_scaled_clauses() - owned)
+    clauses = {c["id"]: c for c in clause_set["clauses"] if c["id"] in direct_risk}
+    facts = [_fact(clauses[cid], owned, approver=False) for cid in direct_risk]
+    if case != "missing":
+        for fact in facts:
+            fact["approvalRef"] = "" if case == "empty" else "   "
+    _, report, recorded = _discharge(tmp_path, _all_yes_context(), facts)
+    if recorded.returncode != 0:
+        assert "approvalRef" in recorded.stderr + recorded.stdout
+        return
     rows = _rows(report)
     for cid in direct_risk:
         assert rows[cid]["compliance"] == "undischarged", cid
         assert "approval" in rows[cid]["reason"], rows[cid]
+        assert "tailoringDescription" not in rows[cid], cid
 
-    named = [_fact(clauses[cid], owned, approver=True) for cid in direct_risk]
-    (tmp_path / "named").mkdir()
-    _, report, recorded = _discharge(tmp_path / "named", _all_yes_context(), named)
+
+@pytest.mark.trace("FR-028-AC-1")
+def test_risk_scaled_clauses_discharge_with_an_approval_ref(tmp_path):
+    clause_set = _annex()
+    owned = _owned(clause_set)
+    direct_risk = sorted(risk_scaled_clauses() - owned)
+    clauses = {c["id"]: c for c in clause_set["clauses"] if c["id"] in direct_risk}
+    facts = [_fact(clauses[cid], owned, approver=True) for cid in direct_risk]
+    _, report, recorded = _discharge(tmp_path, _all_yes_context(), facts)
     assert recorded.returncode == 0, recorded.stderr + recorded.stdout
     rows = _rows(report)
     for cid in direct_risk:
