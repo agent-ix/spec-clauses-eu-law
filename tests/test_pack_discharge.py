@@ -95,11 +95,6 @@ def _corpus_validation_modules() -> list[str]:
     return [str(modules_root / name) for name in roots]
 
 
-def _records_of_processing_modules() -> list[str]:
-    """Return the corpus module roots needed to resolve producer records."""
-    return _corpus_validation_modules()
-
-
 def _checked(
     *args: str, env: dict[str, str] | None = None
 ) -> subprocess.CompletedProcess:
@@ -422,7 +417,7 @@ def _generate_records_of_processing(
     """Run PLAT-1658's producer and return its JSON report and generated file."""
     module_args = [
         argument
-        for module in _records_of_processing_modules()
+        for module in _corpus_validation_modules()
         for argument in ("--module", module)
     ]
     result = run(
