@@ -19,19 +19,19 @@
   "outputCatalog": {
     "anomaly-list": {
       "kind": "record",
-      "description": "Unresolved-anomaly report."
+      "description": "Unresolved anomalies reported by `quoin anomaly report`."
     },
     "it-requirements-statement": {
       "kind": "document",
-      "description": "Minimum hardware, network and IT-security requirements for instructions for use."
+      "description": "Customer-supplied statement of minimum hardware, network and IT-security requirements for instructions for use; no toolchain producer."
     },
     "release-record": {
       "kind": "record",
-      "description": "Engineering-assurance release decision."
+      "description": "Release evidence snapshot produced by `quoin release snapshot`."
     },
     "risk-management-records": {
       "kind": "record",
-      "description": "`spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records."
+      "description": "`spec-objects-safety` `hazard` and `failure_mode` artifacts; `quoin risk-summary`."
     },
     "security-risk-records": {
       "kind": "record",
@@ -39,15 +39,23 @@
     },
     "software-architecture": {
       "kind": "record",
-      "description": "`spec-objects-architecture` parts and connections."
+      "description": "`spec-objects-architecture` `part`, `port`, `connection`, and `allocation` artifacts; ADR artifacts from `spec-artifacts-process`."
     },
     "software-requirements": {
       "kind": "record",
-      "description": "Functional and non-functional requirements (FR/NFR)."
+      "description": "Requirements authored with the `spec-artifacts-iso` StR, FR, and NFR archetypes."
+    },
+    "soup-list": {
+      "kind": "record",
+      "description": "Software of unknown provenance (SOUP) report produced by `quoin soup report`."
     },
     "verification-records": {
       "kind": "record",
-      "description": "Test matrix and retained evidence."
+      "description": "`quire matrix` / `quoin matrix` results and `quoin evidence record`."
+    },
+    "written-procedure": {
+      "kind": "procedure",
+      "description": "Customer-owned written procedure."
     }
   },
   "clauses": [
@@ -64,7 +72,8 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "risk-management-records"
+        "risk-management-records",
+        "security-risk-records"
       ]
     },
     {
@@ -98,7 +107,7 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "anomaly-list",
+        "it-requirements-statement",
         "security-risk-records"
       ]
     },
@@ -148,8 +157,8 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "security-risk-records",
-        "verification-records"
+        "it-requirements-statement",
+        "security-risk-records"
       ]
     },
     {
@@ -165,7 +174,6 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "anomaly-list",
         "security-risk-records"
       ]
     },
@@ -182,7 +190,6 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "anomaly-list",
         "security-risk-records"
       ]
     },
@@ -266,7 +273,6 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "release-record",
         "verification-records"
       ]
     },
@@ -285,7 +291,9 @@
       "styles": {},
       "expectedOutputs": [
         "anomaly-list",
-        "release-record"
+        "release-record",
+        "security-risk-records",
+        "soup-list"
       ]
     },
     {
@@ -334,8 +342,7 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "it-requirements-statement",
-        "verification-records"
+        "it-requirements-statement"
       ]
     },
     {
@@ -352,8 +359,9 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "anomaly-list",
-        "release-record"
+        "security-risk-records",
+        "soup-list",
+        "written-procedure"
       ]
     },
     {
@@ -370,8 +378,7 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "anomaly-list",
-        "release-record"
+        "written-procedure"
       ]
     }
   ],
@@ -387,7 +394,7 @@
         "clause": "I-1"
       },
       "relation": "informative",
-      "rationale": "Introduces the guidance context for risk management; it does not replace the MDR risk-management requirement."
+      "rationale": "The security goals set the context in which device risks are considered; they do not replace the MDR risk-management requirement."
     },
     {
       "sourceClause": "2.1",
@@ -439,7 +446,7 @@
         "clause": "I-17.4"
       },
       "relation": "partial",
-      "rationale": "Relates cybersecurity risk control to software security, without covering all software verification and validation."
+      "rationale": "The described use and operating environment informs the operating prerequisites the manufacturer states, without fixing the hardware and network values."
     },
     {
       "sourceClause": "2.4",
@@ -504,7 +511,7 @@
         "clause": "I-17.4"
       },
       "relation": "partial",
-      "rationale": "Security-control discussion informs software security measures but does not cover the full verification and validation obligation."
+      "rationale": "Stakeholder security responsibilities inform which security measures the manufacturer states as operating prerequisites, not the hardware and network prerequisites."
     },
     {
       "sourceClause": "3.1",
@@ -527,10 +534,10 @@
           "id": "mdr-2017-745",
           "version": "2026-07-19"
         },
-        "clause": "I-17.4"
+        "clause": "I-18.8"
       },
       "relation": "partial",
-      "rationale": "Security-by-design informs software security measures, not every verification and validation activity."
+      "rationale": "Security-by-design informs protection against access that could stop the device operating as intended, one aspect of the lifecycle guidance."
     },
     {
       "sourceClause": "3.2",
@@ -553,10 +560,10 @@
           "id": "mdr-2017-745",
           "version": "2026-07-19"
         },
-        "clause": "I-17.4"
+        "clause": "I-18.8"
       },
       "relation": "partial",
-      "rationale": "Design recommendations inform security measures but do not establish the full verification outcome."
+      "rationale": "Design recommendations inform protection against unauthorised access, without establishing that the protection works."
     },
     {
       "sourceClause": "3.3",
@@ -583,6 +590,19 @@
       },
       "relation": "partial",
       "rationale": "Architecture guidance addresses cybersecurity-related software lifecycle risks."
+    },
+    {
+      "sourceClause": "3.3",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
+        "clause": "I-18.8"
+      },
+      "relation": "partial",
+      "rationale": "Security capabilities in the architecture are how the design provides protection against unauthorised access."
     },
     {
       "sourceClause": "3.4",
@@ -657,6 +677,19 @@
           "id": "mdr-2017-745",
           "version": "2026-07-19"
         },
+        "clause": "I-17.4"
+      },
+      "relation": "partial",
+      "rationale": "Minimum operating-environment requirements are the content of the operating prerequisites the manufacturer specifies."
+    },
+    {
+      "sourceClause": "3.6",
+      "target": {
+        "set": {
+          "authority": "eu",
+          "id": "mdr-2017-745",
+          "version": "2026-07-19"
+        },
         "clause": "I-23.4(ab)"
       },
       "relation": "informative",
@@ -670,10 +703,10 @@
           "id": "mdr-2017-745",
           "version": "2026-07-19"
         },
-        "clause": "I-17.4"
+        "clause": "I-17.2"
       },
       "relation": "partial",
-      "rationale": "Verification and validation guidance addresses a portion of the software lifecycle process."
+      "rationale": "Verification and validation guidance addresses the verification part of the software lifecycle clause for cybersecurity."
     },
     {
       "sourceClause": "3.7",
@@ -686,7 +719,7 @@
         "clause": "I-18.8"
       },
       "relation": "partial",
-      "rationale": "Verification and validation evidence can contribute to the release process without covering its full scope."
+      "rationale": "Security test evidence shows whether protection against unauthorised access behaves as designed, without covering the design of that protection."
     },
     {
       "sourceClause": "3.8",
@@ -696,10 +729,10 @@
           "id": "mdr-2017-745",
           "version": "2026-07-19"
         },
-        "clause": "I-17.4"
+        "clause": "I-17.2"
       },
       "relation": "partial",
-      "rationale": "Lifecycle guidance informs continuing software security activities but not all verification and validation duties."
+      "rationale": "Maintenance guidance covers the post-release part of the software lifecycle, including updates and component advisories."
     },
     {
       "sourceClause": "3.8",
@@ -712,7 +745,7 @@
         "clause": "I-18.8"
       },
       "relation": "partial",
-      "rationale": "Vulnerability resolution may affect release evidence, without covering all release-process duties."
+      "rationale": "Fixing vulnerabilities restores protection against unauthorised access, without covering the design of that protection."
     },
     {
       "sourceClause": "4.1",
@@ -764,7 +797,7 @@
         "clause": "I-17.4"
       },
       "relation": "partial",
-      "rationale": "Operational security guidance informs software security measures, not all verification and validation activities."
+      "rationale": "Information for healthcare providers informs the operating prerequisites the manufacturer states, not the hardware and network values."
     },
     {
       "sourceClause": "4.3",
@@ -787,10 +820,10 @@
           "id": "mdr-2017-745",
           "version": "2026-07-19"
         },
-        "clause": "I-17.4"
+        "clause": "I-3"
       },
       "relation": "partial",
-      "rationale": "Lifecycle maintenance guidance informs software security evidence but does not exhaust the clause."
+      "rationale": "Cybersecurity surveillance supplies part of the post-market information that updates the risk process; the manufacturer's own surveillance procedure is customer-supplied."
     },
     {
       "sourceClause": "5.1",
@@ -800,10 +833,10 @@
           "id": "mdr-2017-745",
           "version": "2026-07-19"
         },
-        "clause": "I-18.8"
+        "clause": "I-17.2"
       },
       "relation": "partial",
-      "rationale": "Maintenance and update records can support release evidence within the broader release obligation."
+      "rationale": "Advisories reported against third-party components inform lifecycle maintenance of the software, covering only that input."
     },
     {
       "sourceClause": "5.2",
@@ -813,23 +846,10 @@
           "id": "mdr-2017-745",
           "version": "2026-07-19"
         },
-        "clause": "I-17.4"
+        "clause": "I-3"
       },
       "relation": "partial",
-      "rationale": "Incident and vulnerability response informs software maintenance evidence, not the whole lifecycle obligation."
-    },
-    {
-      "sourceClause": "5.2",
-      "target": {
-        "set": {
-          "authority": "eu",
-          "id": "mdr-2017-745",
-          "version": "2026-07-19"
-        },
-        "clause": "I-18.8"
-      },
-      "relation": "partial",
-      "rationale": "Response and release handling are related, but the guidance addresses only part of the MDR release process."
+      "rationale": "Incident and vulnerability handling feeds the risk process; investigating and reporting incidents is the manufacturer's own procedure, which is customer-supplied."
     }
   ]
 }

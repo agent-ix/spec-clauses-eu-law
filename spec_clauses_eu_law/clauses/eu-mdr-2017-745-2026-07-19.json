@@ -24,39 +24,27 @@
   "outputCatalog": {
     "risk-management-records": {
       "kind": "record",
-      "description": "`spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records."
+      "description": "`spec-objects-safety` `hazard` and `failure_mode` artifacts; `quoin risk-summary`."
     },
     "it-requirements-statement": {
       "kind": "document",
-      "description": "Minimum hardware, network and IT-security requirements for instructions for use."
+      "description": "Customer-supplied statement of minimum hardware, network and IT-security requirements for instructions for use; no toolchain producer."
     },
     "software-requirements": {
       "kind": "record",
-      "description": "Functional and non-functional requirements (FR/NFR)."
+      "description": "Requirements authored with the `spec-artifacts-iso` StR, FR, and NFR archetypes."
     },
     "software-architecture": {
       "kind": "record",
-      "description": "`spec-objects-architecture` parts and connections."
+      "description": "`spec-objects-architecture` `part`, `port`, `connection`, and `allocation` artifacts; ADR artifacts from `spec-artifacts-process`."
     },
     "verification-records": {
       "kind": "record",
-      "description": "Test matrix and retained evidence."
+      "description": "`quire matrix` / `quoin matrix` results and `quoin evidence record`."
     },
     "security-risk-records": {
       "kind": "record",
       "description": "`spec-objects-security` threat, risk, and control records."
-    },
-    "soup-list": {
-      "kind": "record",
-      "description": "Software of unknown provenance (SOUP) report."
-    },
-    "anomaly-list": {
-      "kind": "record",
-      "description": "Unresolved-anomaly report."
-    },
-    "release-record": {
-      "kind": "record",
-      "description": "Engineering-assurance release decision."
     }
   },
   "clauses": [
@@ -135,7 +123,7 @@
       "obligatedActors": [],
       "approvalRoles": [],
       "styles": {},
-      "expectedOutputs": ["it-requirements-statement"]
+      "expectedOutputs": ["it-requirements-statement", "security-risk-records"]
     },
     {
       "id": "I-17.1",
@@ -157,7 +145,7 @@
       "obligatedActors": [],
       "approvalRoles": [],
       "styles": {},
-      "expectedOutputs": ["software-requirements", "software-architecture", "security-risk-records"]
+      "expectedOutputs": ["software-requirements", "software-architecture", "security-risk-records", "verification-records"]
     },
     {
       "id": "I-17.3",
@@ -184,7 +172,7 @@
       "obligatedActors": [],
       "approvalRoles": [],
       "styles": {},
-      "expectedOutputs": ["soup-list", "anomaly-list", "risk-management-records"]
+      "expectedOutputs": ["it-requirements-statement", "security-risk-records"]
     },
     {
       "id": "I-18.8",
@@ -195,7 +183,7 @@
       "obligatedActors": [],
       "approvalRoles": [],
       "styles": {},
-      "expectedOutputs": ["release-record", "verification-records", "anomaly-list"]
+      "expectedOutputs": ["security-risk-records", "verification-records"]
     },
     {
       "id": "I-23.4(ab)",
@@ -239,7 +227,7 @@
       "obligatedActors": [],
       "approvalRoles": [],
       "styles": {},
-      "expectedOutputs": ["software-requirements", "verification-records", "security-risk-records"]
+      "expectedOutputs": ["risk-management-records", "software-requirements", "verification-records", "security-risk-records"]
     },
     {
       "id": "II-6.1(b)",

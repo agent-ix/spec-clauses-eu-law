@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: agent-ix/spec-clauses-us-health
-          ref: ca78ac063186e5ff8d8e074382a3527b6b84d0b8
+          ref: main
           path: .deps/spec-clauses-us-health
       - uses: actions/checkout@v4
         with:

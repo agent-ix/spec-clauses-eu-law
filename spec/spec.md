@@ -66,16 +66,16 @@ The table is normative for IDs, applicability and outputs. All outputs resolve i
 | I-4 | always | risk-management-records |
 | I-5 | always | risk-management-records |
 | I-8 | always | risk-management-records |
-| I-14.2(d) | always | it-requirements-statement |
+| I-14.2(d) | always | it-requirements-statement, security-risk-records |
 | I-17.1 | always | software-requirements, software-architecture, verification-records |
-| I-17.2 | always | software-requirements, software-architecture, security-risk-records |
+| I-17.2 | always | software-requirements, software-architecture, security-risk-records, verification-records |
 | I-17.3 | eq mobile_platform yes | software-requirements, software-architecture, verification-records |
-| I-17.4 | always | soup-list, anomaly-list, risk-management-records |
-| I-18.8 | always | release-record, verification-records, anomaly-list |
+| I-17.4 | always | it-requirements-statement, security-risk-records |
+| I-18.8 | always | security-risk-records, verification-records |
 | I-23.4(ab) | always | it-requirements-statement |
 | II-1.1 | always | software-requirements, software-architecture |
 | II-4 | always | software-requirements, software-architecture, verification-records |
-| II-5 | always | software-requirements, verification-records, security-risk-records |
+| II-5 | always | risk-management-records, software-requirements, verification-records, security-risk-records |
 | II-6.1(b) | always | software-architecture, verification-records |
 
 ## GDPR Clause Table
@@ -205,41 +205,42 @@ The pack includes only the substantive software and cybersecurity sections 2.1â€
 
 | MDCG ID | MDR target | Relation | Rationale | Expected outputs |
 |---|---|---|---|---|
-| 2.1 | I-1 | informative | Introduces the guidance context for risk management; it does not replace the MDR risk-management requirement. | risk-management-records |
-| 2.1 | I-3 | partial | Connects cybersecurity risk consideration to the broader risk process while covering only the cybersecurity aspect. | risk-management-records |
+| 2.1 | I-1 | informative | The security goals set the context in which device risks are considered; they do not replace the MDR risk-management requirement. | security-risk-records |
+| 2.1 | I-3 | partial | Connects cybersecurity risk consideration to the broader risk process while covering only the cybersecurity aspect. | risk-management-records, security-risk-records |
 | 2.2 | I-17.2 | partial | Describes cybersecurity as part of software risk management, covering only that aspect of the MDR software lifecycle clause. | security-risk-records |
 | 2.3 | I-17.2 | partial | Frames cybersecurity risk management across the software lifecycle, a subset of the clause's lifecycle activities. | security-risk-records |
-| 2.3 | I-17.4 | partial | Relates cybersecurity risk control to software security, without covering all software verification and validation. | security-risk-records, anomaly-list |
+| 2.3 | I-17.4 | partial | The described use and operating environment informs the operating prerequisites the manufacturer states, without fixing the hardware and network values. | it-requirements-statement, security-risk-records |
 | 2.4 | I-17.2 | partial | Describes a risk-management approach for cybersecurity threats, not the entire software lifecycle process. | security-risk-records |
 | 2.5 | I-17.2 | partial | Connects threat identification and risk analysis to software lifecycle risk records. | security-risk-records |
 | 2.5 | I-14.2(d) | informative | Network and IT-security considerations can inform the device's stated environmental and infrastructure requirements. | it-requirements-statement |
 | 2.6 | I-17.2 | partial | The section's security risk-control discussion covers a subset of software lifecycle risk management. | security-risk-records |
-| 2.6 | I-17.4 | partial | Security-control discussion informs software security measures but does not cover the full verification and validation obligation. | security-risk-records, verification-records |
+| 2.6 | I-17.4 | partial | Stakeholder security responsibilities inform which security measures the manufacturer states as operating prerequisites, not the hardware and network prerequisites. | it-requirements-statement, security-risk-records |
 | 3.1 | I-17.2 | partial | Security-by-design guidance concerns software lifecycle activities, limited to the cybersecurity dimension. | security-risk-records |
-| 3.1 | I-17.4 | partial | Security-by-design informs software security measures, not every verification and validation activity. | security-risk-records, anomaly-list |
+| 3.1 | I-18.8 | partial | Security-by-design informs protection against access that could stop the device operating as intended, one aspect of the lifecycle guidance. | security-risk-records |
 | 3.2 | I-17.2 | partial | Secure design guidance concerns software lifecycle activity only for cybersecurity risks. | security-risk-records |
-| 3.2 | I-17.4 | partial | Design recommendations inform security measures but do not establish the full verification outcome. | security-risk-records, anomaly-list |
+| 3.2 | I-18.8 | partial | Design recommendations inform protection against unauthorised access, without establishing that the protection works. | security-risk-records |
 | 3.3 | I-17.1 | partial | Architecture guidance concerns software architecture within the broader software lifecycle. | software-architecture |
 | 3.3 | I-17.2 | partial | Architecture guidance addresses cybersecurity-related software lifecycle risks. | security-risk-records |
+| 3.3 | I-18.8 | partial | Security capabilities in the architecture are how the design provides protection against unauthorised access. | software-architecture, security-risk-records |
 | 3.4 | I-17.1 | partial | Software requirements guidance addresses only the requirements portion of lifecycle processes. | software-requirements |
 | 3.4 | I-17.2 | partial | Security requirements contribute to, but do not exhaust, software risk management. | security-risk-records |
 | 3.5 | I-17.2 | partial | Implementation guidance addresses cybersecurity risk controls within lifecycle risk management. | security-risk-records |
 | 3.5 | I-17.3 | partial | The guidance can inform mobile-platform verification when applicable, without making that MDR clause universally applicable. | verification-records |
 | 3.6 | I-14.2(d) | partial | Minimum IT requirements inform only the device's infrastructure requirement. | it-requirements-statement |
+| 3.6 | I-17.4 | partial | Minimum operating-environment requirements are the content of the operating prerequisites the manufacturer specifies. | it-requirements-statement |
 | 3.6 | I-23.4(ab) | informative | Environment and security information may inform instructions but does not cover the whole instructions requirement. | it-requirements-statement |
-| 3.7 | I-17.4 | partial | Verification and validation guidance addresses a portion of the software lifecycle process. | verification-records |
-| 3.7 | I-18.8 | partial | Verification and validation evidence can contribute to the release process without covering its full scope. | verification-records, release-record |
-| 3.8 | I-17.4 | partial | Lifecycle guidance informs continuing software security activities but not all verification and validation duties. | anomaly-list |
-| 3.8 | I-18.8 | partial | Vulnerability resolution may affect release evidence, without covering all release-process duties. | release-record |
+| 3.7 | I-17.2 | partial | Verification and validation guidance addresses the verification part of the software lifecycle clause for cybersecurity. | verification-records |
+| 3.7 | I-18.8 | partial | Security test evidence shows whether protection against unauthorised access behaves as designed, without covering the design of that protection. | verification-records |
+| 3.8 | I-17.2 | partial | Maintenance guidance covers the post-release part of the software lifecycle, including updates and component advisories. | release-record, soup-list |
+| 3.8 | I-18.8 | partial | Fixing vulnerabilities restores protection against unauthorised access, without covering the design of that protection. | security-risk-records, anomaly-list |
 | 4.1 | I-14.2(d) | partial | Security requirements for the operating environment inform only the IT-infrastructure portion of this requirement. | it-requirements-statement |
 | 4.1 | I-23.4(ab) | informative | User information can inform the security-related content considered for instructions, without asserting full equivalence. | it-requirements-statement |
 | 4.2 | I-23.4(ab) | partial | Security information for users contributes to, but does not exhaust, the information required by this clause. | it-requirements-statement |
-| 4.3 | I-17.4 | partial | Operational security guidance informs software security measures, not all verification and validation activities. | verification-records |
+| 4.3 | I-17.4 | partial | Information for healthcare providers informs the operating prerequisites the manufacturer states, not the hardware and network values. | it-requirements-statement |
 | 4.3 | I-23.4(ab) | informative | User-facing security considerations may inform instructions but do not establish clause equivalence. | it-requirements-statement |
-| 5.1 | I-17.4 | partial | Lifecycle maintenance guidance informs software security evidence but does not exhaust the clause. | anomaly-list |
-| 5.1 | I-18.8 | partial | Maintenance and update records can support release evidence within the broader release obligation. | release-record |
-| 5.2 | I-17.4 | partial | Incident and vulnerability response informs software maintenance evidence, not the whole lifecycle obligation. | anomaly-list |
-| 5.2 | I-18.8 | partial | Response and release handling are related, but the guidance addresses only part of the MDR release process. | release-record |
+| 5.1 | I-3 | partial | Cybersecurity surveillance supplies part of the post-market information that updates the risk process; the manufacturer's own surveillance procedure is customer-supplied. | security-risk-records, written-procedure |
+| 5.1 | I-17.2 | partial | Advisories reported against third-party components inform lifecycle maintenance of the software, covering only that input. | soup-list |
+| 5.2 | I-3 | partial | Incident and vulnerability handling feeds the risk process; investigating and reporting incidents is the manufacturer's own procedure, which is customer-supplied. | written-procedure |
 
 ## EU Pack Output Catalog
 
@@ -247,15 +248,15 @@ The same artifact has the same name, kind and description in every EU-law set. E
 
 | Name | Kind | Description |
 |---|---|---|
-| risk-management-records | record | `spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records. |
-| software-requirements | record | Functional and non-functional requirements (FR/NFR). |
-| software-architecture | record | `spec-objects-architecture` parts and connections. |
-| verification-records | record | Test matrix and retained evidence. |
-| soup-list | record | Software of unknown provenance (SOUP) report. |
+| risk-management-records | record | `spec-objects-safety` `hazard` and `failure_mode` artifacts; `quoin risk-summary`. |
+| software-requirements | record | Requirements authored with the `spec-artifacts-iso` StR, FR, and NFR archetypes. |
+| software-architecture | record | `spec-objects-architecture` `part`, `port`, `connection`, and `allocation` artifacts; ADR artifacts from `spec-artifacts-process`. |
+| verification-records | record | `quire matrix` / `quoin matrix` results and `quoin evidence record`. |
+| soup-list | record | Software of unknown provenance (SOUP) report produced by `quoin soup report`. |
 | security-risk-records | record | `spec-objects-security` threat, risk, and control records. |
-| anomaly-list | record | Unresolved-anomaly report. |
-| release-record | record | Engineering-assurance release decision. |
-| it-requirements-statement | document | Minimum hardware, network and IT-security requirements for instructions for use. |
+| anomaly-list | record | Unresolved anomalies reported by `quoin anomaly report`. |
+| release-record | record | Release evidence snapshot produced by `quoin release snapshot`. |
+| it-requirements-statement | document | Customer-supplied statement of minimum hardware, network and IT-security requirements for instructions for use; no toolchain producer. |
 | written-procedure | procedure | Customer-owned written procedure. |
 | signed-record | record | Signed commits and tags verified by the `signature-verify` capability. |
 | audit-trail | record | Git history and signed-approval history produced by the `approval-trail` capability for the record. |
@@ -277,7 +278,15 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | post-market-monitoring-plan | document | Provider plan and evidence for post-market performance monitoring. |
 | conformity-declaration | document | EU declaration of conformity and its controlled reference. |
 
-A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with rationale and customer approval reference, never a direct fact. `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
+`tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
+
+## Customer-Owned Obligations
+
+A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with an owner, rationale and customer approval reference, never a direct fact. The inventory is exhaustive:
+
+| Clause set | Clause ID | Expected outputs |
+|---|---|---|
+| mdcg-2019-16 | 5.2 | written-procedure |
 
 ## Requirements Architecture
 

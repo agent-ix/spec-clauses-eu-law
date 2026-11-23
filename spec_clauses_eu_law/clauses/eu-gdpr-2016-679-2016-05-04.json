@@ -63,7 +63,7 @@
     },
     "software-architecture": {
       "kind": "record",
-      "description": "`spec-objects-architecture` parts and connections."
+      "description": "`spec-objects-architecture` `part`, `port`, `connection`, and `allocation` artifacts; ADR artifacts from `spec-artifacts-process`."
     },
     "training-record": {
       "kind": "procedure",
@@ -71,7 +71,7 @@
     },
     "verification-records": {
       "kind": "record",
-      "description": "Test matrix and retained evidence."
+      "description": "`quire matrix` / `quoin matrix` results and `quoin evidence record`."
     },
     "written-procedure": {
       "kind": "procedure",

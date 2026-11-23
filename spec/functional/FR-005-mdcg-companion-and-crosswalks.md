@@ -27,6 +27,7 @@ The MDCG set SHALL use the key, source and section IDs in `spec.md`, with recomm
 | FR-005-AC-1 | MDCG IDs equal the table exactly and every crosswalk target resolves to a loaded MDR clause. | Test |
 | FR-005-AC-2 | A fixture with a missing target fails the pack test and names the crosswalk. | Test |
 | FR-005-AC-3 | All guidance clauses are recommended and use only informative or partial relations. | Test |
+| FR-005-AC-4 | Security-goal section `2.1` expects `security-risk-records`. Post-market and vigilance sections `5.1` and `5.2` expect the customer-supplied `written-procedure`, and no section outside `3.8` expects `release-record` or `anomaly-list`. Section `3.7` crosswalks to `I-17.2` and not `I-17.4`; section `3.6` crosswalks to `I-17.4`; section `3.8` expects `security-risk-records`. | Test |
 
 ## Dependencies
 

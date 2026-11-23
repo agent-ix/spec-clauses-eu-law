@@ -197,9 +197,13 @@ def assert_crosswalk_targets_resolve(
                 target_clause_set = by_key.get(target_key)
                 if target_clause_set is None:
                     target_clause_set = _installed_clause_set(target_key, env)
-                target_clauses = (
-                    target_clause_set.get("clauses", []) if target_clause_set else []
-                )
+                if target_clause_set is None:
+                    raise AssertionError(
+                        f"crosswalk from {source_key}#{crosswalk['sourceClause']} "
+                        f"targets clause set {target_key}, which is neither loaded "
+                        f"nor installed: {target_key}#{target['clause']}"
+                    )
+                target_clauses = target_clause_set.get("clauses", [])
             if not any(clause["id"] == target["clause"] for clause in target_clauses):
                 raise AssertionError(
                     f"crosswalk from {source_key}#{crosswalk['sourceClause']} "
