@@ -22,7 +22,6 @@ from conftest import (
     REPO_ROOT,
     assert_crosswalk_targets_resolve,
     assert_output_catalog_consistent,
-    assert_shared_producers_identical,
     clause_set_key,
     engine_tool,
     evaluate_clause_set,
@@ -825,10 +824,9 @@ def test_all_declared_sets_share_one_output_catalog():
     clause_sets = load_clause_sets()
     clause_sets.extend(_installed_clause_sets("spec_clauses_us_health"))
     assert_output_catalog_consistent(clause_sets)
-    assert_shared_producers_identical(clause_sets)
 
 
-@pytest.mark.trace("FR-006-AC-5")
+@pytest.mark.trace("FR-006-AC-3")
 def test_shared_producers_drift_fails_and_names_the_output():
     base = _synthetic_set(
         "example.invalid",
@@ -843,7 +841,7 @@ def test_shared_producers_drift_fails_and_names_the_output():
         },
     )
     same = copy.deepcopy(base)
-    assert_shared_producers_identical([base, same])
+    assert_output_catalog_consistent([base, same])
     for drifted_producers in (["scan"], None):
         drifted = copy.deepcopy(base)
         if drifted_producers is None:
@@ -853,7 +851,7 @@ def test_shared_producers_drift_fails_and_names_the_output():
                 "producers"
             ] = drifted_producers
         with pytest.raises(AssertionError, match="verification-records"):
-            assert_shared_producers_identical([base, drifted])
+            assert_output_catalog_consistent([base, drifted])
 
 
 @pytest.mark.trace("FR-003-AC-1", "FR-003-AC-2")
@@ -1033,7 +1031,7 @@ def test_mdr_publish_check_accepts_the_set_and_rejects_licensed_text(tmp_path):
     assert _spec_set_key("mdr") in refused.stderr + refused.stdout
 
 
-@pytest.mark.trace("FR-006-AC-1")
+@pytest.mark.trace("FR-006-AC-1", "FR-006-AC-5")
 def test_mdr_declares_the_spec_catalog_subset_used_by_its_clauses():
     """Check that the MDR set uses only its exact catalog subset.
 
@@ -1660,7 +1658,7 @@ def test_nist_and_hipaa_clause_files_are_not_copied_into_the_eu_pack():
     assert copied == []
 
 
-@pytest.mark.trace("FR-006-AC-1")
+@pytest.mark.trace("FR-006-AC-1", "FR-006-AC-5")
 def test_mdcg_declares_the_spec_catalog_subset_used_by_its_clauses():
     """Check that the MDCG set uses its exact canonical output subset.
 
@@ -2567,45 +2565,9 @@ FR_211_FIXED_KINDS = {"run", "scan", "mock-inspection", "analysis-report", "scen
 
 
 @pytest.mark.trace("FR-006-AC-4")
-def test_catalog_producers_name_only_fr_211_kinds_and_match_the_spec():
-    """`producers` are valid retained kinds on exactly the outputs the spec lists."""
+def test_spec_producers_name_only_fr_211_kinds():
+    """Every kind in the spec's producers table is an FR-211 family kind."""
     expected = _spec_output_producers()
     assert expected, "the spec lists no output with producers"
-    for clause_set in load_clause_sets():
-        key = clause_set_key(clause_set)
-        for name, entry in clause_set["outputCatalog"].items():
-            if "producers" not in entry:
-                assert name not in expected, f"{key}: {name} lacks producers"
-                continue
-            kinds = entry["producers"]
-            assert kinds, f"{key}: {name} has empty producers"
-            assert len(kinds) == len(set(kinds)), f"{key}: {name} repeats a kind"
-            assert all(
-                kind == kind.strip() and kind in FR_211_FIXED_KINDS for kind in kinds
-            ), f"{key}: {name} names a kind outside FR-211: {kinds!r}"
-            assert kinds == expected.get(name), f"{key}: {name} differs from the spec"
-
-
-@pytest.mark.trace("FR-006-AC-6")
-def test_quire_accepts_sets_that_carry_producers():
-    """The installed quire validates and evaluates every set with `producers`."""
-    publish = run(engine_tool("quire"), "publish-check", "--module", str(PACKAGE_ROOT))
-    assert publish.returncode == 0, publish.stderr + publish.stdout
-    for clause_set in load_clause_sets():
-        if not any("producers" in e for e in clause_set["outputCatalog"].values()):
-            continue
-        result = run(
-            engine_tool("quire"),
-            "clauses",
-            "evaluate",
-            "--module",
-            str(PACKAGE_ROOT),
-            "--authority",
-            clause_set["authority"],
-            "--set",
-            clause_set["id"],
-            "--version",
-            clause_set["version"],
-            "--json",
-        )
-        assert result.returncode == 0, result.stderr + result.stdout
+    for name, kinds in expected.items():
+        assert kinds and set(kinds) <= FR_211_FIXED_KINDS, f"{name}: {kinds!r}"

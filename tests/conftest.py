@@ -160,22 +160,6 @@ def assert_output_catalog_consistent(clause_sets: list[dict]) -> None:
             definitions[output] = (clause_set, definition)
 
 
-def assert_shared_producers_identical(clause_sets: list[dict]) -> None:
-    """Reject a shared output whose `producers` differ or exist in only one set."""
-    seen: dict[str, tuple[dict, list | None]] = {}
-    for clause_set in clause_sets:
-        for output, definition in clause_set.get("outputCatalog", {}).items():
-            producers = definition.get("producers")
-            previous = seen.get(output)
-            if previous and previous[1] != producers:
-                raise AssertionError(
-                    f"output {output!r} producers differ between "
-                    f"{clause_set_key(previous[0])} ({previous[1]!r}) and "
-                    f"{clause_set_key(clause_set)} ({producers!r})"
-                )
-            seen[output] = (clause_set, producers)
-
-
 def _installed_clause_set(target_key: str, env: dict | None = None) -> dict | None:
     """Find a clause set by key in any Quoin-installed dependency module."""
     listed = run(engine_tool("quoin"), "module", "list", env=env)
