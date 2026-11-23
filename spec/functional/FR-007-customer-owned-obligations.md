@@ -12,14 +12,14 @@ relationships:
 
 ## Description
 
-When a clause has only outputs of kind `procedure`, the pack SHALL require delegated disposition with nonempty rationale and customer `approvalRef`; direct disposition is rejected.
+When a clause has only outputs of kind `procedure`, the pack SHALL require delegated disposition with an `owner`, nonempty rationale and customer `approvalRef`; direct disposition is rejected.
 
 ## Acceptance Criteria
 
 | ID | Criteria | Verification |
 |----|----------|--------------|
-| FR-007-AC-1 | Every all-procedure clause appears in the customer-owned inventory. | Test |
-| FR-007-AC-2 | Delegated disposition with rationale and customer approval reference succeeds; a direct fact is rejected. | Test |
+| FR-007-AC-1 | Every all-procedure clause in every EU set appears in the customer-owned inventory in `spec.md`, and the inventory lists no other clause. | Test |
+| FR-007-AC-2 | Delegated disposition with owner, rationale and customer approval reference succeeds; a direct fact is rejected. | Test |
 
 ## Dependencies
 

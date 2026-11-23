@@ -66,7 +66,7 @@ The table is normative for IDs, applicability and outputs. All outputs resolve i
 | I-4 | always | risk-management-records |
 | I-5 | always | risk-management-records |
 | I-8 | always | risk-management-records |
-| I-14.2(d) | always | it-requirements-statement |
+| I-14.2(d) | always | it-requirements-statement, security-risk-records |
 | I-17.1 | always | software-requirements, software-architecture, verification-records |
 | I-17.2 | always | software-requirements, software-architecture, security-risk-records, verification-records |
 | I-17.3 | eq mobile_platform yes | software-requirements, software-architecture, verification-records |
@@ -205,7 +205,7 @@ The pack includes only the substantive software and cybersecurity sections 2.1â€
 
 | MDCG ID | MDR target | Relation | Rationale | Expected outputs |
 |---|---|---|---|---|
-| 2.1 | I-1 | informative | Introduces the guidance context for risk management; it does not replace the MDR risk-management requirement. | security-risk-records |
+| 2.1 | I-1 | informative | The security goals set the context in which device risks are considered; they do not replace the MDR risk-management requirement. | security-risk-records |
 | 2.1 | I-3 | partial | Connects cybersecurity risk consideration to the broader risk process while covering only the cybersecurity aspect. | risk-management-records, security-risk-records |
 | 2.2 | I-17.2 | partial | Describes cybersecurity as part of software risk management, covering only that aspect of the MDR software lifecycle clause. | security-risk-records |
 | 2.3 | I-17.2 | partial | Frames cybersecurity risk management across the software lifecycle, a subset of the clause's lifecycle activities. | security-risk-records |
@@ -232,7 +232,7 @@ The pack includes only the substantive software and cybersecurity sections 2.1â€
 | 3.7 | I-17.2 | partial | Verification and validation guidance addresses the verification part of the software lifecycle clause for cybersecurity. | verification-records |
 | 3.7 | I-18.8 | partial | Security test evidence shows whether protection against unauthorised access behaves as designed, without covering the design of that protection. | verification-records |
 | 3.8 | I-17.2 | partial | Maintenance guidance covers the post-release part of the software lifecycle, including updates and component advisories. | release-record, soup-list |
-| 3.8 | I-18.8 | partial | Fixing vulnerabilities restores protection against unauthorised access, without covering the design of that protection. | anomaly-list |
+| 3.8 | I-18.8 | partial | Fixing vulnerabilities restores protection against unauthorised access, without covering the design of that protection. | security-risk-records, anomaly-list |
 | 4.1 | I-14.2(d) | partial | Security requirements for the operating environment inform only the IT-infrastructure portion of this requirement. | it-requirements-statement |
 | 4.1 | I-23.4(ab) | informative | User information can inform the security-related content considered for instructions, without asserting full equivalence. | it-requirements-statement |
 | 4.2 | I-23.4(ab) | partial | Security information for users contributes to, but does not exhaust, the information required by this clause. | it-requirements-statement |
@@ -240,7 +240,7 @@ The pack includes only the substantive software and cybersecurity sections 2.1â€
 | 4.3 | I-23.4(ab) | informative | User-facing security considerations may inform instructions but do not establish clause equivalence. | it-requirements-statement |
 | 5.1 | I-3 | partial | Cybersecurity surveillance supplies part of the post-market information that updates the risk process; the manufacturer's own surveillance procedure is customer-supplied. | security-risk-records, written-procedure |
 | 5.1 | I-17.2 | partial | Advisories reported against third-party components inform lifecycle maintenance of the software, covering only that input. | soup-list |
-| 5.2 | I-3 | partial | Incident and vulnerability handling feeds the risk process; the toolchain gathers no incident or vulnerability intelligence, so the response and reporting procedure is customer-supplied. | written-procedure |
+| 5.2 | I-3 | partial | Incident and vulnerability handling feeds the risk process; investigating and reporting incidents is the manufacturer's own procedure, which is customer-supplied. | written-procedure |
 
 ## EU Pack Output Catalog
 
@@ -248,14 +248,14 @@ The same artifact has the same name, kind and description in every EU-law set. E
 
 | Name | Kind | Description |
 |---|---|---|
-| risk-management-records | record | `spec-objects-safety` hazard, harm, risk-estimate, and residual-risk records. |
-| software-requirements | record | Functional and non-functional requirements (FR/NFR). |
-| software-architecture | record | `spec-objects-architecture` parts and connections. |
-| verification-records | record | Test matrix and retained evidence. |
+| risk-management-records | record | `spec-objects-safety` `hazard` and `failure_mode` artifacts; `quoin risk-summary`. |
+| software-requirements | record | Requirements authored with the `spec-artifacts-iso` StR, FR, and NFR archetypes. |
+| software-architecture | record | `spec-objects-architecture` `part`, `port`, `connection`, and `allocation` artifacts; ADR artifacts from `spec-artifacts-process`. |
+| verification-records | record | `quire matrix` / `quoin matrix` results and `quoin evidence record`. |
 | soup-list | record | Software of unknown provenance (SOUP) report. |
 | security-risk-records | record | `spec-objects-security` threat, risk, and control records. |
-| anomaly-list | record | Unresolved-anomaly report. |
-| release-record | record | Engineering-assurance release decision. |
+| anomaly-list | record | Unresolved anomalies reported by `quoin anomaly report`. |
+| release-record | record | Release evidence snapshot produced by `quoin release snapshot`. |
 | it-requirements-statement | document | Customer-supplied statement of minimum hardware, network and IT-security requirements for instructions for use; no toolchain producer. |
 | written-procedure | procedure | Customer-owned written procedure. |
 | signed-record | record | Signed commits and tags verified by the `signature-verify` capability. |
@@ -278,7 +278,11 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | post-market-monitoring-plan | document | Provider plan and evidence for post-market performance monitoring. |
 | conformity-declaration | document | EU declaration of conformity and its controlled reference. |
 
-A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with rationale and customer approval reference, never a direct fact. `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
+A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with an owner, rationale and customer approval reference, never a direct fact. The customer-owned inventory is exhaustive:
+
+| Clause set | Clause ID | Expected outputs |
+|---|---|---|
+| mdcg-2019-16 | 5.2 | written-procedure | `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
 
 ## Requirements Architecture
 
