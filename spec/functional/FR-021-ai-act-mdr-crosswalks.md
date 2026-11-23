@@ -23,6 +23,7 @@ Every Annex IV point SHALL have at least one crosswalk to a resolving MDR Annex 
 | FR-021-AC-1 | Every Annex IV table row has one or more resolving MDR Annex II targets or the explicit `none` value; no row has an omitted target. | Test |
 | FR-021-AC-2 | Every declared target resolves in the loaded MDR set, has relation `partial` or `informative`, and includes a nonempty rationale. | Test |
 | FR-021-AC-3 | An injected unknown target, `equivalent` relation, or empty rationale fails and names its source clause and field. | Test |
+| FR-021-AC-4 | The `art-15` crosswalks to `I-17.2`, `I-17.4` and `I-18.8` describe those MDR clauses by what they cover: `I-17.2` software lifecycle controls including information-security risk management and verification, `I-17.4` the operating prerequisites the manufacturer states, and `I-18.8` protection against unauthorised access. Annex IV point `IV-9` has no Annex II counterpart (`none`). | Test |
 
 ## Dependencies
 
