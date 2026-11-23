@@ -69,3 +69,26 @@ Expected fix: See SR-024 FND-003.
 ## Verdict
 
 Every FR-001, FR-023..FR-028 and NFR-004 criterion except FR-025-AC-5 (Inspection; inspected, clean) is tagged by at least one test in tests/test_annex11.py or tests/test_clause_sets.py, and all of them pass. The gaps are FR-027-AC-2, where the coverage is a test helper and not the product, and FR-028-AC-2, which is only partly covered. Reverse gap: the shipped JSON carries `approvalRoles: [system-owner]`, plus `title` and `subjects` on every clause, and no requirement defines those values (SR-024 FND-002). No stub was found.
+
+## New findings (disposition pass 1)
+
+Reviewed `git diff 645527d4..355a76a9`. Tests: test_annex11.py, test_clause_sets.py, test_pack_discharge.py, 84 passed with spec-clauses-us-health origin/main installed from a temp copy and removed afterwards.
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-003 | medium | `_assert_customer_owned_facts` is still the only customer-owned check behind an FR-007 trace. test_records_facts_and_renders_both_clause_sets is tagged FR-007-AC-2, which now reads 'renders as tailored through quoin discharge --rmm'. That t | tests/test_pack_discharge.py:818-825,908 |
+
+### FND-003 — FR-007-AC-2
+
+`_assert_customer_owned_facts` is still the only customer-owned check behind an FR-007 trace. test_records_facts_and_renders_both_clause_sets is tagged FR-007-AC-2, which now reads 'renders as tailored through quoin discharge --rmm'. That test calls the helper on its own fixture facts (line 908) and never asserts a tailored row (no 'tailored' anywhere in tests/test_pack_discharge.py). The Annex 11 corpus test does assert `tailored` for all ten customer-owned clauses through quoin, but it is tagged FR-027-AC-2, not FR-007-AC-2.
+
+Expected fix: Tag the Annex 11 corpus test with FR-007-AC-2 (it proves the AC through quoin) and drop the FR-007-AC-2 tag from test_records_facts_and_renders_both_clause_sets. Either delete the helper call or keep it only as a fixture sanity check that no trace claims.
+
+## Dispositions
+
+Round 1 at head 355a76a9b4f3b9757913b38bf714ee1aebcbc4b6.
+
+| FND | outcome | reason |
+|---|---|---|
+| FND-001 | deferred | deferred: PLAT-1805. Lead decision (Round 2 lead): rejecting a direct fact on a customer-owned clause is quoin's job under quoin FR-211, which PLAT-1805 is implementing. FR-007-AC-3 and FR-027-AC-6 now state that requirement and are untested until FR-211 ships. The helper-based test test_all_procedure_clauses_accept_only_a_delegated_disposition was removed, and FR-027-AC-2 is narrowed to 'delegated disposition renders tailored', which the corpus test asserts through quoin. |
+| FND-002 | fixed | - |

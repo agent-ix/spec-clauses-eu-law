@@ -818,7 +818,6 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
 @pytest.mark.trace(
     "FR-008-AC-2",
     "FR-008-AC-3",
-    "FR-007-AC-2",
     "FR-012-AC-1",
     "FR-012-AC-2",
     "FR-013-AC-2",
@@ -831,7 +830,7 @@ def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
     Criteria: Every binding MDR, MDCG, GDPR, and AI Act clause except open
     examples has one fact; references resolve; the report index and statuses
     match the acceptance contract; report output excludes clause titles and text.
-    Trace: FR-008-AC-2, FR-008-AC-3, FR-007-AC-2
+    Trace: FR-008-AC-2, FR-008-AC-3
     """
     quire, quoin, assurance = _preflight()
     corpus = _signed_corpus(tmp_path, assurance)

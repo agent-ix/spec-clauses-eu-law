@@ -110,6 +110,16 @@ def _assert_tool_limits(clause_set: dict) -> None:
         ), f"clause {clause['id']} text differs from its summary and tool limits"
 
 
+def _assert_titles_and_subjects(clause_set: dict) -> None:
+    """Compare every clause title and subject list with the spec table."""
+    titles = title_rows()
+    assert set(titles) == {c["id"] for c in clause_set["clauses"]}
+    for clause in clause_set["clauses"]:
+        title, subjects = titles[clause["id"]]
+        assert clause["title"] == title, f"{clause['id']} title"
+        assert clause["subjects"] == subjects, f"{clause['id']} subjects"
+
+
 def _assert_commands_exist(rows: list[dict]) -> None:
     """Every command in the producer-command column answers --help."""
     for row in rows:
@@ -225,16 +235,16 @@ def test_each_second_dimension_gates_its_clauses():
 @pytest.mark.trace("FR-024-AC-6")
 def test_titles_subjects_and_text_follow_the_spec():
     clause_set = _annex()
+    _assert_titles_and_subjects(clause_set)
     _assert_tool_limits(clause_set)
-    titles = title_rows()
-    assert set(titles) == {c["id"] for c in clause_set["clauses"]}
-    for clause in clause_set["clauses"]:
-        title, subjects = titles[clause["id"]]
-        assert clause["title"] == title, clause["id"]
-        assert clause["subjects"] == subjects, clause["id"]
     broken = copy.deepcopy(clause_set)
     broken["clauses"][0]["title"] = "changed"
-    assert broken["clauses"][0]["title"] != titles["1"][0]
+    with pytest.raises(AssertionError, match="title"):
+        _assert_titles_and_subjects(broken)
+    broken = copy.deepcopy(clause_set)
+    broken["clauses"][0]["subjects"] = ["changed"]
+    with pytest.raises(AssertionError, match="subjects"):
+        _assert_titles_and_subjects(broken)
 
 
 @pytest.mark.trace("FR-024-AC-5")

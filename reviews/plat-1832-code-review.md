@@ -100,3 +100,30 @@ Expected fix: Parse the identity and official URL from the Annex 11 Set Design s
 ## Verdict
 
 Not mergeable: one high and two medium findings. Sound: `pytest tests/test_annex11.py tests/test_clause_sets.py tests/test_pack_discharge.py` gives 81 passed, with spec-clauses-us-health origin/main 64f95e4 installed as a module and removed afterwards. The catalog-parity tests now pass, so SR-016 FND-006 is resolved. The JSON has the 34 clauses of the spec table. The spec-table readers cannot pass vacuously: an empty clause, bindings, tool-limit or crosswalk table fails a set-equality or `>=` assertion elsewhere. Clause text and crosswalk rationales are original. Compared with the official 2011 PDF, the longest shared word run is 7 words, a noun list ('patient safety, data integrity and product quality'), and no sentence is copied. No tool assigns a score, class or criticality, and the RMM test checks that no score, percentage or overall key appears. Every producer command answers --help. FR-025-AC-5 (Inspection) has no test: by inspection, no Annex 11 clause text, binding or limit claims a tool verdict.
+
+## New findings (disposition pass 1)
+
+Reviewed `git diff 645527d4..355a76a9`. Tests: test_annex11.py, test_clause_sets.py, test_pack_discharge.py, 84 passed with spec-clauses-us-health origin/main installed from a temp copy and removed afterwards.
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-007 | low | The negative case in test_titles_subjects_and_text_follow_the_spec changes a title on a copy and then asserts the copy differs from the spec value (`assert broken['clauses'][0]['title'] != titles['1'][0]`). It never runs the comparison agai | tests/test_annex11.py:226-238 |
+
+### FND-007 — FR-024-AC-6
+
+The negative case in test_titles_subjects_and_text_follow_the_spec changes a title on a copy and then asserts the copy differs from the spec value (`assert broken['clauses'][0]['title'] != titles['1'][0]`). It never runs the comparison against the broken copy, so it cannot fail. The positive comparison above it is real, so this is a no-op, not a coverage hole.
+
+Expected fix: Factor the title and subject comparison into a helper and assert that it raises on the broken copy, as _assert_tool_limits is tested.
+
+## Dispositions
+
+Round 1 at head 355a76a9b4f3b9757913b38bf714ee1aebcbc4b6.
+
+| FND | outcome | reason |
+|---|---|---|
+| FND-001 | deferred | deferred: PLAT-1805. Lead decision (Round 2 lead): rejecting a direct fact on a customer-owned clause is quoin's job under quoin FR-211, which PLAT-1805 is implementing. FR-007-AC-3 and FR-027-AC-6 now state that requirement and are untested until FR-211 ships. The helper-based test test_all_procedure_clauses_accept_only_a_delegated_disposition was removed, and FR-027-AC-2 is narrowed to 'delegated disposition renders tailored', which the corpus test asserts through quoin. |
+| FND-002 | fixed | - |
+| FND-003 | fixed | - |
+| FND-004 | fixed | - |
+| FND-005 | fixed | - |
+| FND-006 | fixed | - |
