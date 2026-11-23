@@ -52,8 +52,17 @@ Check it with `quoin module list`. The default modules provide the record
 types behind commands such as `quoin risk-summary`.
 
 Several commands in the tables below are `engineering-assurance` commands.
-That CLI is a native binary and is not part of the npm toolchain. Install it
-with Cargo:
+That CLI is a native binary and is not part of the npm toolchain.
+On Linux x86-64, download the latest release binary and put it on your `PATH`:
+
+```sh
+curl -fsSL -o engineering-assurance \
+  https://github.com/agent-ix/engineering-assurance/releases/latest/download/engineering-assurance
+chmod +x engineering-assurance
+mv engineering-assurance ~/.local/bin/
+```
+
+On other platforms, build it with Cargo:
 
 ```sh
 cargo install --git https://github.com/agent-ix/engineering-assurance \

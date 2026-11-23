@@ -48,3 +48,26 @@ What holds up:
 | FND-008 | low | The producer attribution is off in two Annex 11 rows. Row 14(a) lists `engineering-assurance approval-trail`, but none of its outputs is produced by approval-trail: signer-registry's producer is "none" (spec/spec.md:291), and approval-trail only reads it. Row 8.1 lists matrix and evidence audit but leaves out `engineering-assurance approval-trail`, which the record-export catalog entry also names. Fix: 14(a) Tool produces `approval-verify` only; add approval-trail to 8.1. | README.md:250, 260 |
 | FND-009 | low | Install does not say where the engineering-assurance CLI comes from. Eight table rows name `engineering-assurance` commands, but the npm toolchain ships only `quoin` and `quire`, and the default `engineering-assurance` module provides schemas, not the binary. Separately, lines 29-30 tell adopters to install "the security object module for NIST", but `quoin module ensure-defaults` already installs spec-objects-security. Fix: add one line on getting the engineering-assurance CLI. Drop the NIST install advice, or say it comes with the defaults. | README.md:29-30, 32-48 |
 | FND-010 | low | The README is inconsistent with the US pack README (spec-clauses-us-health#40). The headings differ: "What each clause needs" here, "What each clause set needs" there, and "Contributing" here, "Development" there. The install order is reversed. This README marks empty cells "-" where the US one says "Nothing", and the two define "Tool produces" differently. The shared limits are missing: "Evidence checks are shallow" (the example's nonexistent `evidence://acme/...` ref is accepted as Compliant, which I verified) and "not legal advice and does not certify anything". Fix: align the headings, the install order and the Tool-produces definition, and copy the shared limit wording. | README.md:32-45, 100-106, 266-293 |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-011 | low | The engineering-assurance install offers only `cargo install --git ... --locked --features full --bin engineering-assurance`. That command is valid: the `engineering-assurance` bin requires `full`. But a prebuilt binary also exists. The v0.10.1 GitHub release (Latest) carries one asset, `engineering-assurance` (26,350,832 bytes, application/octet-stream), and spec-clauses-us-health's ci.yml downloads it with curl on `ubuntu-latest`. An adopter on Linux x86-64 does not need a Rust toolchain. Fix: offer the download first, using the unpinned `https://github.com/agent-ix/engineering-assurance/releases/latest/download/engineering-assurance` URL so that no version pin sits in prose. Say it is a Linux x86-64 binary, and keep Cargo as the route for other platforms. | README.md:54-61 |
+
+## Dispositions
+
+Round 1 checks `git diff 21083644..7b7462b7`. I re-ran the new README example verbatim (lines 92-121) in a scratch clone with a throwaway HOME: `npm ci` from npmjs only (quoin 0.36.10, quire 0.52.1), then `ensure-defaults` and the git install. All steps exit 0. The four rows printed under `eu/gdpr-2016-679@2016-05-04` match README lines 132-135 byte for byte. I also probed the new state legend. An expired `temporary_exception` prints `Not compliant - temporary exception expired`, and a missing context prints `Unresolved` / `Undetermined: ...`. Both match lines 328-333.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | Lines 145-151 now say these records are yours and are schema-checked by `quire validate`, which does not judge content. Data flows are read by `quoin dossier generate` and a Baseline by `engineering-assurance release-verify`. "Nothing" means that no command writes a report. |
+| FND-002 | fixed | Lines 318-337 give a full state legend. Every state in it matches what quoin 0.36.10 prints, including attestation not current, temporary exception expired, approval reference missing, Undetermined/Unresolved and Not applicable. |
+| FND-003 | fixed | Lines 70-77 name the required fact fields. Lines 99-112 show facts.json, and the example reproduces exactly. |
+| FND-004 | fixed | Rows 4.2, 8.1, 8.2 and 10 (lines 285, 296, 297, 299) now carry the record-export and change-assurance limits. |
+| FND-005 | fixed | Line 162 now reads "I-1 to I-5, I-8". |
+| FND-006 | fixed | Lines 124-136 show the real header and all six columns verbatim, with escaping, and say what was trimmed. |
+| FND-007 | fixed | Line 238 now reads "ai_high_risk=yes and ai_role=deployer". Line 246 names the per-point `ai_annex_iv_*_applicable` dimension and says a missing one shows as Undetermined. |
+| FND-008 | fixed | Row 14(a) (line 306) now lists only `approval-verify`. Row 8.1 (line 296) adds `engineering-assurance approval-trail`. |
+| FND-009 | fixed | Lines 54-61 now say where the engineering-assurance CLI comes from, and line 34 says NIST comes with the default modules. The new low FND-011 asks for the release-binary route in addition. |
+| FND-010 | fixed | Headings, install order, "Nothing", the Tool-produces definition, "Evidence checks are shallow", "not legal advice" and "Development" now match the US README. |
