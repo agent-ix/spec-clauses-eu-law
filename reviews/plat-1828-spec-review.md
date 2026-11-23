@@ -33,3 +33,20 @@ Ticket: PLAT-1828. PR agent-ix/spec-clauses-eu-law#23 at head 082a7ee32e8b5e7f6c
 - Checked the IV-9 `none` row against the section 155 prose ("`none` records that no direct Annex II counterpart is asserted"): consistent.
 - Checked the art-73 inventory row against the FR-007 "exhaustive" rule and the data: consistent.
 - No paywalled standard text and no ticket narration in the spec edits.
+
+## Dispositions
+
+Disposition pass 1, head cba6ffb91b6170f5a192ead07d3670e38239e157, fix commits 96e9d2f and cba6ffb.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | FR-021 is retitled "AI Act to MDR crosswalks", and its statement now covers the provider set's article crosswalks. That statement's Annex I wording is wrong for art-9 (see FND-003). |
+| FND-002 | fixed | The art-20 and art-73 output rule moved to FR-017-AC-6. The IV-9 half of FR-021-AC-4 is dropped, and IV-9 → none stays covered by the FR-021-AC-1 table-equality test: restoring the old IV-9 crosswalk fails it. |
+
+## New findings (disposition pass 1)
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-003 | high | The new FR-021 sentence "The provider set's article crosswalks (`art-9`, `art-15`) SHALL target resolving MDR Annex I clauses" is false for the data: `art-9` → `II-5` targets Annex II. No test checks which annex is targeted, so this passes unnoticed. Fix: "SHALL target resolving MDR Annex I or Annex II clauses", or drop the annex qualifier. | spec/functional/FR-021-ai-act-mdr-crosswalks.md:17, spec_clauses_eu_law/clauses/eu-ai-act-2024-1689-2026-07-27.json (art-9 → II-5) |
+
+Coverage for this pass: `quire validate` with spec-artifacts-iso passes on spec.md, FR-017 and FR-021 (exit 0). Full `spec/**/*.md` validation exits 0; its only warnings are EARS warnings on FR-024, FR-027 and FR-028, which came from PR #21, not this PR. The rebase merge of spec.md is clean. The catalog keeps the six customer-supplied AI rows next to the Annex 11 supplier rows, and the inventory lists art-20, art-73, MDCG 5.2 and the Annex 11 rows with no duplicates.

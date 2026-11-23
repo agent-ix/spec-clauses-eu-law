@@ -34,3 +34,12 @@ The remaining defect is art-20 (FND-001). One low wording point (FND-002) is opt
 - Fail-on-old-data: the branch tests were run in a temporary copy with origin/main `spec.md` and both AI Act JSON files. `test_ai_act_outputs_without_a_producer_are_marked_customer_supplied` and `test_ai_act_art_15_crosswalks_describe_the_mdr_clauses_they_target` both fail. Neither pins a count or a version.
 - Hard rules: the diff has no standard text or designators and no ticket narration in prose, JSON or test docstrings. Nothing is vendored: the US catalog is read from the installed module.
 - Concurrent PR #21 also edits spec.md. That is a rebase concern, not a finding.
+
+## Dispositions
+
+Disposition pass 1, head cba6ffb91b6170f5a192ead07d3670e38239e157 (rebased onto main after PR #21), fix commits 96e9d2f and cba6ffb.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | art-20 now expects only `written-procedure` in spec/spec.md:146 and in the JSON. It is in the Customer-Owned Obligations inventory, and the new FR-017-AC-6 test asserts it. That test fails on origin/main data, and also on the previous PR head's JSON with only art-20 left unfixed. |
+| FND-002 | fixed | The I-17.4 rationale now reads "The minimum hardware, network and IT-security prerequisites the manufacturer states bound the conditions the AI system operates in, without covering the accuracy, robustness or cybersecurity evaluation itself." The FR-021-AC-4 test asserts that phrase. |

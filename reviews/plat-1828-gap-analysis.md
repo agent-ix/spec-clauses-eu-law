@@ -32,3 +32,11 @@ Ticket: PLAT-1828. PR agent-ix/spec-clauses-eu-law#23 at head 082a7ee32e8b5e7f6c
 - Focused run on the branch, with the US module installed from a temporary copy of us-health origin/main: 21 passed in `test_clause_sets.py` and 15 passed in `test_pack_discharge.py`.
 - On old data (origin/main spec.md and AI Act JSON in a temporary copy), both new tests fail.
 - No stubs. The `CUSTOMER_SUPPLIED_AI_OUTPUTS` constant restates the AC's own list. It is the assertion's subject, not a count pin.
+
+## Dispositions
+
+Disposition pass 1, head cba6ffb91b6170f5a192ead07d3670e38239e157, fix commits 96e9d2f and cba6ffb.
+
+| FND | outcome | reason |
+| --- | --- | --- |
+| FND-001 | fixed | FR-017-AC-5 now exempts the customer-owned `written-procedure`. The test skips only `kind == "procedure"` outputs and asserts that each remaining non-customer-supplied description names a backticked command or archetype. The art-73 half moved to the new FR-017-AC-6, with its own test. Focused run: 26 passed in `test_clause_sets.py` and 14 in `test_pack_discharge.py`, with a throwaway HOME and us-health origin/main installed. All three PLAT-1828 tests fail on origin/main data. |
