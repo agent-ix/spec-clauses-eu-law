@@ -278,11 +278,15 @@ The same artifact has the same name, kind and description in every EU-law set. E
 | post-market-monitoring-plan | document | Provider plan and evidence for post-market performance monitoring. |
 | conformity-declaration | document | EU declaration of conformity and its controlled reference. |
 
-A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with an owner, rationale and customer approval reference, never a direct fact. The customer-owned inventory is exhaustive:
+`tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
+
+## Customer-Owned Obligations
+
+A clause whose expected outputs are all procedures is customer-owned and requires a delegated disposition with an owner, rationale and customer approval reference, never a direct fact. The inventory is exhaustive:
 
 | Clause set | Clause ID | Expected outputs |
 |---|---|---|
-| mdcg-2019-16 | 5.2 | written-procedure | `tests/corpus/` is synthetic; every synthetic ID and evidence reference uses `example.invalid`, and discharge facts are written to a temporary store.
+| mdcg-2019-16 | 5.2 | written-procedure |
 
 ## Requirements Architecture
 
