@@ -188,7 +188,7 @@ The `ai_annex_iv_<point>_applicable` dimensions are person-supplied yes/no value
 
 The Annex 11 set uses authority `eu`, ID `eu-gmp-annex-11`, and version `2011-01`. The source is EudraLex Volume 4, Annex 11 "Computerised Systems", the January 2011 revision published by the European Commission, which the Commission's Volume 4 page lists as the current Annex 11. The official document URL is `https://health.ec.europa.eu/document/download/8d305550-dd22-4dad-8463-2ddb4a1345f1_en?filename=annex11_01-2011_en.pdf` and the listing page is `https://health.ec.europa.eu/medicinal-products/eudralex/eudralex-volume-4_en`. The version string is the year and month of the revision in force. A draft revision of Annex 11 was published for stakeholder consultation in July 2025 with comments due 7 October 2025; it is a draft, not in force, and this set does not specify it. If the Commission adopts a revised Annex 11, the adopted text is a new set version named by its own revision date, and the `2011-01` set stays unchanged for systems still assessed against the 2011 text.
 
-Rights are `structure: citation_only`, `text: original`, and `clearance_ref: null`. Licence metadata states that European Commission documents are reusable under the Commission reuse policy (Decision 2011/833/EU), that the Commission legal notice (`https://commission.europa.eu/legal-notice_en`) licenses Commission content under CC BY 4.0 with attribution, and that the Annex 11 document carries no separate licence statement of its own. Attribution states `© European Union. Source: <{official document URL}>. Original summaries; changes made.` The set reproduces no Annex 11 sentence, so it does not depend on the reuse licence for any copied text.
+Rights are `structure: citation_only`, `text: original`, and `clearance_ref: null`. Licence metadata says exactly: `European Commission documents may be reused under the Commission reuse policy (Decision 2011/833/EU); the Commission legal notice (https://commission.europa.eu/legal-notice_en) licenses Commission content under CC BY 4.0 with attribution. The Annex 11 document carries no licence statement of its own. This set reproduces no Annex 11 text.` Attribution says `© European Union. Source: <{official document URL}>. Original summaries; changes made.` The set reproduces no Annex 11 sentence, so it does not depend on the reuse licence for any copied text.
 
 Annex 11 is part of the EU GMP guidelines, which interpret the binding GMP requirements; its wording is "should". All clauses are therefore `recommended`. The module does not say whether a system complies with the underlying GMP law.
 
@@ -418,6 +418,16 @@ A clause whose expected outputs are all procedures is customer-owned and require
 | Clause set | Clause ID | Expected outputs |
 |---|---|---|
 | mdcg-2019-16 | 5.2 | written-procedure |
+| eu-gmp-annex-11 | 2 | written-procedure, training-record |
+| eu-gmp-annex-11 | 3.1 | supplier-agreement |
+| eu-gmp-annex-11 | 3.2 | supplier-assessment |
+| eu-gmp-annex-11 | 3.4 | supplier-assessment |
+| eu-gmp-annex-11 | 4.5 | supplier-assessment, written-procedure |
+| eu-gmp-annex-11 | 7.2 | backup-restore-record, written-procedure |
+| eu-gmp-annex-11 | 11 | periodic-evaluation-record |
+| eu-gmp-annex-11 | 15 | batch-certification-record, written-procedure |
+| eu-gmp-annex-11 | 16 | business-continuity-plan |
+| eu-gmp-annex-11 | 17 | archive-verification-record, written-procedure |
 
 ## Requirements Architecture
 
