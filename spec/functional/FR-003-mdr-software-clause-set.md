@@ -25,6 +25,7 @@ The MDR set SHALL use the source, key, version, clause IDs, mandatory force, app
 | FR-003-AC-1 | IDs equal the MDR table exactly, including punctuation and no extra clauses. | Test |
 | FR-003-AC-2 | Every clause is mandatory, has original nonempty text and at least one catalog output; set validation succeeds. | Test |
 | FR-003-AC-3 | A clause referencing an output missing from its catalog fails validation and names the clause. | Test |
+| FR-003-AC-4 | Clause `I-17.4` expects `it-requirements-statement` and `security-risk-records`, and `I-18.8` expects `security-risk-records` and `verification-records`; neither expects `release-record`, `anomaly-list`, or `soup-list`. `it-requirements-statement` is described as customer-supplied with no toolchain producer. | Test |
 
 ## Dependencies
 
