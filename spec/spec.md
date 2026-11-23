@@ -143,7 +143,7 @@ This table is normative for IDs, force, applicability, and expected outputs. The
 | `art-17` | Quality-management system | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `written-procedure`, `audit-trail` |
 | `art-18` | Retention of documentation and logs | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `model-description`, `event-logging-design` |
 | `art-19` | Automatically generated logs under provider control | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `event-logging-design` |
-| `art-20` | Corrective action and authority notification | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `written-procedure`, `release-record` |
+| `art-20` | Corrective action and authority notification | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `written-procedure` |
 | `art-26` | Deployer use, oversight, monitoring and incident duties | `all[eq ai_high_risk yes, eq ai_role deployer]` | mandatory | `human-oversight-design`, `written-procedure`, `event-logging-design` |
 | `art-43` | Conformity-assessment route | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `conformity-declaration`, `verification-records` |
 | `art-47` | EU declaration of conformity | `all[eq ai_high_risk yes, eq ai_role provider]` | mandatory | `conformity-declaration` |
@@ -458,6 +458,7 @@ A clause whose expected outputs are all procedures is customer-owned and require
 
 | Clause set | Clause ID | Expected outputs |
 |---|---|---|
+| ai-act-2024-1689 | art-20 | written-procedure |
 | ai-act-2024-1689 | art-73 | written-procedure |
 | mdcg-2019-16 | 5.2 | written-procedure |
 | eu-gmp-annex-11 | 2 | written-procedure, training-record |
