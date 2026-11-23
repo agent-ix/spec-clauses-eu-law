@@ -453,8 +453,7 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "written-procedure",
-        "release-record"
+        "written-procedure"
       ],
       "applicability": {
         "op": "all",
@@ -657,7 +656,7 @@
         "clause": "I-17.4"
       },
       "relation": "partial",
-      "rationale": "The operating prerequisites the manufacturer states for the software relate to the intended operating conditions over which the AI system is evaluated, without covering the accuracy, robustness or cybersecurity evaluation itself."
+      "rationale": "The minimum hardware, network and IT-security prerequisites the manufacturer states bound the conditions the AI system operates in, without covering the accuracy, robustness or cybersecurity evaluation itself."
     },
     {
       "sourceClause": "art-15",
