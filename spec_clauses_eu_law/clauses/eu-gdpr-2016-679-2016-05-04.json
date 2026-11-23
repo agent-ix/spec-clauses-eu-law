@@ -37,10 +37,6 @@
     }
   },
   "outputCatalog": {
-    "access-control": {
-      "kind": "record",
-      "description": "Repository permission and branch-rule settings."
-    },
     "data-flow-model": {
       "kind": "record",
       "description": "Architecture connections with their declared data flows and classifications."
@@ -51,7 +47,11 @@
     },
     "privacy-by-default-settings": {
       "kind": "record",
-      "description": "Declared default processing settings and data-minimisation choices."
+      "description": "Customer-supplied record of declared default processing settings and data-minimisation choices; no toolchain producer."
+    },
+    "processing-access-control": {
+      "kind": "record",
+      "description": "`spec-objects-security` `security.role` and `security.permission` records the customer authors for the personal-data processing system, or customer-supplied evidence of who may process personal data and on whose instructions; the clause set defines no producer."
     },
     "records-of-processing": {
       "kind": "record",
@@ -510,7 +510,8 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "records-of-processing"
+        "records-of-processing",
+        "written-procedure"
       ],
       "applicability": {
         "op": "eq",
@@ -615,7 +616,7 @@
       "approvalRoles": [],
       "styles": {},
       "expectedOutputs": [
-        "access-control",
+        "processing-access-control",
         "written-procedure",
         "training-record"
       ]

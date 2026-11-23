@@ -1688,6 +1688,54 @@ def test_gdpr_clause_ids_fields_and_catalog_match_the_spec():
     )
 
 
+@pytest.mark.trace("FR-010-AC-3")
+def test_gdpr_processing_outputs_are_product_side_and_customer_supplied():
+    """Check Article 32(4) and privacy-by-default name honest outputs.
+
+    Assumptions: Repository permissions describe the development repository,
+    not the controller's processing.
+    Criteria: art-32(4) names the processing-system output, no GDPR clause binds
+    repository `access-control`, and the two outputs without a producer say so.
+    """
+    clause_set = _gdpr_set()
+    by_id = {clause["id"]: clause for clause in clause_set["clauses"]}
+    assert "processing-access-control" in by_id["art-32(4)"]["expectedOutputs"]
+    assert not any(
+        "access-control" in clause["expectedOutputs"] for clause in by_id.values()
+    )
+    assert "access-control" not in clause_set["outputCatalog"]
+    catalog = clause_set["outputCatalog"]
+    assert "repository" not in catalog["processing-access-control"]["description"]
+    for name in ("processing-access-control", "privacy-by-default-settings"):
+        assert (
+            "no toolchain producer" in catalog[name]["description"]
+            or "defines no producer" in catalog[name]["description"]
+        ), name
+
+
+@pytest.mark.trace("FR-010-AC-4")
+def test_gdpr_art30_supervisory_access_names_a_person_procedure():
+    """Check Article 30(4) is not discharged by the generated record alone.
+
+    Assumptions: Making a record available on request is a person's action.
+    Criteria: art-30(4) names `written-procedure` beside the record.
+    """
+    clause = next(c for c in _gdpr_set()["clauses"] if c["id"] == "art-30(4)")
+    assert clause["expectedOutputs"] == ["records-of-processing", "written-procedure"]
+
+
+@pytest.mark.trace("FR-012-AC-1")
+def test_gdpr_article35_clauses_declare_the_privacy_officer_role():
+    """Check approval roles sit on exactly the Article 35 clauses.
+
+    Assumptions: Quoin verifies approvals for clauses that declare a role.
+    Criteria: Every art-35 clause declares `privacy-officer`; no other clause does.
+    """
+    for clause in _gdpr_set()["clauses"]:
+        expected = ["privacy-officer"] if clause["id"].startswith("art-35") else []
+        assert clause["approvalRoles"] == expected, clause["id"]
+
+
 @pytest.mark.trace(
     "FR-011-AC-1", "FR-011-AC-2", "FR-011-AC-3", "FR-011-AC-4", "FR-011-AC-5"
 )

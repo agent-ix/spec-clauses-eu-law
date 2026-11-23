@@ -1,0 +1,18 @@
+{
+  "recordType": "synthetic-customer-supplied-processing-access-control",
+  "suppliedBy": "customer",
+  "processing": {
+    "roles": [
+      "support-reviewer"
+    ],
+    "permissions": [
+      {
+        "role": "support-reviewer",
+        "verb": "read",
+        "resource": "service-request"
+      }
+    ],
+    "instruction": "Reviewers process service requests only as the controller's support procedure directs."
+  },
+  "owner": "person://example.invalid/people/privacy-officer"
+}

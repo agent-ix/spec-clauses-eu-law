@@ -54,7 +54,9 @@ GDPR_EVIDENCE_REFS = {
     ),
     "security-risk-records": "evidence://example.invalid/security/RISK-002.md",
     "software-architecture": "evidence://example.invalid/architecture/evidence_store.md",
-    "access-control": "evidence://example.invalid/security/CTRL-001.md",
+    "processing-access-control": (
+        "evidence://example.invalid/gdpr/processing-access-control.json"
+    ),
     "written-procedure": "evidence://example.invalid/requirements/FR-001.md",
     "training-record": "evidence://example.invalid/requirements/NFR-001.md",
     "verification-records": "evidence://example.invalid/tests/TM-001.md",
@@ -651,7 +653,6 @@ def test_ai_act_human_oversight_requires_named_person_approval():
         _assert_named_person_approvals(missing_approval)
 
 
-@pytest.mark.trace("FR-012-AC-1", "FR-012-AC-2")
 @pytest.mark.parametrize(
     "fact",
     [
@@ -696,11 +697,46 @@ def test_gdpr_dpia_direct_fact_passes_with_named_approval():
     )
 
 
-@pytest.mark.trace("FR-012-AC-1")
-def test_gdpr_dpia_direct_fact_without_approval_stays_open(
-    tmp_path: pathlib.Path,
+def _dpia_fact(shape: str, approval_ref: str | None) -> dict:
+    """Return an Art 35(1) fact of the given shape with the given approval."""
+    if shape == "direct":
+        fact = {
+            "kind": "direct",
+            "clauseId": "art-35(1)",
+            "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
+            "attestation": {
+                "attestedBy": "reviewer@example.invalid",
+                "authority": "quality-lead@example.invalid",
+                "attestedAt": AS_OF,
+                "expiresAt": "2027-11-15T00:00:00Z",
+            },
+        }
+    else:
+        fact = {
+            "kind": "disposition",
+            "clauseId": "art-35(1)",
+            "decision": "accepted_risk",
+            "owner": "person://example.invalid/people/privacy-officer",
+            "rationale": "The residual risk was reviewed.",
+            "attestation": {
+                "attestedBy": "reviewer@example.invalid",
+                "authority": "quality-lead@example.invalid",
+                "attestedAt": AS_OF,
+                "expiresAt": "2027-11-15T00:00:00Z",
+            },
+        }
+    if approval_ref is not None:
+        fact["approvalRef"] = approval_ref
+    return fact
+
+
+@pytest.mark.trace("FR-012-AC-1", "FR-012-AC-2")
+@pytest.mark.parametrize("shape", ["direct", "disposition"])
+@pytest.mark.parametrize("approval_ref", [None, "", "   "])
+def test_gdpr_dpia_fact_without_approval_ref_stays_open(
+    tmp_path: pathlib.Path, shape: str, approval_ref: str | None
 ):
-    """Keep an Art 35 direct fact open when its approval reference is absent."""
+    """Quoin leaves an Art 35 clause undischarged without an approval reference."""
     quire, quoin, _ = _preflight()
     config_root = tmp_path / "config"
     config_root.mkdir()
@@ -738,23 +774,7 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
     binding_path = tmp_path / "binding.json"
     binding_path.write_text(json.dumps(binding))
     facts_path = tmp_path / "facts.json"
-    facts_path.write_text(
-        json.dumps(
-            [
-                {
-                    "kind": "direct",
-                    "clauseId": "art-35(1)",
-                    "evidenceRefs": [GDPR_EVIDENCE_REFS["dpia"]],
-                    "attestation": {
-                        "attestedBy": "reviewer@example.invalid",
-                        "authority": "quality-lead@example.invalid",
-                        "attestedAt": AS_OF,
-                        "expiresAt": "2027-11-15T00:00:00Z",
-                    },
-                }
-            ]
-        )
-    )
+    facts_path.write_text(json.dumps([_dpia_fact(shape, approval_ref)]))
     store = tmp_path / "evidence-store"
     recorded = run(
         quoin,
@@ -807,8 +827,6 @@ def test_gdpr_dpia_direct_fact_without_approval_stays_open(
 @pytest.mark.trace(
     "FR-008-AC-2",
     "FR-008-AC-3",
-    "FR-012-AC-1",
-    "FR-012-AC-2",
     "FR-013-AC-2",
 )
 def test_records_facts_and_renders_both_clause_sets(tmp_path: pathlib.Path):
