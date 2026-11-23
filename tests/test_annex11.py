@@ -584,7 +584,9 @@ def _rows(report: dict) -> dict[str, dict]:
     return {cid: rows[0] for cid, rows in found.items()}
 
 
-@pytest.mark.trace("FR-027-AC-1", "FR-027-AC-2", "FR-027-AC-4", "FR-027-AC-5")
+@pytest.mark.trace(
+    "FR-007-AC-2", "FR-027-AC-1", "FR-027-AC-2", "FR-027-AC-4", "FR-027-AC-5"
+)
 def test_corpus_discharge_partitions_every_clause_without_a_verdict(tmp_path):
     from test_pack_discharge import _assert_fact_refs_resolve
 
