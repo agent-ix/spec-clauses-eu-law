@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import shutil
 import subprocess
+import sys
 import tarfile
 from importlib.util import module_from_spec, spec_from_file_location
 
@@ -197,3 +199,41 @@ def test_scan_archive_checks_clause_ignored_by_package_gitignore(tmp_path):
 
     assert not accepted
     assert findings == ["package/clauses/evil.json:1: external-publication-identifier"]
+
+
+def test_release_gate_accepts_freshly_built_wheel_and_npm_archive(tmp_path):
+    """Run the release workflow's gate over the real wheel and npm archive."""
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    built = run(
+        "poetry", "build", "--format", "wheel", "--output", str(dist), cwd=REPO_ROOT
+    )
+    assert built.returncode == 0, built.stderr
+    environment = {**os.environ, "npm_config_userconfig": os.devnull}
+    packed = subprocess.run(
+        ["npm", "pack", "--pack-destination", str(dist)],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+        env=environment,
+        check=False,
+    )
+    assert packed.returncode == 0, packed.stderr
+
+    result = run(
+        sys.executable,
+        str(REPO_ROOT / "scripts" / "publish_gate.py"),
+        "--module",
+        str(REPO_ROOT / "spec_clauses_eu_law"),
+        "--wheel-dir",
+        str(dist),
+        "--npm-dir",
+        str(dist),
+        "--engineering-assurance",
+        _rights_tool(),
+        "--quire",
+        engine_tool("quire"),
+        cwd=REPO_ROOT,
+    )
+
+    assert result.returncode == 0, result.stderr
