@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: agent-ix/engineering-assurance
-          ref: v0.10.1
+          ref: 19d33f6792ffc731aee2d8de8e46c13d6c54cc58
           path: .deps/engineering-assurance
       - uses: dtolnay/rust-toolchain@stable
         with:
