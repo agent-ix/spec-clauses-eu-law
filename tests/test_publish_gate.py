@@ -201,6 +201,7 @@ def test_scan_archive_checks_clause_ignored_by_package_gitignore(tmp_path):
     assert findings == ["package/clauses/evil.json:1: external-publication-identifier"]
 
 
+@pytest.mark.trace("NFR-001-AC-2")
 def test_release_gate_accepts_freshly_built_wheel_and_npm_archive(tmp_path):
     """Run the release workflow's gate over the real wheel and npm archive."""
     dist = tmp_path / "dist"
